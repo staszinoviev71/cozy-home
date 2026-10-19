@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Уютный Дом — Liquid Glass & Animated Alter-Ego</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FF5E62;
+      --primary-glow: rgba(255, 94, 98, 0.45);
+      --accent-cyan: #00F2FE;
+      --accent-purple: #9B51E0;
+      --accent-amber: #FF9900;
+      
+      /* Liquid Glass tokens */
+      --glass-bg: rgba(255, 255, 255, 0.22);
+      --glass-bg-subtle: rgba(255, 255, 255, 0.12);
+      --glass-bg-solid: rgba(255, 255, 255, 0.78);
+      --glass-border: rgba(255, 255, 255, 0.45);
+      --glass-border-light: rgba(255, 255, 255, 0.65);
+      --glass-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+      --glass-blur: blur(28px) saturate(190%);
+      
+      --text-dark: #16181D;
+      --text-soft: #4E525E;
+      --text-muted: #8E93A3;
+      --phone-radius: 48px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0B0E17;
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Жидкие фоновые световые пятна (Liquid Mesh / Aura) */
+    .ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.6;
+      animation: floatBlob 16s ease-in-out infinite alternate;
+    }
+
+    .blob-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, #FF5E62 0%, #FF9966 60%);
+      top: -150px;
+      left: -100px;
+    }
+
+    .blob-2 {
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, #7F00FF 0%, #E100FF 60%);
+      bottom: -200px;
+      right: -100px;
+      animation-delay: -6s;
+    }
+
+    .blob-3 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, #00F2FE 0%, #4FACFE 60%);
+      top: 40%;
+      left: 40%;
+      transform: translate(-50%, -50%);
+      animation-delay: -11s;
+      opacity: 0.35;
+    }
+
+    @keyframes floatBlob {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      50% { transform: translate(60px, 40px) scale(1.12) rotate(40deg); }
+      100% { transform: translate(-40px, 80px) scale(0.95) rotate(-20deg); }
+    }
+
+    /* Стеклянная верхняя панель управления */
+    header {
+      background: rgba(18, 22, 34, 0.65);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon-glass {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.08));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 24px var(--primary-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .brand-title h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .liquid-tag {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      background: linear-gradient(135deg, #FF6B8B, #FF8E53);
+      padding: 3px 10px;
+      border-radius: 20px;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(255, 107, 139, 0.4);
+    }
+
+    .brand-title p {
+      font-size: 12px;
+      color: #A0A5B5;
+    }
+
+    /* Навигационные табы */
+    .screen-tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(20px);
+      padding: 4px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      gap: 4px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: #B5B9C8;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: #FFFFFF;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.1));
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Основная область */
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 36px 24px 60px;
+      gap: 44px;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Смартфон Samsung Galaxy A54 */
+    .phone-container {
+      position: sticky;
+      top: 94px;
+      flex-shrink: 0;
+    }
+
+    .phone-mockup {
+      width: 385px;
+      height: 790px;
+      background: #090B10;
+      border-radius: var(--phone-radius);
+      padding: 10px;
+      box-shadow: 0 35px 80px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 0 50px rgba(255, 94, 98, 0.18);
+      position: relative;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: #0F131D;
+      border-radius: calc(var(--phone-radius) - 8px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Вырез камеры и статусбар */
+    .status-bar {
+      height: 38px;
+      padding: 10px 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      z-index: 20;
+    }
+
+    .camera-punch {
+      width: 12px;
+      height: 12px;
+      background: #000;
+      border-radius: 50%;
+      position: absolute;
+      top: 13px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+      z-index: 30;
+    }
+
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 74px;
+      position: relative;
+    }
+
+    .screen-content::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Стеклянный Liquid Glass Bottom Nav */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 68px;
+      background: rgba(18, 24, 38, 0.72);
+      backdrop-filter: blur(24px) saturate(200%);
+      -webkit-backdrop-filter: blur(24px) saturate(200%);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 12px;
+      z-index: 25;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #7B8196;
+      font-size: 10.5px;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .nav-item .icon {
+      font-size: 20px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-pill {
+      width: 110px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 4px;
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    /* Liquid Glass Push Notification */
+    .push-toast {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(30px) saturate(190%);
+      -webkit-backdrop-filter: blur(30px) saturate(190%);
+      border-radius: 24px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 20px 45px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.06);
+      z-index: 99;
+      display: none;
+      color: #1A1A1E;
+      animation: slideDownGlass 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideDownGlass {
+      from { transform: translateY(-90px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .push-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+
+    .push-app-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .push-body {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #1A1A1E;
+      line-height: 1.35;
+    }
+
+    .push-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .push-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .push-btn.primary {
+      background: linear-gradient(135deg, #FF5E62, #FF8E53);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(255, 94, 98, 0.35);
+    }
+
+    .push-btn.secondary {
+      background: rgba(0,0,0,0.06);
+      color: #333;
+    }
+
+    /* Сайдбар описания справа */
+    .details-panel {
+      flex: 1;
+      max-width: 680px;
+      background: rgba(18, 23, 37, 0.65);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 32px;
+      padding: 38px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .details-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.2), rgba(255, 142, 83, 0.2));
+      border: 1px solid rgba(255, 94, 98, 0.4);
+      color: #FFA39E;
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .details-panel h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+      line-height: 1.25;
+    }
+
+    .details-panel p.lead {
+      font-size: 15px;
+      color: #B5B9C8;
+      line-height: 1.6;
+      margin-bottom: 26px;
+    }
+
+    .feature-card-glass {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 22px;
+      margin-bottom: 18px;
+      transition: all 0.2s;
+    }
+
+    .feature-card-glass:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .feature-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .feature-icon-glass {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .feature-card-glass h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .feature-card-glass p {
+      font-size: 13.5px;
+      color: #9EA3B5;
+      line-height: 1.55;
+    }
+
+    .status-picker-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 18px 0 24px;
+    }
+
+    .status-preview-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .status-preview-pill:hover, .status-preview-pill.active {
+      background: rgba(255, 94, 98, 0.15);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .status-preview-pill .icon {
+      font-size: 26px;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .status-preview-pill .name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #E2E4EC;
+    }
+
+    /* ===================================================
+       АНИМИРОВАННЫЙ МУЛЬТЯШНЫЙ АВАТАР (SVG CHARACTER)
+       =================================================== */
+
+    .avatar-wrapper {
+      position: relative;
+      width: 82px;
+      height: 82px;
+      border-radius: 26px;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.05));
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2), 0 0 20px var(--primary-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: visible;
+    }
+
+    /* Интерактивные SVG-эмоции персонажа */
+    .character-svg {
+      width: 64px;
+      height: 64px;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Анимации персонажа */
+    @keyframes breatheBody {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-3px) scale(1.02, 0.98); }
+    }
+
+    @keyframes happyBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-7px) rotate(-3deg); }
+      75% { transform: translateY(-3px) rotate(3deg); }
+    }
+
+    @keyframes tiredSway {
+      0%, 100% { transform: rotate(-3deg) translateY(2px); }
+      50% { transform: rotate(3deg) translateY(4px); }
+    }
+
+    @keyframes hungryDream {
+      0%, 100% { transform: scale(1) translateY(0); }
+      50% { transform: scale(1.04) translateY(-2px); }
+    }
+
+    @keyframes sadDroop {
+      0%, 100% { transform: translateY(3px) scale(0.96); }
+      50% { transform: translateY(5px) scale(0.94); }
+    }
+
+    @keyframes floatingHeart {
+      0% { transform: translateY(0) scale(0.8); opacity: 0; }
+      50% { transform: translateY(-12px) scale(1.1); opacity: 1; }
+      100% { transform: translateY(-24px) scale(0.9); opacity: 0; }
+    }
+
+    @keyframes tearDrop {
+      0% { transform: translateY(0); opacity: 0; }
+      40% { opacity: 1; }
+      100% { transform: translateY(12px); opacity: 0; }
+    }
+
+    @keyframes zzzFloat {
+      0% { transform: translate(0, 0) scale(0.6); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translate(14px, -18px) scale(1.1); opacity: 0; }
+    }
+
+    .anim-happy { animation: happyBounce 2s ease-in-out infinite; }
+    .anim-tired { animation: tiredSway 3.5s ease-in-out infinite; }
+    .anim-hungry { animation: hungryDream 2.5s ease-in-out infinite; }
+    .anim-sad { animation: sadDroop 3s ease-in-out infinite; }
+    .anim-cozy { animation: breatheBody 3s ease-in-out infinite; }
+    .anim-grumpy { animation: breatheBody 1.4s ease-in-out infinite; }
+
+    /* Парящие микро-эффекты рядом с аватаром */
+    .avatar-particle {
+      position: absolute;
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    .particle-heart {
+      top: -4px;
+      right: -4px;
+      animation: floatingHeart 2.2s infinite ease-out;
+    }
+
+    .particle-zzz {
+      top: -8px;
+      right: -2px;
+      animation: zzzFloat 2.6s infinite ease-out;
+      font-weight: 800;
+      color: #89CFF0;
+      font-size: 12px;
+    }
+
+    .particle-tear {
+      bottom: 22px;
+      right: 18px;
+      width: 5px;
+      height: 8px;
+      background: #00F2FE;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      animation: tearDrop 2s infinite ease-in;
+    }
+
+    .particle-food {
+      top: -12px;
+      left: -8px;
+      font-size: 18px;
+      animation: happyBounce 3s infinite ease-in-out;
+    }
+
+    /* ===================================================
+       1. СТЕКЛЯННЫЙ ВИДЖЕТ ONE UI (НА РАБОЧЕМ СТОЛЕ)
+       =================================================== */
+
+    .desktop-wallpaper {
+      height: 100%;
+      background: linear-gradient(145deg, #182239 0%, #2A173B 50%, #0F172A 100%);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .desktop-clock {
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 24px;
+      color: #FFFFFF;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    .desktop-clock .time {
+      font-family: 'Outfit', sans-serif;
+      font-size: 52px;
+      font-weight: 300;
+      letter-spacing: -1.5px;
+      line-height: 1;
+    }
+
+    .desktop-clock .date {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.85;
+      margin-top: 6px;
+    }
+
+    /* САМ ВИДЖЕТ LIQUID GLASS */
+    .liquid-widget {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.07) 100%);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border-radius: 28px;
+      padding: 16px 18px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+      margin-bottom: 20px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+
+    .liquid-widget:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.4), 0 0 25px var(--primary-glow);
+    }
+
+    .widget-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .widget-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: #FFA39E;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .widget-pulse-dot {
+      width: 7px;
+      height: 7px;
+      background: #00F2FE;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00F2FE;
+      animation: pulseDot 2s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    .widget-time-ago {
+      font-size: 11px;
+      color: #B5B9C8;
+      font-weight: 600;
+    }
+
+    .widget-body-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .widget-info-col h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.25;
+      margin-bottom: 3px;
+    }
+
+    .widget-info-col p {
+      font-size: 12.5px;
+      color: #CFD3E2;
+      line-height: 1.35;
+    }
+
+    .widget-actions-grid {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .glass-btn {
+      flex: 1;
+      padding: 9px 8px;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.2s;
+    }
+
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.26);
+      border-color: rgba(255, 255, 255, 0.45);
+      transform: translateY(-1px);
+    }
+
+    /* Иконки приложений на рабочем столе */
+    .desktop-app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: auto;
+      padding-bottom: 12px;
+    }
+
+    .app-icon-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .app-icon-squircle {
+      width: 56px;
+      height: 56px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      position: relative;
+    }
+
+    .app-icon-squircle.main-app {
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.7), rgba(255, 142, 83, 0.6));
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 25px var(--primary-glow);
+    }
+
+    .app-badge-pill {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #FF3366;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(255, 51, 102, 0.6);
+      border: 2px solid #0F131D;
+    }
+
+    .app-label {
+      font-size: 11px;
+      color: #FFFFFF;
+      font-weight: 600;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    /* ===================================================
+       2. ЭКРАН ВНУТРИ ПРИЛОЖЕНИЯ (LIQUID GLASS APP UI)
+       =================================================== */
+
+    .app-inner-screen {
+      padding: 16px 18px;
+    }
+
+    .app-header-glass {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .user-greeting h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .user-greeting p {
+      font-size: 12.5px;
+      color: #9EA3B5;
+    }
+
+    .mini-status-glass {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 5px 12px 5px 8px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* Карточка смены настроения (Liquid Glass) */
+    .mood-glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 26px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .card-title-row h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .mood-character-preview {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 14px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .preview-texts h5 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 2px;
+    }
+
+    .preview-texts p {
+      font-size: 12px;
+      color: #A0A5B5;
+    }
+
+    /* Сетка выбора настроений */
+    .mood-liquid-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .mood-tile {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 10px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mood-tile:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .mood-tile.active {
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.35), rgba(255, 142, 83, 0.2));
+      border: 1px solid var(--primary);
+      box-shadow: 0 6px 18px var(--primary-glow);
+      transform: translateY(-2px);
+    }
+
+    .mood-tile .tile-emoji {
+      font-size: 24px;
+    }
+
+    .mood-tile .tile-name {
+      font-size: 10px;
+      font-weight: 700;
+      color: #B5B9C8;
+      text-align: center;
+    }
+
+    .mood-tile.active .tile-name {
+      color: #FFFFFF;
+    }
+
+    /* Срочные SOS-кнопки «Купи...» */
+    .sos-pushes-card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .sos-pushes-card h4 {
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #FFFFFF;
+    }
+
+    .sos-chips-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .sos-chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 14px;
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+      cursor: pointer;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .sos-chip:hover {
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.4), rgba(255, 142, 83, 0.3));
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    /* Большая кнопка мужа «Я зашел в магазин» */
+    .market-entry-glass {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(74, 222, 128, 0.25) 0%, rgba(34, 197, 94, 0.12) 100%);
+      border: 1px solid rgba(74, 222, 128, 0.45);
+      border-radius: 22px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.18);
+      margin-bottom: 18px;
+      transition: all 0.2s;
+      color: #FFFFFF;
+    }
+
+    .market-entry-glass:hover {
+      transform: translateY(-2px);
+      border-color: rgba(74, 222, 128, 0.7);
+      box-shadow: 0 12px 30px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Сводка покупок в приложении */
+    .shopping-glass-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 18px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .shopping-glass-item.checked {
+      opacity: 0.45;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .shopping-glass-item.checked .item-text-title {
+      text-decoration: line-through;
+    }
+
+    .glass-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .shopping-glass-item.checked .glass-checkbox {
+      background: #22C55E;
+      border-color: #22C55E;
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .item-text-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .item-text-sub {
+      font-size: 11px;
+      color: #FFA39E;
+      font-weight: 600;
+    }
+
+    .photo-preview-pill {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    /* Адаптивность для мобильных */
+    @media (max-width: 950px) {
+      main {
+        flex-direction: column;
+        align-items: center;
+      }
+      .phone-container {
+        position: static;
+      }
+      .details-panel {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Динамические жидкие световые шары на фоне -->
+  <div class="ambient-canvas">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Верхняя шапка -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon-glass">✨</div>
+      <div class="brand-title">
+        <h1>Уютный Дом <span class="liquid-tag">Liquid Glass 2.0</span></h1>
+        <p>Анимированный аватар-персонаж & современное жидкое стекло</p>
+      </div>
+    </div>
+
+    <!-- Вкладки экранов -->
+    <div class="screen-tabs">
+      <button class="tab-btn active" onclick="switchScreen('widget')">
+        <span>📱</span> Виджет One UI
+      </button>
+      <button class="tab-btn" onclick="switchScreen('home')">
+        <span>💖</span> Настроение & Персонаж
+      </button>
+      <button class="tab-btn" onclick="switchScreen('shopping')">
+        <span>🛒</span> Умный список
+      </button>
+      <button class="tab-btn" onclick="switchScreen('dinner')">
+        <span>🍳</span> Ужин & Вишлист
+      </button>
+      <button class="tab-btn" onclick="switchScreen('passport')">
+        <span>📋</span> Паспорт дома
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Рамка смартфона Samsung Galaxy A54 -->
+    <div class="phone-container">
+      <div class="phone-mockup">
+        <div class="phone-screen">
+          
+          <!-- Вырез фронтальной камеры Samsung A54 -->
+          <div class="camera-punch"></div>
+
+          <!-- Статус-бар Android -->
+          <div class="status-bar" id="statusBar">
+            <span>19:30</span>
+            <div style="display:flex; align-items:center; gap:6px; font-size:12px;">
+              <span>📶 5G</span>
+              <span>🔋 92%</span>
+            </div>
+          </div>
+
+          <!-- Всплывающий Liquid Glass Пуш -->
+          <div class="push-toast" id="pushToast">
+            <div class="push-header">
+              <div class="push-app-title">
+                <span>✨</span> Уютный дом
+              </div>
+              <span style="font-size:10px; color:#888;">сейчас</span>
+            </div>
+            <div class="push-body" id="pushBodyText">
+              Жена: «Купи, пожалуйста, свежий бородинский хлеб! 🥖»
+            </div>
+            <div class="push-actions">
+              <button class="push-btn primary" onclick="dismissPush('Куплю!')">👍 Куплю сейчас!</button>
+              <button class="push-btn secondary" onclick="dismissPush('В списке')">👀 Открыть список</button>
+            </div>
+          </div>
+
+          <!-- Контент экрана внутри телефона -->
+          <div class="screen-content" id="screenContent">
+            <!-- Динамический рендер -->
+          </div>
+
+          <!-- Стеклянный Bottom Nav (внутри приложения) -->
+          <div class="bottom-nav" id="bottomNav" style="display:none;">
+            <button class="nav-item active" onclick="switchScreen('home')">
+              <span class="icon">🏠</span>
+              <span>Дом</span>
+            </button>
+            <button class="nav-item" onclick="switchScreen('shopping')">
+              <span class="icon">🛒</span>
+              <span>Покупки</span>
+            </button>
+            <button class="nav-item" onclick="switchScreen('dinner')">
+              <span class="icon">✨</span>
+              <span>Ужин & Wish</span>
+            </button>
+            <button class="nav-item" onclick="switchScreen('passport')">
+              <span class="icon">📋</span>
+              <span>Паспорт</span>
+            </button>
+          </div>
+
+          <!-- Навигационная полоса Android -->
+          <div class="nav-pill"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Сайдбар с описанием концепции Liquid Glass и аватара -->
+    <div class="details-panel" id="detailsPanel">
+      <!-- Динамический рендер сайдбара -->
+    </div>
+  </main>
+
+  <script>
+    // База разнообразных эмоциональных статусов жены с анимированными аватарами
+    const moods = [
+      {
+        id: 'happy',
+        title: 'На волне радости! ✨',
+        sub: 'Отличный вайб, куча энергии, обнимаю весь мир!',
+        type: 'happy',
+        animClass: 'anim-happy',
+        particle: '<span class="avatar-particle particle-heart">💖</span>',
+        bodyColor: '#FF8A65',
+        faceDetails: 'happy'
+      },
+      {
+        id: 'tired',
+        title: 'Села батарейка 🪫',
+        sub: 'Тяжелый день... Нужен горячий чай, плед и тишина',
+        type: 'tired',
+        animClass: 'anim-tired',
+        particle: '<span class="avatar-particle particle-zzz">Zzz</span>',
+        bodyColor: '#90A4AE',
+        faceDetails: 'tired'
+      },
+      {
+        id: 'hungry',
+        title: 'Хочу кушать! 🍕',
+        sub: 'Срочно требуется пицца, суши или сытный ужин',
+        type: 'hungry',
+        animClass: 'anim-hungry',
+        particle: '<span class="avatar-particle particle-food">🍣</span>',
+        bodyColor: '#FFB74D',
+        faceDetails: 'hungry'
+      },
+      {
+        id: 'sad',
+        title: 'Нужны обнимашки 🥺',
+        sub: 'Немного грустно, просто побудь со мной рядом',
+        type: 'sad',
+        animClass: 'anim-sad',
+        particle: '<div class="avatar-particle particle-tear"></div>',
+        bodyColor: '#64B5F6',
+        faceDetails: 'sad'
+      },
+      {
+        id: 'treat',
+        title: 'Сладкоежка 🧁',
+        sub: 'Жизненно необходима шоколадка, круассан или тортик',
+        type: 'treat',
+        animClass: 'anim-happy',
+        particle: '<span class="avatar-particle particle-food">🍩</span>',
+        bodyColor: '#F06292',
+        faceDetails: 'treat'
+      },
+      {
+        id: 'grumpy',
+        title: 'Вредничаю 😾',
+        sub: 'Не трогать без вкусняшки! Надула щечки',
+        type: 'grumpy',
+        animClass: 'anim-grumpy',
+        particle: '<span class="avatar-particle" style="top:-8px; right:-2px;">🗯️</span>',
+        bodyColor: '#E57373',
+        faceDetails: 'grumpy'
+      },
+      {
+        id: 'cozy',
+        title: 'Уютная булочка 🥐',
+        sub: 'Закуталась в самый теплый плед, смотрю сериал',
+        type: 'cozy',
+        animClass: 'anim-cozy',
+        particle: '<span class="avatar-particle" style="top:-8px; right:-2px;">☕</span>',
+        bodyColor: '#FFD54F',
+        faceDetails: 'cozy'
+      },
+      {
+        id: 'love',
+        title: 'Люблю & Скучаю 🥰',
+        sub: 'Очень жду тебя домой, считаю минутки до встречи',
+        type: 'love',
+        animClass: 'anim-happy',
+        particle: '<span class="avatar-particle particle-heart">❤️</span>',
+        bodyColor: '#FF4081',
+        faceDetails: 'love'
+      }
+    ];
+
+    let currentScreen = 'widget';
+    let currentMood = moods[0]; // По умолчанию радостная
+
+    let shoppingItems = [
+      { id: 1, name: 'Молоко 3.2% Parmalat', comment: 'Именно в синей пачке', photo: '🥛', checked: false },
+      { id: 2, name: 'Свежий багет / хлеб', comment: 'Хрустящий', photo: '🥖', checked: false },
+      { id: 3, name: 'Сыр Маасдам Excelsior', comment: 'Фото упаковки прикреплено', photo: '🧀', checked: true },
+      { id: 4, name: 'Яблоки Голден', comment: '1 кг, желтые спелые', photo: '🍏', checked: false }
+    ];
+
+    // Генератор векторного анимированного мультяшного альтер-эго
+    function getCharacterSvg(moodObj) {
+      const color = moodObj.bodyColor;
+      let eyesHtml = '';
+      let mouthHtml = '';
+      let blushHtml = '<circle cx="16" cy="38" r="5" fill="#FF4081" opacity="0.35"/><circle cx="48" cy="38" r="5" fill="#FF4081" opacity="0.35"/>';
+      let extraHtml = '';
+
+      if (moodObj.faceDetails === 'happy' || moodObj.faceDetails === 'love') {
+        eyesHtml = `
+          <!-- Счастливые глазки-дуги -->
+          <path d="M16 30 Q 22 23 28 30" stroke="#1D1D26" stroke-width="3" stroke-linecap="round" fill="none" />
+          <path d="M36 30 Q 42 23 48 30" stroke="#1D1D26" stroke-width="3" stroke-linecap="round" fill="none" />
+        `;
+        mouthHtml = `
+          <path d="M26 38 Q 32 46 38 38" stroke="#1D1D26" stroke-width="3" stroke-linecap="round" fill="#FF4D6D" />
+        `;
+      } else if (moodObj.faceDetails === 'tired') {
+        eyesHtml = `
+          <!-- Сонные прикрытые глазки -->
+          <path d="M16 32 L 28 32" stroke="#1D1D26" stroke-width="3.5" stroke-linecap="round" />
+          <path d="M36 32 L 48 32" stroke="#1D1D26" stroke-width="3.5" stroke-linecap="round" />
+        `;
+        mouthHtml = `
+          <!-- Зевок -->
+          <ellipse cx="32" cy="41" rx="4" ry="6" fill="#1D1D26" />
+        `;
+      } else if (moodObj.faceDetails === 'hungry') {
+        eyesHtml = `
+          <!-- Блестящие большие круглые глазки -->
+          <circle cx="21" cy="30" r="5" fill="#1D1D26" />
+          <circle cx="19.5" cy="28.5" r="2" fill="#FFFFFF" />
+          <circle cx="43" cy="30" r="5" fill="#1D1D26" />
+          <circle cx="41.5" cy="28.5" r="2" fill="#FFFFFF" />
+        `;
+        mouthHtml = `
+          <!-- Ротик пускает слюнки / улыбка предвкушения -->
+          <path d="M26 39 Q 32 47 38 39" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="#FF708D" />
+          <circle cx="39" cy="45" r="2" fill="#00F2FE" />
+        `;
+      } else if (moodObj.faceDetails === 'sad') {
+        eyesHtml = `
+          <!-- Жалобные бровки и глаза -->
+          <path d="M17 26 Q 22 29 27 28" stroke="#1D1D26" stroke-width="2" stroke-linecap="round" fill="none" />
+          <path d="M37 28 Q 42 29 47 26" stroke="#1D1D26" stroke-width="2" stroke-linecap="round" fill="none" />
+          <circle cx="21" cy="32" r="4.5" fill="#1D1D26" />
+          <circle cx="20" cy="31" r="1.5" fill="#FFFFFF" />
+          <circle cx="43" cy="32" r="4.5" fill="#1D1D26" />
+          <circle cx="42" cy="31" r="1.5" fill="#FFFFFF" />
+        `;
+        mouthHtml = `
+          <!-- Грустная дуга -->
+          <path d="M27 43 Q 32 38 37 43" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="none" />
+        `;
+      } else if (moodObj.faceDetails === 'grumpy') {
+        eyesHtml = `
+          <!-- Сердитые бровки -->
+          <path d="M17 27 L 27 30" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" />
+          <path d="M37 30 L 47 27" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="23" cy="33" r="3.5" fill="#1D1D26" />
+          <circle cx="41" cy="33" r="3.5" fill="#1D1D26" />
+        `;
+        mouthHtml = `
+          <path d="M28 42 L 36 42" stroke="#1D1D26" stroke-width="3" stroke-linecap="round" />
+        `;
+        blushHtml = '<circle cx="15" cy="38" r="6" fill="#FF3366" opacity="0.6"/><circle cx="49" cy="38" r="6" fill="#FF3366" opacity="0.6"/>';
+      } else if (moodObj.faceDetails === 'cozy' || moodObj.faceDetails === 'treat') {
+        eyesHtml = `
+          <path d="M17 31 Q 22 26 27 31" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="none" />
+          <path d="M37 31 Q 42 26 47 31" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="none" />
+        `;
+        mouthHtml = `
+          <path d="M28 39 Q 32 44 36 39" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="#FF708D" />
+        `;
+      }
+
+      return `
+        <svg class="character-svg ${moodObj.animClass}" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Милые мультяшные ушки -->
+          <path d="M12 24 C 6 12, 18 6, 23 19 Z" fill="${color}" stroke="#FFFFFF" stroke-width="1.5" />
+          <path d="M14 20 C 10 13, 17 9, 20 18 Z" fill="#FFE5EB" />
+          <path d="M52 24 C 58 12, 46 6, 41 19 Z" fill="${color}" stroke="#FFFFFF" stroke-width="1.5" />
+          <path d="M50 20 C 54 13, 47 9, 44 18 Z" fill="#FFE5EB" />
+
+          <!-- Тело/Мордочка персонажа -->
+          <ellipse cx="32" cy="35" rx="24" ry="21" fill="${color}" stroke="#FFFFFF" stroke-width="1.5" />
+          
+          <!-- Румянец -->
+          ${blushHtml}
+
+          <!-- Глазки -->
+          ${eyesHtml}
+
+          <!-- Милый носик -->
+          <ellipse cx="32" cy="34" rx="2" ry="1.5" fill="#1D1D26" />
+
+          <!-- Ротик -->
+          ${mouthHtml}
+        </svg>
+      `;
+    }
+
+    // Переключение экранов
+    function switchScreen(screen) {
+      currentScreen = screen;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes(screen));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      const navMapping = { home: 0, shopping: 1, dinner: 2, passport: 3 };
+      if (navMapping[screen] !== undefined) {
+        document.querySelectorAll('.nav-item')[navMapping[screen]]?.classList.add('active');
+      }
+
+      renderScreen();
+      renderDetails();
+    }
+
+    function setMoodById(id) {
+      const found = moods.find(m => m.id === id);
+      if (found) {
+        currentMood = found;
+        renderScreen();
+        renderDetails();
+        triggerPush('Жена обновила альтер-эго: ' + found.title);
+      }
+    }
+
+    function toggleCheck(id) {
+      const item = shoppingItems.find(x => x.id === id);
+      if (item) {
+        item.checked = !item.checked;
+        renderScreen();
+      }
+    }
+
+    function triggerPush(text) {
+      const toast = document.getElementById('pushToast');
+      document.getElementById('pushBodyText').innerText = text;
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 5000);
+    }
+
+    function dismissPush(reply) {
+      document.getElementById('pushToast').style.display = 'none';
+      alert('Ответ отправлен жене: "' + reply + '"');
+    }
+
+    // Рендер экранов телефона
+    function renderScreen() {
+      const container = document.getElementById('screenContent');
+      const bottomNav = document.getElementById('bottomNav');
+      const statusBar = document.getElementById('statusBar');
+
+      if (currentScreen === 'widget') {
+        bottomNav.style.display = 'none';
+        container.innerHTML = `
+          <div class="desktop-wallpaper">
+            <div class="desktop-clock">
+              <div class="time">19:30</div>
+              <div class="date">Понедельник, 19 октября</div>
+            </div>
+
+            <!-- ИНТЕРАКТИВНЫЙ LIQUID GLASS ВИДЖЕТ -->
+            <div class="liquid-widget" onclick="switchScreen('home')">
+              <div class="widget-header-row">
+                <span class="widget-tag">
+                  <span class="widget-pulse-dot"></span>
+                  Настроение жены
+                </span>
+                <span class="widget-time-ago">только что</span>
+              </div>
+
+              <div class="widget-body-row">
+                <div class="avatar-wrapper">
+                  ${getCharacterSvg(currentMood)}
+                  ${currentMood.particle}
+                </div>
+                <div class="widget-info-col">
+                  <h4>${currentMood.title}</h4>
+                  <p>${currentMood.sub}</p>
+                </div>
+              </div>
+
+              <div class="widget-actions-grid">
+                <button class="glass-btn" onclick="event.stopPropagation(); triggerPush('Муж отправил виртуальное объятие! 💖');">
+                  <span>🫂</span> Обнять
+                </button>
+                <button class="glass-btn" onclick="event.stopPropagation(); triggerPush('Муж: «Уже еду домой!» 🚗');">
+                  <span>🚗</span> Уже еду
+                </button>
+                <button class="glass-btn" onclick="event.stopPropagation(); switchScreen('shopping');">
+                  <span>🛒</span> ${shoppingItems.filter(i => !i.checked).length} в списке
+                </button>
+              </div>
+            </div>
+
+            <!-- Иконки на рабочем столе One UI -->
+            <div class="desktop-app-grid">
+              <div class="app-icon-wrap" onclick="switchScreen('home')">
+                <div class="app-icon-squircle main-app">
+                  <span>🏡</span>
+                  <div class="app-badge-pill">2</div>
+                </div>
+                <span class="app-label">Уютный Дом</span>
+              </div>
+              <div class="app-icon-wrap">
+                <div class="app-icon-squircle"><span>💬</span></div>
+                <span class="app-label">Сообщения</span>
+              </div>
+              <div class="app-icon-wrap">
+                <div class="app-icon-squircle"><span>📞</span></div>
+                <span class="app-label">Телефон</span>
+              </div>
+              <div class="app-icon-wrap">
+                <div class="app-icon-squircle"><span>📷</span></div>
+                <span class="app-label">Камера</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (currentScreen === 'home') {
+        bottomNav.style.display = 'flex';
+        container.innerHTML = `
+          <div class="app-inner-screen">
+            <div class="app-header-glass">
+              <div class="user-greeting">
+                <h3>Привет, Любимая ✨</h3>
+                <p>Дом под контролем • Связь отличная</p>
+              </div>
+              <div class="mini-status-glass">
+                <span style="font-size:16px;">🏡</span>
+                <span>На связи</span>
+              </div>
+            </div>
+
+            <!-- Блок управления персонажем и настроением -->
+            <div class="mood-glass-card">
+              <div class="card-title-row">
+                <h4>Твое альтер-эго сейчас</h4>
+                <span style="font-size:11px; color:#FFA39E; font-weight:700;">Синхронно с мужем</span>
+              </div>
+
+              <div class="mood-character-preview">
+                <div class="avatar-wrapper" style="width:72px; height:72px;">
+                  ${getCharacterSvg(currentMood)}
+                  ${currentMood.particle}
+                </div>
+                <div class="preview-texts">
+                  <h5>${currentMood.title}</h5>
+                  <p>${currentMood.sub}</p>
+                </div>
+              </div>
+
+              <!-- Сетка смены настроений -->
+              <div class="mood-liquid-grid">
+                ${moods.map(m => `
+                  <div class="mood-tile ${currentMood.id === m.id ? 'active' : ''}" onclick="setMoodById('${m.id}')">
+                    <span class="tile-emoji">${m.faceDetails === 'happy' ? '🌟' : m.faceDetails === 'tired' ? '😴' : m.faceDetails === 'hungry' ? '🍕' : m.faceDetails === 'sad' ? '🥺' : m.faceDetails === 'treat' ? '🧁' : m.faceDetails === 'grumpy' ? '😾' : m.faceDetails === 'cozy' ? '🥐' : '🥰'}</span>
+                    <span class="tile-name">${m.id === 'happy' ? 'Весёлая' : m.id === 'tired' ? 'Устала' : m.id === 'hungry' ? 'Голодная' : m.id === 'sad' ? 'Грустная' : m.id === 'treat' ? 'Сладкое' : m.id === 'grumpy' ? 'Вредная' : m.id === 'cozy' ? 'Уютная' : 'Люблю'}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Быстрые SOS-пуши -->
+            <div class="sos-pushes-card">
+              <h4><span>⚡</span> Срочно отправить мужу в пуш:</h4>
+              <div class="sos-chips-scroll">
+                <div class="sos-chip" onclick="triggerPush('Жена: «Купи, пожалуйста, свежий бородинский хлеб! 🥖»')">
+                  <span>🥖</span> Хлеб
+                </div>
+                <div class="sos-chip" onclick="triggerPush('Жена: «Захвати молоко к кофе на утро! 🥛»')">
+                  <span>🥛</span> Молоко
+                </div>
+                <div class="sos-chip" onclick="triggerPush('Жена: «Привези что-нибудь вкусненькое к чаю! 🍰»')">
+                  <span>🍰</span> Вкусняшку
+                </div>
+                <div class="sos-chip" onclick="triggerPush('Жена: «Закончилась питьевая вода! 💧»')">
+                  <span>💧</span> Воду
+                </div>
+              </div>
+            </div>
+
+            <!-- Кнопка «Я зашел в магазин» -->
+            <button class="market-entry-glass" onclick="triggerPush('🔔 Муж зашел в магазин! Есть 5 минут проверить корзину.')">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:24px;">🛒</span>
+                <div style="text-align:left;">
+                  <div style="font-size:14px; font-weight:800;">Я зашёл в супермаркет!</div>
+                  <div style="font-size:11px; opacity:0.8;">Тихий пуш жене: есть 5 мин докинуть товар</div>
+                </div>
+              </div>
+              <span style="font-size:16px;">➔</span>
+            </button>
+          </div>
+        `;
+      } else if (currentScreen === 'shopping') {
+        bottomNav.style.display = 'flex';
+        container.innerHTML = `
+          <div class="app-inner-screen">
+            <div class="app-header-glass">
+              <div>
+                <h3 style="font-size:20px; font-weight:700;">Список покупок 🛒</h3>
+                <p style="font-size:11px; color:#A0A5B5;">Синхронизация между двумя Galaxy A54</p>
+              </div>
+              <span style="font-size:11.5px; font-weight:800; background:rgba(34,197,94,0.2); color:#4ADE80; padding:4px 10px; border-radius:12px; border:1px solid rgba(74,222,128,0.3);">
+                ${shoppingItems.filter(i => !i.checked).length} осталось
+              </span>
+            </div>
+
+            <!-- Строка добавления с фото -->
+            <div style="display:flex; gap:8px; margin-bottom:16px;">
+              <input type="text" placeholder="Добавить товар..." style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:10px 14px; color:#fff; font-family:inherit; font-size:13px; outline:none;">
+              <button style="width:42px; height:42px; border-radius:14px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer;" onclick="alert('Камера Samsung открыта: сфотографируйте нужную пачку!')">📷</button>
+              <button style="width:42px; height:42px; border-radius:14px; background:linear-gradient(135deg, #FF5E62, #FF8E53); border:none; color:#fff; font-size:18px; cursor:pointer;" onclick="alert('Товар добавлен в список!')">＋</button>
+            </div>
+
+            <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#8E93A3; margin:14px 4px 8px; letter-spacing:0.6px;">Надо купить</div>
+            ${shoppingItems.filter(i => !i.checked).map(item => `
+              <div class="shopping-glass-item" onclick="toggleCheck(${item.id})">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div class="glass-checkbox"></div>
+                  <div>
+                    <div class="item-text-title">${item.name}</div>
+                    <div class="item-text-sub">${item.comment}</div>
+                  </div>
+                </div>
+                <div class="photo-preview-pill" onclick="event.stopPropagation(); alert('Показано сохраненное фото упаковки: «${item.name}»');">
+                  <span>${item.photo}</span>
+                </div>
+              </div>
+            `).join('')}
+
+            <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#8E93A3; margin:18px 4px 8px; letter-spacing:0.6px;">Уже в тележке</div>
+            ${shoppingItems.filter(i => i.checked).map(item => `
+              <div class="shopping-glass-item checked" onclick="toggleCheck(${item.id})">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div class="glass-checkbox">✓</div>
+                  <div>
+                    <div class="item-text-title">${item.name}</div>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else if (currentScreen === 'dinner') {
+        bottomNav.style.display = 'flex';
+        container.innerHTML = `
+          <div class="app-inner-screen">
+            <div style="background:linear-gradient(135deg, rgba(255,142,83,0.2), rgba(255,94,98,0.1)); border:1px solid rgba(255,142,83,0.3); border-radius:22px; padding:16px; margin-bottom:16px;">
+              <h4 style="font-size:15px; font-weight:800; color:#FFA39E; margin-bottom:4px;">Что на ужин? 🍝</h4>
+              <p style="font-size:12px; color:#CFD3E2;">Выберите любимое блюдо — продукты сами полетят в список покупок</p>
+            </div>
+
+            <div class="shopping-glass-item" style="display:block; padding:14px; margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="font-size:14px; font-weight:800; color:#fff;">Паста Карбонара 🍝</div>
+                <span style="font-size:11px; color:#A0A5B5;">⏱ 25 мин</span>
+              </div>
+              <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:10px;">Спагетти, бекон, сыр Пармезан, яйца, перец</div>
+              <button class="glass-btn" style="width:100%; padding:8px;" onclick="alert('Все недостающие ингредиенты добавлены в список покупок!')">
+                🛒 Добавить недостающее в список
+              </button>
+            </div>
+
+            <!-- Вишлист радостей -->
+            <div style="margin-top:22px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-size:14px; font-weight:800; color:#fff;">Вишлист маленьких радостей 🎁</h4>
+                <span style="font-size:11px; color:var(--primary); font-weight:700; cursor:pointer;">+ Добавить</span>
+              </div>
+
+              <div class="shopping-glass-item">
+                <div>
+                  <div style="font-size:13px; font-weight:700; color:#fff;">Аромасвеча Black Vanilla</div>
+                  <div style="font-size:11px; color:#9EA3B5;">Zara Home</div>
+                </div>
+                <span style="font-size:10px; font-weight:800; background:rgba(155,81,224,0.25); color:#D8B4FE; padding:3px 8px; border-radius:10px; border:1px solid rgba(155,81,224,0.4);">
+                  🔒 Секрет куплен
+                </span>
+              </div>
+
+              <div class="shopping-glass-item">
+                <div>
+                  <div style="font-size:13px; font-weight:700; color:#fff;">Махровые теплые носочки</div>
+                  <div style="font-size:11px; color:#9EA3B5;">Бежевые, размер 37</div>
+                </div>
+                <button class="glass-btn" style="font-size:10.5px; padding:4px 8px;" onclick="alert('Куплено тайно: пуш жене отключен!')">
+                  Купить тайно
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (currentScreen === 'passport') {
+        bottomNav.style.display = 'flex';
+        container.innerHTML = `
+          <div class="app-inner-screen">
+            <div class="app-header-glass">
+              <div>
+                <h3 style="font-size:20px; font-weight:700;">Паспорт дома 📋</h3>
+                <p style="font-size:11px; color:#A0A5B5;">Все важные коды и размеры в одном месте</p>
+              </div>
+              <span style="font-size:18px;">🔑</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-bottom:14px;">
+              <div class="shopping-glass-item" style="display:block; padding:12px;">
+                <div style="font-size:20px; margin-bottom:6px;">🔢</div>
+                <div style="font-size:11px; color:#8E93A3; font-weight:700;">Домофон</div>
+                <div style="font-size:14px; font-weight:800; color:#fff;"># 4829</div>
+                <div style="font-size:10px; color:#A0A5B5;">Калитка: 1234</div>
+              </div>
+
+              <div class="shopping-glass-item" style="display:block; padding:12px;">
+                <div style="font-size:20px; margin-bottom:6px;">🚰</div>
+                <div style="font-size:11px; color:#8E93A3; font-weight:700;">Фильтры воды</div>
+                <div style="font-size:14px; font-weight:800; color:#fff;">Аквафор К5</div>
+                <div style="font-size:10px; color:#A0A5B5;">Замена: декабрь</div>
+              </div>
+
+              <div class="shopping-glass-item" style="display:block; padding:12px;">
+                <div style="font-size:20px; margin-bottom:6px;">🎨</div>
+                <div style="font-size:11px; color:#8E93A3; font-weight:700;">Цвет краски</div>
+                <div style="font-size:14px; font-weight:800; color:#fff;">Dulux 30YY</div>
+                <div style="font-size:10px; color:#A0A5B5;">Гостиная</div>
+              </div>
+
+              <div class="shopping-glass-item" style="display:block; padding:12px;">
+                <div style="font-size:20px; margin-bottom:6px;">📶</div>
+                <div style="font-size:11px; color:#8E93A3; font-weight:700;">Wi-Fi для гостей</div>
+                <div style="font-size:14px; font-weight:800; color:#fff;">Home_5G</div>
+                <div style="font-size:10px; color:#A0A5B5;">cozyhome2026</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Рендер сайдбара
+    function renderDetails() {
+      const panel = document.getElementById('detailsPanel');
+      panel.innerHTML = `
+        <div class="details-badge">Новая дизайн-система</div>
+        <h2>Liquid Glass & Мультяшный Аватар</h2>
+        <p class="lead">
+          Мы полностью перевели интерфейс на эстетику «жидкого стекла»: глубокие неоновые размытия, полупрозрачные карточки с легким преломлением света и живой анимированный персонаж-альтер-эго.
+        </p>
+
+        <h3 style="font-size:15px; color:#FFFFFF; margin-bottom:10px;">Протестируйте эмоции персонажа прямо сейчас:</h3>
+        <div class="status-picker-preview-grid">
+          ${moods.map(m => `
+            <div class="status-preview-pill ${currentMood.id === m.id ? 'active' : ''}" onclick="setMoodById('${m.id}')">
+              <span class="icon">${m.faceDetails === 'happy' ? '✨' : m.faceDetails === 'tired' ? '🪫' : m.faceDetails === 'hungry' ? '🍕' : m.faceDetails === 'sad' ? '🥺' : m.faceDetails === 'treat' ? '🧁' : m.faceDetails === 'grumpy' ? '😾' : m.faceDetails === 'cozy' ? '🥐' : '🥰'}</span>
+              <span class="name">${m.id === 'happy' ? 'Весёлая' : m.id === 'tired' ? 'Устала' : m.id === 'hungry' ? 'Голодная' : m.id === 'sad' ? 'Грустная' : m.id === 'treat' ? 'Сладкоежка' : m.id === 'grumpy' ? 'Вредная' : m.id === 'cozy' ? 'Уютная' : 'Люблю'}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="feature-card-glass">
+          <div class="feature-card-header">
+            <div class="feature-icon-glass">🦊</div>
+            <h3>Анимированное мультяшное альтер-эго</h3>
+          </div>
+          <p>
+            Каждое состояние оживает: уставшая милашка зевает и качается со значком батарейки, голодная мечтает о пицце/суши со слюнками, грустная роняет капельку слезы и ждет обнимашек, а вредная смешно надувает щечки! На виджете One UI всё это анимируется плавно и легко.
+          </p>
+        </div>
+
+        <div class="feature-card-glass">
+          <div class="feature-card-header">
+            <div class="feature-icon-glass">💎</div>
+            <h3>Стиль Liquid Glass (Жидкое стекло)</h3>
+          </div>
+          <p>
+            Многослойный эффект стекла с динамическими градиентами фона, размытием <code>backdrop-filter</code>, световыми контурами и адаптивностью под Samsung One UI. Выглядит премиально, футуристично и очень уютно.
+          </p>
+        </div>
+
+        <div style="background:rgba(255, 94, 98, 0.12); border:1px dashed var(--primary); border-radius:18px; padding:16px 20px; font-size:13px; color:#FFA39E; line-height:1.5;">
+          <strong>💡 Попробуйте в телефоне:</strong> кликайте на разные статусы в списке выше — персонаж на экране телефона мгновенно изменит позу, анимацию, цвет мордочки и парящие частицы!
+        </div>
+      `;
+    }
+
+    // Старт
+    renderScreen();
+    renderDetails();
+  </script>
+</body>
+</html>
