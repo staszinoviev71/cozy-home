@@ -79,3 +79,26 @@ export interface PushNotificationPayload {
   actions?: PushNotificationAction[];
   data?: Record<string, string>;
 }
+
+export interface WidgetAction {
+  id: string;
+  label: string;
+  icon?: string;
+}
+
+export interface WidgetDisplayData {
+  partnerId: string;
+  partnerName: string;
+  partnerRole: UserRole;
+  moodId: string;
+  moodTitle: string;
+  moodColor: string;
+  moodEmoji: string;
+  moodDescription?: string;
+  unboughtCount: number;
+  unboughtCountText: string;
+  timeAgoText: string;
+  characterSvg: string;
+  actions: WidgetAction[];
+  updatedAt: number;
+}
