@@ -181,6 +181,61 @@
       box-shadow: 0 2px 8px var(--primary-glow);
     }
 
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      padding: 5px 12px;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s ease;
+    }
+    .role-badge:active {
+      transform: scale(0.96);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .onboard-role-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 16px 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .onboard-role-card.active {
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.25), rgba(255, 142, 83, 0.25));
+      border-color: #FF5E62;
+      box-shadow: 0 0 24px rgba(255, 94, 98, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .onboard-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #A0A5B5;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 9px 6px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .onboard-tab-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+    }
+
     .sync-badge {
       display: inline-flex;
       align-items: center;
@@ -1190,6 +1245,78 @@
     </div>
   </div>
 
+  <!-- Модальное окно первого входа (Онбординг): Выбор роли и понятная связь -->
+  <div class="modal-overlay" id="onboardingModal" style="display:none; z-index:99999;">
+    <div class="modal-card" style="max-width:390px; padding:22px;">
+      <div style="text-align:center; margin-bottom:18px;">
+        <div style="font-size:40px; margin-bottom:4px;">🏡❤️</div>
+        <h2 style="font-size:19px; font-weight:900; color:#FFFFFF; margin-bottom:4px;">Добро пожаловать в Уютный Дом!</h2>
+        <p style="font-size:12px; color:#A0A5B5;">Приложение для вас двоих на смартфонах Galaxy A54</p>
+      </div>
+
+      <!-- ШАГ 1: Кто вы? -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:11px; font-weight:800; color:#FF7B93; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px;">
+          ШАГ 1: КТО ВЫ НА ЭТОМ СМАРТФОНЕ?
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div id="onboardRoleHusband" class="onboard-role-card active" onclick="selectOnboardRole('husband')">
+            <div style="font-size:36px; margin-bottom:4px;">👱🏼‍♂️</div>
+            <div style="font-size:14px; font-weight:800; color:#FFFFFF;">Муж</div>
+            <div style="font-size:10px; color:#A0A5B5;">Мелированный блонд</div>
+          </div>
+          <div id="onboardRoleWife" class="onboard-role-card" onclick="selectOnboardRole('wife')">
+            <div style="font-size:36px; margin-bottom:4px;">👩🏻</div>
+            <div style="font-size:14px; font-weight:800; color:#FFFFFF;">Любимая</div>
+            <div style="font-size:10px; color:#A0A5B5;">Брюнетка</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ШАГ 2: Семейная связь -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:11px; font-weight:800; color:#4FACFE; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px;">
+          ШАГ 2: СОПРЯЖЕНИЕ ТЕЛЕФОНОВ
+        </div>
+
+        <div style="display:flex; background:rgba(255,255,255,0.06); border-radius:12px; padding:3px; margin-bottom:10px;">
+          <button id="tabOnboardCreate" class="onboard-tab-btn active" onclick="switchOnboardTab('create')">
+            Я создаю пару
+          </button>
+          <button id="tabOnboardJoin" class="onboard-tab-btn" onclick="switchOnboardTab('join')">
+            У меня есть код
+          </button>
+        </div>
+
+        <!-- Создание пары -->
+        <div id="onboardCreateBlock">
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px; text-align:center;">
+            <div style="font-size:11px; color:#8E93A3; margin-bottom:4px;">Ваш уникальный семейный код:</div>
+            <div id="onboardGeneratedCode" style="font-size:26px; font-weight:900; letter-spacing:4px; color:#4FACFE; margin-bottom:8px;">
+              ------
+            </div>
+            <button class="btn-primary-action" style="width:100%; font-size:11.5px; padding:8px 12px;" onclick="shareOnboardCode()">
+              📲 Отправить код любимой / мужу
+            </button>
+          </div>
+        </div>
+
+        <!-- Подключение к партнеру -->
+        <div id="onboardJoinBlock" style="display:none;">
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px;">
+            <div style="font-size:11px; color:#8E93A3; margin-bottom:6px;">Введите 6 цифр кода от партнера:</div>
+            <input type="text" id="onboardPartnerCodeInput" class="form-input" placeholder="например, 482915" maxlength="8" style="font-size:18px; font-weight:800; letter-spacing:3px; text-align:center;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Кнопка сохранения -->
+      <button class="store-btn" onclick="finishOnboarding()" style="width:100%; margin:0; justify-content:center; padding:12px;">
+        <span style="font-size:14px; font-weight:800;">Войти в Уютный Дом ❤️</span>
+      </button>
+    </div>
+  </div>
+
   <!-- Модальное окно добавления в Паспорт дома -->
   <div class="modal-overlay" id="addPassportModal" onclick="if(event.target===this) closeAddPassportModal()">
     <div class="modal-card">
@@ -1424,16 +1551,16 @@
       </div>
     </div>
 
-    <!-- Индикатор синхронизации и переключение роли -->
+    <!-- Индикатор синхронизации и закрепленная роль -->
     <div style="display:flex; align-items:center; gap:8px;">
       <button id="syncStatusBadge" class="sync-badge" onclick="openPairModal()" title="Семейная синхронизация">
         <span class="sync-dot online" id="syncStatusDot"></span>
         <span id="syncStatusText">В сети</span>
       </button>
-      <div class="role-switcher">
-        <button class="role-btn active" id="btnHusband" onclick="setRole('husband')">Муж</button>
-        <button class="role-btn" id="btnWife" onclick="setRole('wife')">Жена</button>
-      </div>
+      <button class="role-badge" id="currentRoleBadge" onclick="openPairModal()" title="Настройки профиля и связи">
+        <span id="roleBadgeIcon">👱🏼‍♂️</span>
+        <span id="roleBadgeText">Муж</span>
+      </button>
     </div>
   </header>
 
@@ -1513,12 +1640,91 @@
       localStorage.setItem('cozy_device_id', myDeviceId);
     }
 
+    function generateUniquePairCode() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
-    let pairCode = urlParams.get('pair') || localStorage.getItem('cozy_pair_code') || '582910';
-    localStorage.setItem('cozy_pair_code', pairCode);
+    let pairCode = urlParams.get('pair') || localStorage.getItem('cozy_pair_code');
+    if (!pairCode || pairCode === '582910') {
+      pairCode = generateUniquePairCode();
+      localStorage.setItem('cozy_pair_code', pairCode);
+    }
 
     let currentRole = localStorage.getItem('cozy_device_role') || 'husband';
     let currentTab = 'home';
+
+    // Онбординг для первого входа
+    let onboardSelectedRole = currentRole;
+    let onboardTab = 'create';
+
+    function openOnboardingModal() {
+      const modal = document.getElementById('onboardingModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      selectOnboardRole(onboardSelectedRole);
+      const codeBox = document.getElementById('onboardGeneratedCode');
+      if (codeBox) {
+        codeBox.innerText = pairCode.replace(/(\d{3})(\d{3})/, '$1 $2');
+      }
+    }
+
+    function selectOnboardRole(role) {
+      onboardSelectedRole = role;
+      document.getElementById('onboardRoleHusband')?.classList.toggle('active', role === 'husband');
+      document.getElementById('onboardRoleWife')?.classList.toggle('active', role === 'wife');
+    }
+
+    function switchOnboardTab(tab) {
+      onboardTab = tab;
+      document.getElementById('tabOnboardCreate')?.classList.toggle('active', tab === 'create');
+      document.getElementById('tabOnboardJoin')?.classList.toggle('active', tab === 'join');
+      const createB = document.getElementById('onboardCreateBlock');
+      const joinB = document.getElementById('onboardJoinBlock');
+      if (createB) createB.style.display = tab === 'create' ? 'block' : 'none';
+      if (joinB) joinB.style.display = tab === 'join' ? 'block' : 'none';
+    }
+
+    function shareOnboardCode() {
+      const link = window.location.origin + window.location.pathname + '?pair=' + pairCode;
+      const text = `Привет! Наш код для приложения Уютный Дом: ${pairCode}\nИли перейди по ссылке: ${link}`;
+      if (navigator.share) {
+        navigator.share({ title: 'Уютный Дом — Наш семейный код', text, url: link }).catch(() => {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+        showToast('Код ' + pairCode + ' скопирован в буфер!');
+      }
+    }
+
+    function finishOnboarding() {
+      if (onboardTab === 'join') {
+        const inp = document.getElementById('onboardPartnerCodeInput');
+        const code = inp ? inp.value.trim().replace(/\s+/g, '') : '';
+        if (code && code.length >= 4) {
+          pairCode = code;
+          localStorage.setItem('cozy_pair_code', pairCode);
+        } else {
+          showToast('Пожалуйста, введите 6 цифр кода от партнера');
+          return;
+        }
+      }
+      setRole(onboardSelectedRole);
+      localStorage.setItem('cozy_onboarding_completed', 'true');
+      document.getElementById('onboardingModal').style.display = 'none';
+      showToast('🎉 Вы вошли как ' + (currentRole === 'husband' ? 'Муж 👱🏼‍♂️' : 'Любимая 👩🏻'));
+      initMqtt();
+      updateNativeWidget();
+      render();
+    }
+
+    function updateNativeWidget() {
+      if (window.AndroidBridge && window.AndroidBridge.updateWidget) {
+        const partnerLabel = currentRole === 'husband' ? 'НАСТРОЕНИЕ: ЛЮБИМАЯ' : 'НАСТРОЕНИЕ: МУЖ';
+        const moodTitle = partnerMood ? partnerMood.title : 'На волне радости!';
+        const moodEmoji = partnerMood ? partnerMood.emoji : '🐕';
+        window.AndroidBridge.updateWidget(partnerLabel, moodTitle, moodEmoji, 'только что • связь отличная');
+      }
+    }
 
     // Тип альтер-эго: 'corgi' (собачка корги) или 'human' (люди)
     let avatarType = {
@@ -1571,10 +1777,16 @@
     function setRole(role) {
       currentRole = role;
       localStorage.setItem('cozy_device_role', role);
-      document.getElementById('btnHusband')?.classList.toggle('active', role === 'husband');
-      document.getElementById('btnWife')?.classList.toggle('active', role === 'wife');
+      const iconSpan = document.getElementById('roleBadgeIcon');
+      const textSpan = document.getElementById('roleBadgeText');
+      if (iconSpan && textSpan) {
+        iconSpan.innerText = role === 'husband' ? '👱🏼‍♂️' : '👩🏻';
+        textSpan.innerText = role === 'husband' ? 'Муж' : 'Любимая';
+      }
+      document.getElementById('deviceRoleHusband')?.classList.toggle('active', role === 'husband');
+      document.getElementById('deviceRoleWife')?.classList.toggle('active', role === 'wife');
+      updateNativeWidget();
       render();
-      showToast('Переключено на профиль: ' + (role === 'husband' ? 'Муж' : 'Жена'));
     }
 
     function setTab(tab) {
@@ -1603,9 +1815,7 @@
 
     function setDeviceRole(role) {
       setRole(role);
-      document.getElementById('deviceRoleHusband')?.classList.toggle('active', role === 'husband');
-      document.getElementById('deviceRoleWife')?.classList.toggle('active', role === 'wife');
-      showToast('Этот смартфон закреплён: ' + (role === 'husband' ? 'Муж 👨' : 'Любимая 👩'));
+      showToast('Этот смартфон закреплён: ' + (role === 'husband' ? 'Муж 👱🏼‍♂️' : 'Любимая 👩🏻'));
     }
 
     function copyPairCode() {
@@ -1617,15 +1827,16 @@
 
     function sharePairLink() {
       const link = window.location.origin + window.location.pathname + '?pair=' + pairCode;
+      const text = `Привет! Наш семейный код для приложения Уютный Дом: ${pairCode}\nИли перейди по ссылке: ${link}`;
       if (navigator.share) {
         navigator.share({
           title: 'Уютный Дом — Семейное сопряжение',
-          text: 'Подключайся к нашему Уютному Дому! Семейный код: ' + pairCode,
+          text: text,
           url: link
         }).catch(() => {});
       } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(link);
-        showToast('Ссылка скопирована: отправьте в Telegram!');
+        navigator.clipboard.writeText(text);
+        showToast('Код и ссылка скопированы в буфер!');
       }
     }
 
@@ -2161,6 +2372,7 @@
     function selectMood(m) {
       partnerMood = m;
       broadcastSync('MOOD_UPDATE', { role: currentRole, mood: m, avatarType: avatarType[currentRole] });
+      updateNativeWidget();
       render();
       showToast('Настроение обновлено: ' + m.title);
     }
@@ -2180,11 +2392,38 @@
     }
 
     function triggerHeadsUp(icon, sender, text) {
-      document.getElementById('headsUpIcon').innerText = icon;
-      document.getElementById('headsUpTitle').innerText = `${sender}: Срочно нужно!`;
-      document.getElementById('headsUpBody').innerText = `Пожалуйста, купи: ${text}`;
+      const iconEl = document.getElementById('headsUpIcon');
+      const titleEl = document.getElementById('headsUpTitle');
+      const bodyEl = document.getElementById('headsUpBody');
       const card = document.getElementById('headsUpNotification');
-      card.style.display = 'block';
+      if (iconEl) iconEl.innerText = icon || '🚨';
+      if (titleEl) titleEl.innerText = `${sender}: Срочно нужно!`;
+      if (bodyEl) bodyEl.innerText = text;
+      if (card) card.style.display = 'block';
+
+      // 🔔 НАСТОЯЩИЙ СИСТЕМНЫЙ ПУШ ANDROID (НА ТЕЛЕФОН):
+      if (window.AndroidBridge && window.AndroidBridge.showNotification) {
+        window.AndroidBridge.showNotification(`${sender}: Срочно нужно!`, text, icon || '🚨');
+        window.AndroidBridge.vibrate(250);
+      } else if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(`${icon || '🚨'} ${sender}: Срочно нужно!`, { body: text });
+      }
+    }
+
+    function sendWidgetAction(action) {
+      const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
+      let text = '';
+      let icon = '❤️';
+      if (action === 'hug') {
+        text = 'Крепко обнимает вас! 🤗❤️';
+        icon = '🤗';
+      } else if (action === 'on_my_way') {
+        text = 'Уже выезжает домой! 🚗💨';
+        icon = '🚗';
+      }
+      broadcastSync('SOS_PUSH', { sender: sender, icon: icon, text: text });
+      triggerHeadsUp(icon, 'Ты', text);
+      showToast(`Отправлено: ${text}`);
     }
 
     function closeHeadsUp() {
@@ -2439,10 +2678,10 @@
               </div>
             </div>
             <div class="widget-actions">
-              <button class="widget-btn" onclick="showToast('Отправлено объятие: «Обнимаю крепко! ❤️»')">
+              <button class="widget-btn" onclick="sendWidgetAction('hug')">
                 <span>🫂</span> Обнять
               </button>
-              <button class="widget-btn" onclick="showToast('Отправлен статус: «Выезжаю домой! 🚗»')">
+              <button class="widget-btn" onclick="sendWidgetAction('on_my_way')">
                 <span>🚗</span> Уже еду
               </button>
               <button class="widget-btn" onclick="setTab('shopping')">
@@ -2787,9 +3026,15 @@
     }
 
     loadLocalState();
+    const isCompleted = localStorage.getItem('cozy_onboarding_completed') === 'true';
+    if (!isCompleted) {
+      openOnboardingModal();
+    }
+    setRole(currentRole);
     render();
     checkPwaStandalone();
     setTimeout(initMqtt, 300);
+    setTimeout(updateNativeWidget, 600);
   </script>
 </body>
 </html>

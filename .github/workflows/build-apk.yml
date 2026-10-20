@@ -42,7 +42,7 @@ jobs:
       - name: Prepare APK Asset
         run: |
           mkdir -p build-output
-          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.0.0.apk
+          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.0.1.apk
           cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-latest.apk
 
       - name: Upload APK Artifact
@@ -55,8 +55,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: "🏡 Уютный Дом (Нативный APK)"
+          tag_name: v1.0.1
+          name: "🏡 Уютный Дом v1.0.1 (Нативный APK)"
           make_latest: "true"
           overwrite: true
           body: |
