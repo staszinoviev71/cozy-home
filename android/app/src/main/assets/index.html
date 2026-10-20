@@ -2088,7 +2088,7 @@
         render();
         showToast('🛒 Список покупок обновлен партнером!');
       } else if (type === 'SOS_PUSH') {
-        triggerHeadsUp(data.icon || '🚨', data.sender || 'Партнер', data.text);
+        triggerHeadsUp(data.icon || '🚨', data.sender || 'Партнер', data.text, data.title);
         if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 250]);
         showToast('⚡ Срочный пуш: ' + (data.icon || '🚨') + ' ' + data.text);
       } else if (type === 'GAMES_UPDATE') {
@@ -2426,22 +2426,23 @@
       render();
     }
 
-    function triggerHeadsUp(icon, sender, text) {
+    function triggerHeadsUp(icon, sender, text, customTitle) {
+      const displayTitle = customTitle || `${sender}: Срочно нужно!`;
       const iconEl = document.getElementById('headsUpIcon');
       const titleEl = document.getElementById('headsUpTitle');
       const bodyEl = document.getElementById('headsUpBody');
       const card = document.getElementById('headsUpNotification');
       if (iconEl) iconEl.innerText = icon || '🚨';
-      if (titleEl) titleEl.innerText = `${sender}: Срочно нужно!`;
+      if (titleEl) titleEl.innerText = displayTitle;
       if (bodyEl) bodyEl.innerText = text;
       if (card) card.style.display = 'block';
 
-      // 🔔 НАСТОЯЩИЙ СИСТЕМНЫЙ ПУШ ANDROID (НА ТЕЛЕФОН):
+      // 🔔 НАСТОЯЩИЙ СИСТЕМНЫЙ ПУШ ANDROID (НА ТЕЛЕФОН ПАРТНЕРА):
       if (window.AndroidBridge && window.AndroidBridge.showNotification) {
-        window.AndroidBridge.showNotification(`${sender}: Срочно нужно!`, text, icon || '🚨');
+        window.AndroidBridge.showNotification(displayTitle, text, icon || '🚨');
         window.AndroidBridge.vibrate(250);
       } else if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(`${icon || '🚨'} ${sender}: Срочно нужно!`, { body: text });
+        new Notification(`${icon || '🚨'} ${displayTitle}`, { body: text });
       }
     }
 
@@ -2449,16 +2450,18 @@
       const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
       let text = '';
       let icon = '❤️';
+      let title = `${sender} шлёт сигнал ❤️`;
       if (action === 'hug') {
-        text = 'Крепко обнимает вас! 🤗❤️';
+        text = 'Крепко обнимает тебя! 🤗❤️';
         icon = '🤗';
+        title = `${sender} обнимает тебя!`;
       } else if (action === 'on_my_way') {
         text = 'Уже выезжает домой! 🚗💨';
         icon = '🚗';
+        title = `${sender} едет домой!`;
       }
-      broadcastSync('SOS_PUSH', { sender: sender, icon: icon, text: text });
-      triggerHeadsUp(icon, 'Ты', text);
-      showToast(`Отправлено: ${text}`);
+      broadcastSync('SOS_PUSH', { sender: sender, icon: icon, text: text, title: title });
+      showToast(`Отправлено партнеру: ${text}`);
     }
 
     function closeHeadsUp() {
@@ -2473,17 +2476,22 @@
         return;
       }
       const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
-      triggerHeadsUp(selectedSosIcon, sender, text);
-      broadcastSync('SOS_PUSH', { sender: sender, icon: selectedSosIcon, text: text });
-      showToast(`⚡ Срочный пуш отправлен партнеру: ${selectedSosIcon} ${text}`);
+      broadcastSync('SOS_PUSH', { sender: sender, icon: selectedSosIcon, text: text, title: `${sender}: Срочно нужно!` });
+      showToast(`⚡ Пуш отправлен на телефон партнера: ${selectedSosIcon} ${text}`);
       if (input) input.value = '';
     }
 
     function sendPresetSos(text, icon = '🚨') {
       const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
-      triggerHeadsUp(icon, sender, text);
-      broadcastSync('SOS_PUSH', { sender: sender, icon: icon, text: text });
-      showToast(`⚡ Пуш отправлен: ${icon} ${text}`);
+      broadcastSync('SOS_PUSH', { sender: sender, icon: icon, text: text, title: `${sender}: Срочно нужно!` });
+      showToast(`⚡ Пуш отправлен на телефон партнера: ${icon} ${text}`);
+    }
+
+    function sendStoreArrivalNotification() {
+      const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
+      const text = `${sender} зашёл в супермаркет! Есть 5 минут проверить корзину 🛒`;
+      broadcastSync('SOS_PUSH', { sender: sender, icon: '🛒', text: text, title: `${sender} в магазине!` });
+      showToast('🛒 Пуш отправлен партнеру: «Я в супермаркете!»');
     }
 
     function copyToClipboard(text, label) {
@@ -2820,7 +2828,7 @@
           </div>
 
           <!-- Кнопка «Я зашел в магазин» -->
-          <button class="store-btn" onclick="triggerHeadsUp('🛒', currentRole==='husband'?'Муж':'Любимая', 'Партнер зашел в супермаркет! Есть 5 минут проверить корзину'); showToast('🔔 Пуш отправлен: «Партнер зашел в магазин!»');">
+          <button class="store-btn" onclick="sendStoreArrivalNotification()">
             <div style="display:flex; align-items:center; gap:12px;">
               <span style="font-size:24px;">🛒</span>
               <div style="text-align:left;">
