@@ -7,9 +7,12 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Уютный Дом — Liquid Glass</title>
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FF5E62'><path d='M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 20V10.5z'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
   <style>
     :root {
       --primary: #FF5E62;
@@ -176,6 +179,45 @@
       background: linear-gradient(135deg, #FF5E62, #FF8E53);
       color: #FFFFFF;
       box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    .sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 20px;
+      padding: 5px 10px;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s ease;
+    }
+
+    .sync-badge:active {
+      transform: scale(0.96);
+    }
+
+    .sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22C55E;
+      box-shadow: 0 0 8px #22C55E;
+    }
+
+    .sync-dot.connecting {
+      background: #F59E0B;
+      box-shadow: 0 0 8px #F59E0B;
+    }
+
+    .sync-dot.offline {
+      background: #EF4444;
+      box-shadow: 0 0 8px #EF4444;
     }
 
     /* Контейнер страниц */
@@ -1234,6 +1276,87 @@
     </div>
   </div>
 
+  <!-- Модальное окно семейного сопряжения -->
+  <div class="modal-overlay" id="pairModal" onclick="if(event.target===this) closePairModal()">
+    <div class="modal-card" style="max-height:88vh; overflow-y:auto;">
+      <div class="modal-head">
+        <h3>Семейная связь 🔗</h3>
+        <button class="modal-close-btn" onclick="closePairModal()">✕</button>
+      </div>
+
+      <div style="font-size:12px; color:#A0A5B5; margin-bottom:14px; line-height:1.5;">
+        Синхронизирует смартфоны Galaxy A54 в реальном времени через защищённый облачный канал.
+      </div>
+
+      <!-- Кто держит этот телефон -->
+      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px; margin-bottom:14px;">
+        <div style="font-size:11px; font-weight:800; color:#A0A5B5; text-transform:uppercase; margin-bottom:8px;">
+          Этот телефон принадлежит:
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="deviceRoleHusband" class="role-btn active" style="flex:1; padding:8px;" onclick="setDeviceRole('husband')">
+            👨 Муж
+          </button>
+          <button id="deviceRoleWife" class="role-btn" style="flex:1; padding:8px;" onclick="setDeviceRole('wife')">
+            👩 Любимая
+          </button>
+        </div>
+      </div>
+
+      <!-- Код семьи -->
+      <div style="background:linear-gradient(135deg, rgba(0,242,254,0.1), rgba(255,94,98,0.1)); border:1px solid rgba(0,242,254,0.3); border-radius:16px; padding:16px; text-align:center; margin-bottom:14px;">
+        <div style="font-size:11px; font-weight:800; color:#00F2FE; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">
+          Ваш семейный код:
+        </div>
+        <div id="pairCodeDisplay" style="font-size:32px; font-weight:900; letter-spacing:4px; color:#FFFFFF; margin:6px 0;">
+          582 910
+        </div>
+        <div style="font-size:11px; color:#8E93A3; margin-bottom:12px;">
+          Введите этот код на втором телефоне, чтобы мгновенно связать пару
+        </div>
+        <div style="display:flex; gap:8px; justify-content:center;">
+          <button class="btn-secondary" style="font-size:11.5px; padding:8px 12px;" onclick="copyPairCode()">
+            📋 Скопировать код
+          </button>
+          <button class="btn-primary-action" style="font-size:11.5px; padding:8px 12px;" onclick="sharePairLink()">
+            📲 Отправить ссылку
+          </button>
+        </div>
+      </div>
+
+      <!-- Подключиться к коду партнера -->
+      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px; margin-bottom:14px;">
+        <div style="font-size:11px; font-weight:800; color:#A0A5B5; text-transform:uppercase; margin-bottom:6px;">
+          Ввести код с телефона партнера:
+        </div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="inputPartnerPairCode" class="form-input" placeholder="6 цифр кода..." maxlength="8" style="font-size:16px; font-weight:800; letter-spacing:2px; text-align:center;">
+          <button class="btn-primary-action" style="padding:0 16px; white-space:nowrap;" onclick="connectToPartnerCode()">
+            Связать
+          </button>
+        </div>
+      </div>
+
+      <!-- PWA кнопка установки -->
+      <div id="pwaInstallBlock" style="margin-bottom:14px;">
+        <button class="store-btn" onclick="installPwaApp()" style="margin:0; width:100%;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:22px;">📲</span>
+            <div style="text-align:left;">
+              <div style="font-size:13px; font-weight:800;">Установить приложение</div>
+              <div style="font-size:10.5px; opacity:0.85;">Добавить на рабочий стол Galaxy A54</div>
+            </div>
+          </div>
+          <span>➔</span>
+        </button>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" style="width:100%;" onclick="closePairModal()">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Верхняя шапка с переключателем роли -->
   <header>
     <div class="logo-block">
@@ -1249,10 +1372,16 @@
       </div>
     </div>
 
-    <!-- Переключение Муж / Жена -->
-    <div class="role-switcher">
-      <button class="role-btn active" id="btnHusband" onclick="setRole('husband')">Муж</button>
-      <button class="role-btn" id="btnWife" onclick="setRole('wife')">Жена</button>
+    <!-- Индикатор синхронизации и переключение роли -->
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button id="syncStatusBadge" class="sync-badge" onclick="openPairModal()" title="Семейная синхронизация">
+        <span class="sync-dot online" id="syncStatusDot"></span>
+        <span id="syncStatusText">В сети</span>
+      </button>
+      <div class="role-switcher">
+        <button class="role-btn active" id="btnHusband" onclick="setRole('husband')">Муж</button>
+        <button class="role-btn" id="btnWife" onclick="setRole('wife')">Жена</button>
+      </div>
     </div>
   </header>
 
@@ -1309,7 +1438,18 @@
   </nav>
 
   <script>
-    let currentRole = 'husband';
+    // ==================== REAL-TIME FAMILY SYNC ENGINE ====================
+    let myDeviceId = localStorage.getItem('cozy_device_id');
+    if (!myDeviceId) {
+      myDeviceId = 'dev_' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('cozy_device_id', myDeviceId);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let pairCode = urlParams.get('pair') || localStorage.getItem('cozy_pair_code') || '582910';
+    localStorage.setItem('cozy_pair_code', pairCode);
+
+    let currentRole = localStorage.getItem('cozy_device_role') || 'husband';
     let currentTab = 'home';
 
     // Тип альтер-эго: 'corgi' (собачка корги) или 'human' (люди)
@@ -1362,8 +1502,9 @@
 
     function setRole(role) {
       currentRole = role;
-      document.getElementById('btnHusband').classList.toggle('active', role === 'husband');
-      document.getElementById('btnWife').classList.toggle('active', role === 'wife');
+      localStorage.setItem('cozy_device_role', role);
+      document.getElementById('btnHusband')?.classList.toggle('active', role === 'husband');
+      document.getElementById('btnWife')?.classList.toggle('active', role === 'wife');
       render();
       showToast('Переключено на профиль: ' + (role === 'husband' ? 'Муж' : 'Жена'));
     }
@@ -1374,6 +1515,289 @@
       const idx = { home: 0, shopping: 1, games: 2, dinner: 3, passport: 4 }[tab];
       document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
       render();
+    }
+
+    // Сопряжение семьи
+    function openPairModal() {
+      const modal = document.getElementById('pairModal');
+      modal.style.display = 'flex';
+      const disp = document.getElementById('pairCodeDisplay');
+      if (disp) {
+        disp.innerText = pairCode.replace(/(\d{3})(\d{3})/, '$1 $2');
+      }
+      document.getElementById('deviceRoleHusband')?.classList.toggle('active', currentRole === 'husband');
+      document.getElementById('deviceRoleWife')?.classList.toggle('active', currentRole === 'wife');
+    }
+
+    function closePairModal() {
+      document.getElementById('pairModal').style.display = 'none';
+    }
+
+    function setDeviceRole(role) {
+      setRole(role);
+      document.getElementById('deviceRoleHusband')?.classList.toggle('active', role === 'husband');
+      document.getElementById('deviceRoleWife')?.classList.toggle('active', role === 'wife');
+      showToast('Этот смартфон закреплён: ' + (role === 'husband' ? 'Муж 👨' : 'Любимая 👩'));
+    }
+
+    function copyPairCode() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(pairCode);
+      }
+      showToast('Код ' + pairCode + ' скопирован в буфер обмена!');
+    }
+
+    function sharePairLink() {
+      const link = window.location.origin + window.location.pathname + '?pair=' + pairCode;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Уютный Дом — Семейное сопряжение',
+          text: 'Подключайся к нашему Уютному Дому! Семейный код: ' + pairCode,
+          url: link
+        }).catch(() => {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(link);
+        showToast('Ссылка скопирована: отправьте в Telegram!');
+      }
+    }
+
+    function connectToPartnerCode() {
+      const input = document.getElementById('inputPartnerPairCode');
+      const val = input ? input.value.trim().replace(/\s+/g, '') : '';
+      if (!val || val.length < 4) {
+        showToast('Введите 6 цифр семейного кода!');
+        return;
+      }
+      pairCode = val;
+      localStorage.setItem('cozy_pair_code', pairCode);
+      closePairModal();
+      showToast('Связываем с кодом ' + pairCode + '...');
+      initMqtt();
+    }
+
+    // Облачная синхронизация по MQTT и локальный кэш
+    let mqttClient = null;
+    let isMqttConnected = false;
+    let mqttReconnectTimer = null;
+    const MQTT_BROKER = 'broker.emqx.io';
+    const MQTT_PORT = 8084;
+    const MQTT_PATH = '/mqtt';
+
+    function getMqttTopic() {
+      return 'cozyhome/v2/room_' + pairCode;
+    }
+
+    function updateSyncBadge(status, text) {
+      const dot = document.getElementById('syncStatusDot');
+      const txt = document.getElementById('syncStatusText');
+      if (dot) {
+        dot.className = 'sync-dot ' + (status === 'online' ? 'online' : status === 'connecting' ? 'connecting' : 'offline');
+      }
+      if (txt) {
+        txt.innerText = text;
+      }
+    }
+
+    function initMqtt() {
+      if (typeof Paho === 'undefined') {
+        updateSyncBadge('offline', 'Офлайн');
+        return;
+      }
+
+      updateSyncBadge('connecting', 'Связь...');
+
+      const clientId = 'cozy_' + myDeviceId + '_' + Math.floor(Math.random() * 1000);
+      try {
+        if (mqttClient) {
+          try { mqttClient.disconnect(); } catch (e) {}
+        }
+        mqttClient = new Paho.MQTT.Client(MQTT_BROKER, MQTT_PORT, MQTT_PATH, clientId);
+
+        mqttClient.onConnectionLost = (responseObject) => {
+          isMqttConnected = false;
+          updateSyncBadge('offline', 'Офлайн');
+          clearTimeout(mqttReconnectTimer);
+          mqttReconnectTimer = setTimeout(initMqtt, 4000);
+        };
+
+        mqttClient.onMessageArrived = (message) => {
+          try {
+            const payload = JSON.parse(message.payloadString);
+            handleIncomingSync(payload);
+          } catch (e) {
+            console.error('MQTT JSON error:', e);
+          }
+        };
+
+        mqttClient.connect({
+          useSSL: true,
+          timeout: 5,
+          keepAliveInterval: 30,
+          cleanSession: true,
+          onSuccess: () => {
+            isMqttConnected = true;
+            updateSyncBadge('online', 'В сети');
+            mqttClient.subscribe(getMqttTopic(), { qos: 1 });
+            broadcastSync('SYNC_REQUEST', { requester: myDeviceId });
+          },
+          onFailure: () => {
+            isMqttConnected = false;
+            updateSyncBadge('offline', 'Офлайн');
+            clearTimeout(mqttReconnectTimer);
+            mqttReconnectTimer = setTimeout(initMqtt, 6000);
+          }
+        });
+      } catch (err) {
+        updateSyncBadge('offline', 'Офлайн');
+        clearTimeout(mqttReconnectTimer);
+        mqttReconnectTimer = setTimeout(initMqtt, 6000);
+      }
+    }
+
+    function broadcastSync(type, data) {
+      saveLocalState();
+
+      const msg = {
+        senderDeviceId: myDeviceId,
+        senderRole: currentRole,
+        type: type,
+        data: data,
+        timestamp: Date.now()
+      };
+
+      if (typeof BroadcastChannel !== 'undefined') {
+        try {
+          const bc = new BroadcastChannel('cozy_sync_' + pairCode);
+          bc.postMessage(msg);
+          bc.close();
+        } catch (e) {}
+      }
+
+      if (mqttClient && isMqttConnected) {
+        try {
+          const pahoMsg = new Paho.MQTT.Message(JSON.stringify(msg));
+          pahoMsg.destinationName = getMqttTopic();
+          pahoMsg.qos = 1;
+          mqttClient.send(pahoMsg);
+        } catch (e) {
+          console.warn('MQTT broadcast failed:', e);
+        }
+      }
+    }
+
+    function handleIncomingSync(msg) {
+      if (!msg || msg.senderDeviceId === myDeviceId) return;
+
+      const { type, data } = msg;
+
+      if (type === 'SYNC_REQUEST') {
+        broadcastSync('SYNC_FULL_STATE', {
+          partnerMood: partnerMood,
+          avatarType: avatarType,
+          items: items,
+          gamePresets: gamePresets,
+          passportItems: passportItems
+        });
+      } else if (type === 'SYNC_FULL_STATE') {
+        if (data.partnerMood) partnerMood = data.partnerMood;
+        if (data.avatarType) avatarType = data.avatarType;
+        if (data.items) items = data.items;
+        if (data.gamePresets) Object.assign(gamePresets, data.gamePresets);
+        if (data.passportItems) passportItems = data.passportItems;
+        saveLocalState();
+        render();
+        showToast('✨ Данные синхронизированы с партнером!');
+      } else if (type === 'MOOD_UPDATE') {
+        partnerMood = data.mood;
+        if (data.avatarType) avatarType[data.role] = data.avatarType;
+        saveLocalState();
+        render();
+        if (navigator.vibrate) navigator.vibrate([80]);
+        showToast('Партнер обновил настроение: ' + partnerMood.title);
+      } else if (type === 'SHOPPING_UPDATE') {
+        items = data.items;
+        saveLocalState();
+        render();
+        showToast('🛒 Список покупок обновлен партнером!');
+      } else if (type === 'SOS_PUSH') {
+        triggerHeadsUp(data.icon || '🚨', data.sender || 'Партнер', data.text);
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 250]);
+        showToast('⚡ Срочный пуш: ' + (data.icon || '🚨') + ' ' + data.text);
+      } else if (type === 'GAMES_UPDATE') {
+        if (data.presets) gamePresets = data.presets;
+        saveLocalState();
+        render();
+        showToast('🎲 Добавлен новый спор для двоих!');
+      } else if (type === 'PASSPORT_UPDATE') {
+        if (data.items) passportItems = data.items;
+        saveLocalState();
+        render();
+        showToast('📋 Паспорт дома обновлен партнером!');
+      }
+    }
+
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        const localBc = new BroadcastChannel('cozy_sync_' + pairCode);
+        localBc.onmessage = (ev) => handleIncomingSync(ev.data);
+      } catch (e) {}
+    }
+
+    function saveLocalState() {
+      try {
+        const state = {
+          partnerMood,
+          avatarType,
+          items,
+          gamePresets,
+          passportItems,
+          lastSaved: Date.now()
+        };
+        localStorage.setItem('cozy_state_' + pairCode, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function loadLocalState() {
+      try {
+        const raw = localStorage.getItem('cozy_state_' + pairCode);
+        if (raw) {
+          const state = JSON.parse(raw);
+          if (state.partnerMood) partnerMood = state.partnerMood;
+          if (state.avatarType) avatarType = state.avatarType;
+          if (state.items) items = state.items;
+          if (state.gamePresets) Object.assign(gamePresets, state.gamePresets);
+          if (state.passportItems) passportItems = state.passportItems;
+        }
+      } catch (e) {}
+    }
+
+    // PWA & Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration error:', err));
+      });
+    }
+
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const pwaBlock = document.getElementById('pwaInstallBlock');
+      if (pwaBlock) pwaBlock.style.display = 'block';
+    });
+
+    function installPwaApp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            showToast('🎉 Приложение установлено на ваш рабочий стол!');
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        showToast('Нажмите «Добавить на главный экран» в меню Chrome');
+      }
     }
 
     let gameRandomizerMode = 'dice'; // 'dice' | 'wheel'
@@ -1478,6 +1902,7 @@
 
       selectedGamePresetKey = key;
       closeCustomDisputeModal();
+      broadcastSync('GAMES_UPDATE', { presets: gamePresets });
       render();
       showToast('🎉 Вопрос «' + title + '» сохранён!');
     }
@@ -1488,6 +1913,7 @@
       if (selectedGamePresetKey === key) {
         selectedGamePresetKey = 'dishes';
       }
+      broadcastSync('GAMES_UPDATE', { presets: gamePresets });
       render();
       showToast('🗑️ Спор удалён');
     }
@@ -1612,12 +2038,14 @@
 
     function setAvatarType(type) {
       avatarType[currentRole] = type;
+      broadcastSync('MOOD_UPDATE', { role: currentRole, mood: partnerMood, avatarType: type });
       render();
       showToast('Выбран стиль персонажа: ' + (type === 'corgi' ? '🐶 Корги' : (currentRole === 'wife' ? '👩 Девушка (брюнетка)' : '👨 Парень (мелированный блонд)')));
     }
 
     function selectMood(m) {
       partnerMood = m;
+      broadcastSync('MOOD_UPDATE', { role: currentRole, mood: m, avatarType: avatarType[currentRole] });
       render();
       showToast('Настроение обновлено: ' + m.title);
     }
@@ -1626,6 +2054,7 @@
       const it = items.find(x => x.id === id);
       if (it) {
         it.checked = !it.checked;
+        broadcastSync('SHOPPING_UPDATE', { items: items });
         render();
       }
     }
@@ -1656,6 +2085,7 @@
       }
       const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
       triggerHeadsUp(selectedSosIcon, sender, text);
+      broadcastSync('SOS_PUSH', { sender: sender, icon: selectedSosIcon, text: text });
       showToast(`⚡ Срочный пуш отправлен партнеру: ${selectedSosIcon} ${text}`);
       if (input) input.value = '';
     }
@@ -1663,6 +2093,7 @@
     function sendPresetSos(text, icon = '🚨') {
       const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
       triggerHeadsUp(icon, sender, text);
+      broadcastSync('SOS_PUSH', { sender: sender, icon: icon, text: text });
       showToast(`⚡ Пуш отправлен: ${icon} ${text}`);
     }
 
@@ -1720,6 +2151,7 @@
       });
 
       closeAddPassportModal();
+      broadcastSync('PASSPORT_UPDATE', { items: passportItems });
       render();
       showToast(`Запись «${label}» успешно добавлена в паспорт дома!`);
     }
@@ -2006,10 +2438,10 @@
 
           <!-- Поле ввода -->
           <div style="display:flex; gap:8px; margin-bottom:16px;">
-            <input type="text" id="newShopInput" placeholder="Добавить товар..." style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:12px 14px; color:#fff; font-family:inherit; font-size:13px; outline:none;" onkeydown="if(event.key==='Enter'){ const inp=document.getElementById('newShopInput'); if(inp.value){ items.push({ id: Date.now(), name: inp.value, comment: 'Новое', checked: false, photo: '🛍️' }); inp.value = ''; render(); } }">
+            <input type="text" id="newShopInput" placeholder="Добавить товар..." style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:12px 14px; color:#fff; font-family:inherit; font-size:13px; outline:none;" onkeydown="if(event.key==='Enter'){ const inp=document.getElementById('newShopInput'); if(inp.value){ items.push({ id: Date.now(), name: inp.value, comment: 'Новое', checked: false, photo: '🛍️' }); broadcastSync('SHOPPING_UPDATE', { items: items }); inp.value = ''; render(); } }">
             <button style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #FF5E62, #FF8E53); border:none; color:#fff; font-size:18px; cursor:pointer;" onclick="
               const inp = document.getElementById('newShopInput');
-              if (inp.value) { items.push({ id: Date.now(), name: inp.value, comment: 'Новое', checked: false, photo: '🛍️' }); inp.value = ''; render(); }
+              if (inp.value) { items.push({ id: Date.now(), name: inp.value, comment: 'Новое', checked: false, photo: '🛍️' }); broadcastSync('SHOPPING_UPDATE', { items: items }); inp.value = ''; render(); }
             ">＋</button>
           </div>
 
@@ -2043,10 +2475,10 @@
           <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:16px; padding:12px; margin-top:16px;">
             <div style="font-size:11.5px; font-weight:800; color:#4ADE80; margin-bottom:6px;">💡 Скоро закончится дома:</div>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="items.push({ id: Date.now(), name: 'Капсулы для посудомойки', comment: 'Бытовая химия', checked: false, photo: '🧼' }); render(); showToast('Капсулы добавлены в список!');">
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="items.push({ id: Date.now(), name: 'Капсулы для посудомойки', comment: 'Бытовая химия', checked: false, photo: '🧼' }); broadcastSync('SHOPPING_UPDATE', { items: items }); render(); showToast('Капсулы добавлены в список!');">
                 ＋ Капсулы для посудомойки
               </button>
-              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="items.push({ id: Date.now(), name: 'Зерновой кофе Lavazza', comment: 'Бакалея', checked: false, photo: '☕' }); render(); showToast('Кофе добавлен в список!');">
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="items.push({ id: Date.now(), name: 'Зерновой кофе Lavazza', comment: 'Бакалея', checked: false, photo: '☕' }); broadcastSync('SHOPPING_UPDATE', { items: items }); render(); showToast('Кофе добавлен в список!');">
                 ＋ Зерновой кофе
               </button>
             </div>
@@ -2066,6 +2498,7 @@
             <button style="width:100%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:9px; color:#fff; font-size:11.5px; font-weight:700; cursor:pointer;" onclick="
               items.push({ id: Date.now()+1, name: 'Спагетти Barilla', comment: 'Для карбонары', checked:false, photo:'🍝' });
               items.push({ id: Date.now()+2, name: 'Сыр Пармезан', comment: 'Для карбонары', checked:false, photo:'🧀' });
+              broadcastSync('SHOPPING_UPDATE', { items: items });
               render();
               showToast('Продукты для пасты улетели в список покупок!');
             ">🛒 Добавить продукты в список покупок</button>
@@ -2238,7 +2671,9 @@
       }
     }
 
+    loadLocalState();
     render();
+    setTimeout(initMqtt, 300);
   </script>
 </body>
 </html>
