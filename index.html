@@ -2052,17 +2052,15 @@
       initMqtt();
     }
 
-    // Облачная синхронизация нового поколения через HTTPS/SSE (порт 443) + WebSocket + MQTT
-    let syncEventSource = null;
-    let syncWs = null;
+    // Облачная синхронизация по проверенному WSS/MQTT каналу (EMQX 8084)
     let mqttClient = null;
-    let isCloudConnected = false;
-    let cloudReconnectTimer = null;
+    let isConnected = false;
+    let reconnectTimer = null;
     let lastProcessedMsgTime = 0;
     let lastProcessedMsgSig = '';
 
-    function getSyncTopic() {
-      return 'cozyhome_sync_' + pairCode;
+    function getMqttTopic() {
+      return 'cozyhome/v2/room_' + pairCode;
     }
 
     function setDefaultPairCode() {
@@ -2072,7 +2070,7 @@
       getSyncBroadcastChannel();
       closePairModal();
       showToast('Установлен общий семейный код 777 888!');
-      initCloudSync();
+      initMqtt();
       render();
     }
 
@@ -2100,99 +2098,67 @@
     }
 
     function initCloudSync() {
+      initMqtt();
+    }
+
+    function initMqtt() {
       updateSyncBadge('connecting', 'Связь...');
       notifyAndroidBridgeSync();
 
-      // 1. Полнодуплексный WebSocket к защищенному HTTPS/WSS (порт 443)
-      try {
-        if (syncWs) {
-          try { syncWs.close(); } catch(e) {}
-        }
-        syncWs = new WebSocket('wss://ntfy.sh/' + getSyncTopic() + '/ws');
+      if (typeof Paho === 'undefined') {
+        console.warn('Paho MQTT library not found');
+        updateSyncBadge('offline', 'Офлайн');
+        return;
+      }
 
-        syncWs.onopen = () => {
-          isCloudConnected = true;
-          updateSyncBadge('online', 'В сети');
-          broadcastSync('SYNC_REQUEST', { requester: myDeviceId, senderRole: currentRole, senderMood: myMood });
+      try {
+        if (mqttClient) {
+          try { mqttClient.disconnect(); } catch (e) {}
+        }
+
+        const clientId = 'cozy_web_' + myDeviceId + '_' + Math.floor(Math.random() * 1000);
+        mqttClient = new Paho.MQTT.Client('broker.emqx.io', 8084, '/mqtt', clientId);
+
+        mqttClient.onConnectionLost = (responseObject) => {
+          isConnected = false;
+          updateSyncBadge('offline', 'Офлайн');
+          clearTimeout(reconnectTimer);
+          reconnectTimer = setTimeout(initMqtt, 3000);
         };
 
-        syncWs.onmessage = (event) => {
+        mqttClient.onMessageArrived = (message) => {
           try {
-            const ntfyMsg = JSON.parse(event.data);
-            if (ntfyMsg.event === 'message' && ntfyMsg.message) {
-              const payload = JSON.parse(ntfyMsg.message);
-              handleIncomingSync(payload);
-            }
-          } catch(e) {
-            console.error('WS parse error:', e);
+            const payload = JSON.parse(message.payloadString);
+            handleIncomingSync(payload);
+          } catch (e) {
+            console.error('MQTT JSON error:', e);
           }
         };
 
-        syncWs.onerror = () => {
-          connectEventSourceFallback();
-        };
-
-        syncWs.onclose = () => {
-          isCloudConnected = false;
-          updateSyncBadge('offline', 'Офлайн');
-          clearTimeout(cloudReconnectTimer);
-          cloudReconnectTimer = setTimeout(initCloudSync, 4000);
-        };
-      } catch(err) {
-        connectEventSourceFallback();
+        mqttClient.connect({
+          useSSL: true,
+          timeout: 6,
+          keepAliveInterval: 25,
+          cleanSession: true,
+          onSuccess: () => {
+            isConnected = true;
+            updateSyncBadge('online', 'В сети');
+            mqttClient.subscribe(getMqttTopic(), { qos: 1 });
+            broadcastSync('SYNC_REQUEST', { requester: myDeviceId, senderRole: currentRole, senderMood: myMood });
+          },
+          onFailure: (err) => {
+            isConnected = false;
+            updateSyncBadge('offline', 'Офлайн');
+            clearTimeout(reconnectTimer);
+            reconnectTimer = setTimeout(initMqtt, 4000);
+          }
+        });
+      } catch (err) {
+        isConnected = false;
+        updateSyncBadge('offline', 'Офлайн');
+        clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(initMqtt, 4000);
       }
-
-      // 2. Инициализируем резервный MQTT клиент HiveMQ
-      initMqttFallback();
-    }
-
-    function connectEventSourceFallback() {
-      if (typeof EventSource === 'undefined') return;
-      if (syncEventSource) {
-        try { syncEventSource.close(); } catch(e) {}
-      }
-      try {
-        syncEventSource = new EventSource('https://ntfy.sh/' + getSyncTopic() + '/sse');
-        syncEventSource.onopen = () => {
-          isCloudConnected = true;
-          updateSyncBadge('online', 'В сети');
-        };
-        syncEventSource.onmessage = (event) => {
-          try {
-            const ntfyMsg = JSON.parse(event.data);
-            if (ntfyMsg.event === 'message' && ntfyMsg.message) {
-              const payload = JSON.parse(ntfyMsg.message);
-              handleIncomingSync(payload);
-            }
-          } catch(e) {}
-        };
-      } catch(e) {}
-    }
-
-    function initMqttFallback() {
-      if (typeof Paho === 'undefined') return;
-      try {
-        if (!mqttClient) {
-          const clientId = 'cozy_' + myDeviceId;
-          mqttClient = new Paho.MQTT.Client('broker.hivemq.com', 8884, '/mqtt', clientId);
-          mqttClient.onMessageArrived = (message) => {
-            try {
-              const payload = JSON.parse(message.payloadString);
-              handleIncomingSync(payload);
-            } catch(e) {}
-          };
-          mqttClient.connect({
-            useSSL: true,
-            timeout: 5,
-            keepAliveInterval: 30,
-            cleanSession: true,
-            onSuccess: () => {
-              mqttClient.subscribe('cozyhome/v2/room_' + pairCode, { qos: 1 });
-            },
-            onFailure: () => {}
-          });
-        }
-      } catch(e) {}
     }
 
     function broadcastSync(type, data) {
@@ -2206,36 +2172,22 @@
         timestamp: Date.now()
       };
 
-      // 1. BroadcastChannel для синхронизации вкладок
+      // 1. BroadcastChannel для вкладок
       const bc = getSyncBroadcastChannel();
       if (bc) {
-        try { bc.postMessage(msg); } catch(e) {}
+        try { bc.postMessage(msg); } catch (e) {}
       }
 
-      // 2. WebSocket
-      if (syncWs && syncWs.readyState === WebSocket.OPEN) {
-        try {
-          syncWs.send(JSON.stringify(msg));
-        } catch(e) {}
-      }
-
-      // 3. Надежная публикация через HTTPS POST (порт 443)
-      try {
-        fetch('https://ntfy.sh/' + getSyncTopic(), {
-          method: 'POST',
-          headers: { 'Title': 'CozyHome', 'Priority': 'high' },
-          body: JSON.stringify(msg)
-        }).catch(() => {});
-      } catch(e) {}
-
-      // 4. Резервный MQTT
+      // 2. Отправка через MQTT
       if (mqttClient && mqttClient.isConnected && mqttClient.isConnected()) {
         try {
           const pahoMsg = new Paho.MQTT.Message(JSON.stringify(msg));
-          pahoMsg.destinationName = 'cozyhome/v2/room_' + pairCode;
+          pahoMsg.destinationName = getMqttTopic();
           pahoMsg.qos = 1;
           mqttClient.send(pahoMsg);
-        } catch(e) {}
+        } catch (e) {
+          console.warn('MQTT broadcast failed:', e);
+        }
       }
     }
 
