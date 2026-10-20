@@ -32,7 +32,7 @@ jobs:
       - name: Copy latest web assets to Android
         run: |
           mkdir -p android/app/src/main/assets
-          cp index.html manifest.json sw.js icon-192.png icon-512.png paho-mqtt.js android/app/src/main/assets/
+          cp index.html manifest.json sw.js icon-192.png icon-512.png socket.io.min.js android/app/src/main/assets/
           if [ -d "assets" ]; then cp -r assets android/app/src/main/assets/; fi
 
       - name: Build APK with Gradle
@@ -43,7 +43,7 @@ jobs:
       - name: Prepare APK Asset
         run: |
           mkdir -p build-output
-          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.0.8.apk
+          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.1.0.apk
           cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-latest.apk
 
       - name: Upload APK Artifact
@@ -56,27 +56,27 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.8
-          name: "🏡 Уютный Дом v1.0.8 (Мгновенное подключение «В сети», надежный EMQX WSS + нативный MQTT)"
+          tag_name: v1.1.0
+          name: "🏡 Уютный Дом v1.1.0 (Личный сервер Socket.IO + HTTP Long-Polling 24/7)"
           make_latest: "true"
           overwrite: true
           body: |
-            ### Нативное приложение «Уютный Дом» v1.0.8 для двоих
+            ### Нативное приложение «Уютный Дом» v1.1.0 для двоих
 
-            - 🟢 **Мгновенное подключение «В сети» (устранен оранжевый кружок):**
-              - Исправлена ошибка инициализации Paho MQTT: подключение к проверенному WSS-брокеру EMQX (порт 8084) происходит за 1 секунду. Индикатор статуса сразу загорается зелёным: **«В сети #777888»**.
-              - Устранена ошибка вызова `initMqtt()` при первом входе через окно онбординга.
-            - 🔔 **Нативный SSL MQTT в фоновой службе Android (24/7):**
-              - В `CozySyncService` внедрена библиотека Paho Java MQTT с постоянным защищённым каналом `ssl://broker.emqx.io:8883`.
-              - Пуши, реакции и изменения настроения доставляются на телефон партнера и на виджет рабочего стола моментально, даже когда приложение закрыто!
-            - 🔕 **Строго одно системное уведомление:** Убран дублирующий всплывающий баннер внутри экрана.
-            - 📋 **Редактирование Паспорта Дома и Рецептов:** Окна редактирования работают безупречно.
+            - 🚀 **Личный приватный сервер синхронизации (Node.js + Socket.IO):**
+              - Переход с капризных публичных MQTT на свой собственный высокоскоростной сервер.
+              - **Socket.IO с технологией умного фолбэка:** соединение мгновенно стартует через HTTP Long-Polling на стандартном порту 443 (HTTPS), а затем переходит в WebSocket. Это пробивает любые сотовые фильтры операторов РФ (МТС, Мегафон, Билайн, Теле2).
+              - На сервере подключены только ваши 2 смартфона: 0 спама, 0 задержек, 0 банов.
+            - 🔔 **Умная фоновая служба Android (24/7):**
+              - Нативная служба `CozySyncService` использует непрерывный HTTP Long-Polling `/api/poll`. Доставка SOS-пушей, сигналов «Я в магазине» и обновлений виджета происходит за доли секунды, даже когда телефон спит или приложение закрыто!
+            - 🌐 **Настройка адреса сервера в приложении:**
+              - В окне семейной связи добавлено поле для ввода адреса вашего личного сервера на Koyeb / Railway.
             
             **Скачать и установить:**
             1. Нажмите на **`cozy-home-latest.apk`** ниже.
             2. Запустите файл на смартфоне и нажмите **Установить**.
           files: |
-            build-output/cozy-home-v1.0.8.apk
+            build-output/cozy-home-v1.1.0.apk
             build-output/cozy-home-latest.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

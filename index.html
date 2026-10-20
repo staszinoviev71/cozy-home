@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+  <script src="socket.io.min.js"></script>
   <style>
     :root {
       --primary: #FF5E62;
@@ -1725,6 +1725,22 @@
         </div>
       </div>
 
+      <!-- Личный облачный сервер синхронизации (Koyeb) -->
+      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px; margin-bottom:14px;">
+        <div style="font-size:11px; font-weight:800; color:#A0A5B5; text-transform:uppercase; margin-bottom:6px;">
+          🌐 Личный сервер синхронизации:
+        </div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="inputCustomServerUrl" class="form-input" placeholder="https://cozy-home-xxxx.koyeb.app" style="font-size:12px;">
+          <button class="btn-primary-action" style="padding:0 12px; white-space:nowrap; font-size:11px;" onclick="saveCustomServerUrl()">
+            Сохранить
+          </button>
+        </div>
+        <div style="font-size:10px; color:#8E93A3; margin-top:6px;">
+          Укажите адрес вашего сервиса на Koyeb (работает 24/7 без сбоев)
+        </div>
+      </div>
+
 
 
       <div class="form-actions">
@@ -2002,8 +2018,30 @@
       if (disp) {
         disp.innerText = pairCode.replace(/(\d{3})(\d{3})/, '$1 $2');
       }
+      const srvInp = document.getElementById('inputCustomServerUrl');
+      if (srvInp) {
+        srvInp.value = customServerUrl;
+      }
       document.getElementById('deviceRoleHusband')?.classList.toggle('active', currentRole === 'husband');
       document.getElementById('deviceRoleWife')?.classList.toggle('active', currentRole === 'wife');
+    }
+
+    function saveCustomServerUrl() {
+      const srvInp = document.getElementById('inputCustomServerUrl');
+      let val = srvInp ? srvInp.value.trim() : '';
+      if (val && !val.startsWith('http://') && !val.startsWith('https://')) {
+        val = 'https://' + val;
+      }
+      val = val.replace(/\/+$/, '');
+      customServerUrl = val;
+      localStorage.setItem('cozy_cloud_server_url', customServerUrl);
+      if (window.AndroidBridge && window.AndroidBridge.setServerUrl) {
+        try {
+          window.AndroidBridge.setServerUrl(customServerUrl);
+        } catch(e) {}
+      }
+      showToast('Адрес сервера сохранен!');
+      initSocketSync();
     }
 
     function closePairModal() {
@@ -2052,16 +2090,12 @@
       initMqtt();
     }
 
-    // Облачная синхронизация по проверенному WSS/MQTT каналу (EMQX 8084)
-    let mqttClient = null;
+    // Облачная синхронизация нового поколения через Socket.IO (Koyeb 24/7)
+    let socketClient = null;
     let isConnected = false;
-    let reconnectTimer = null;
+    let customServerUrl = localStorage.getItem('cozy_cloud_server_url') || '';
     let lastProcessedMsgTime = 0;
     let lastProcessedMsgSig = '';
-
-    function getMqttTopic() {
-      return 'cozyhome/v2/room_' + pairCode;
-    }
 
     function setDefaultPairCode() {
       pairCode = '777888';
@@ -2070,7 +2104,7 @@
       getSyncBroadcastChannel();
       closePairModal();
       showToast('Установлен общий семейный код 777 888!');
-      initMqtt();
+      initSocketSync();
       render();
     }
 
@@ -2078,6 +2112,11 @@
       if (window.AndroidBridge && window.AndroidBridge.setSyncInfo) {
         try {
           window.AndroidBridge.setSyncInfo(myDeviceId, pairCode, currentRole);
+        } catch(e) {}
+      }
+      if (window.AndroidBridge && window.AndroidBridge.setServerUrl && customServerUrl) {
+        try {
+          window.AndroidBridge.setServerUrl(customServerUrl);
         } catch(e) {}
       }
     }
@@ -2097,74 +2136,102 @@
       }
     }
 
-    function initCloudSync() {
-      initMqtt();
-    }
-
-    function initMqtt() {
-      updateSyncBadge('connecting', 'Связь...');
+    function initSocketSync() {
       notifyAndroidBridgeSync();
 
-      if (typeof Paho === 'undefined') {
-        console.warn('Paho MQTT library not found');
+      const serverUrl = customServerUrl.trim();
+      if (!serverUrl) {
+        updateSyncBadge('connecting', 'Ждёт сервер');
+        return;
+      }
+
+      updateSyncBadge('connecting', 'Связь...');
+
+      if (typeof io === 'undefined') {
+        console.warn('Socket.IO client library not loaded');
         updateSyncBadge('offline', 'Офлайн');
         return;
       }
 
       try {
-        if (mqttClient) {
-          try { mqttClient.disconnect(); } catch (e) {}
+        if (socketClient) {
+          try { socketClient.disconnect(); } catch (e) {}
         }
 
-        const clientId = 'cozy_web_' + myDeviceId + '_' + Math.floor(Math.random() * 1000);
-        mqttClient = new Paho.MQTT.Client('broker.emqx.io', 8084, '/mqtt', clientId);
+        socketClient = io(serverUrl, {
+          transports: ['polling', 'websocket'], // Начинает с HTTP Long-Polling (100% пробивает сотовые сети РФ), затем переходит на WebSocket
+          reconnection: true,
+          reconnectionDelay: 1000,
+          reconnectionDelayMax: 5000,
+          timeout: 10000
+        });
 
-        mqttClient.onConnectionLost = (responseObject) => {
+        socketClient.on('connect', () => {
+          isConnected = true;
+          updateSyncBadge('online', 'В сети');
+          socketClient.emit('join_room', {
+            roomCode: pairCode,
+            deviceId: myDeviceId,
+            role: currentRole,
+            mood: myMood
+          });
+          broadcastSync('SYNC_REQUEST', { requester: myDeviceId, senderRole: currentRole, senderMood: myMood });
+        });
+
+        socketClient.on('room_state', (data) => {
+          if (data && data.state) {
+            handleIncomingFullState(data.state);
+          }
+        });
+
+        socketClient.on('sync_message', (msg) => {
+          handleIncomingSync(msg);
+        });
+
+        socketClient.on('connect_error', (err) => {
+          isConnected = false;
+          updateSyncBadge('connecting', 'Связь...');
+        });
+
+        socketClient.on('disconnect', () => {
           isConnected = false;
           updateSyncBadge('offline', 'Офлайн');
-          clearTimeout(reconnectTimer);
-          reconnectTimer = setTimeout(initMqtt, 3000);
-        };
-
-        mqttClient.onMessageArrived = (message) => {
-          try {
-            const payload = JSON.parse(message.payloadString);
-            handleIncomingSync(payload);
-          } catch (e) {
-            console.error('MQTT JSON error:', e);
-          }
-        };
-
-        mqttClient.connect({
-          useSSL: true,
-          timeout: 6,
-          keepAliveInterval: 25,
-          cleanSession: true,
-          onSuccess: () => {
-            isConnected = true;
-            updateSyncBadge('online', 'В сети');
-            mqttClient.subscribe(getMqttTopic(), { qos: 1 });
-            broadcastSync('SYNC_REQUEST', { requester: myDeviceId, senderRole: currentRole, senderMood: myMood });
-          },
-          onFailure: (err) => {
-            isConnected = false;
-            updateSyncBadge('offline', 'Офлайн');
-            clearTimeout(reconnectTimer);
-            reconnectTimer = setTimeout(initMqtt, 4000);
-          }
         });
       } catch (err) {
         isConnected = false;
         updateSyncBadge('offline', 'Офлайн');
-        clearTimeout(reconnectTimer);
-        reconnectTimer = setTimeout(initMqtt, 4000);
       }
+    }
+
+    // Алиасы для обратной совместимости
+    const initMqtt = initSocketSync;
+    const initCloudSync = initSocketSync;
+
+    function handleIncomingFullState(state) {
+      if (!state) return;
+      if (state.moods) {
+        const partnerRole = currentRole === 'husband' ? 'wife' : 'husband';
+        if (state.moods[partnerRole]) {
+          partnerMood = state.moods[partnerRole];
+          updateNativeWidget();
+        }
+      }
+      if (state.items) {
+        items = state.items;
+        updateNativeWidget();
+      }
+      if (state.passportItems) passportItems = state.passportItems;
+      if (state.dinnerPoll) dinnerPoll = state.dinnerPoll;
+      if (state.dinnerRecipes) dinnerRecipes = state.dinnerRecipes;
+      saveLocalState();
+      render();
     }
 
     function broadcastSync(type, data) {
       saveLocalState();
 
       const msg = {
+        roomCode: pairCode,
         senderDeviceId: myDeviceId,
         senderRole: currentRole,
         type: type,
@@ -2172,22 +2239,22 @@
         timestamp: Date.now()
       };
 
-      // 1. BroadcastChannel для вкладок
+      // 1. BroadcastChannel для синхронизации вкладок
       const bc = getSyncBroadcastChannel();
       if (bc) {
         try { bc.postMessage(msg); } catch (e) {}
       }
 
-      // 2. Отправка через MQTT
-      if (mqttClient && mqttClient.isConnected && mqttClient.isConnected()) {
-        try {
-          const pahoMsg = new Paho.MQTT.Message(JSON.stringify(msg));
-          pahoMsg.destinationName = getMqttTopic();
-          pahoMsg.qos = 1;
-          mqttClient.send(pahoMsg);
-        } catch (e) {
-          console.warn('MQTT broadcast failed:', e);
-        }
+      // 2. Отправка через Socket.IO на свой сервер
+      if (socketClient && socketClient.connected) {
+        socketClient.emit('sync_message', msg);
+      } else if (customServerUrl) {
+        // Резервная отправка через HTTP POST
+        fetch(customServerUrl + '/api/sync/' + pairCode, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(msg)
+        }).catch(() => {});
       }
     }
 

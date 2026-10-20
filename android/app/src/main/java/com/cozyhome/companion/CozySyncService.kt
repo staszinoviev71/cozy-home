@@ -9,13 +9,13 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import org.eclipse.paho.client.mqttv3.*
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 class CozySyncService : Service() {
 
-    private var mqttClient: MqttAsyncClient? = null
+    private var workerThread: Thread? = null
     @Volatile
     private var isRunning = false
 
@@ -32,7 +32,7 @@ class CozySyncService : Service() {
 
         if (!isRunning) {
             isRunning = true
-            connectMqtt()
+            startLongPolling()
         }
 
         return START_STICKY
@@ -70,68 +70,69 @@ class CozySyncService : Service() {
             )
             .build()
 
-    @Synchronized
-    private fun connectMqtt() {
-        try {
-            val prefs = getSharedPreferences("cozy_widget_prefs", Context.MODE_PRIVATE)
-            val pairCode = prefs.getString("pair_code", "777888") ?: "777888"
-            val myDeviceId = prefs.getString("my_device_id", "") ?: ""
+    private fun startLongPolling() {
+        workerThread?.interrupt()
+        workerThread = Thread {
+            var lastSince = System.currentTimeMillis() - 10000
 
-            val clientId = "cozy_bg_" + (if (myDeviceId.isNotBlank()) myDeviceId else "dev_" + System.currentTimeMillis())
-            val brokerUrl = "ssl://broker.emqx.io:8883"
-
-            mqttClient?.let {
+            while (isRunning) {
                 try {
-                    if (it.isConnected) it.disconnect()
-                } catch (e: Exception) {}
-            }
+                    val prefs = getSharedPreferences("cozy_widget_prefs", Context.MODE_PRIVATE)
+                    val rawServerUrl = prefs.getString("custom_server_url", "")?.trim() ?: ""
+                    val serverUrl = if (rawServerUrl.isNotBlank()) rawServerUrl.removeSuffix("/") else ""
+                    val pairCode = prefs.getString("pair_code", "777888") ?: "777888"
+                    val myDeviceId = prefs.getString("my_device_id", "") ?: ""
 
-            val client = MqttAsyncClient(brokerUrl, clientId, MemoryPersistence())
-            mqttClient = client
+                    if (serverUrl.isBlank()) {
+                        Thread.sleep(4000)
+                        continue
+                    }
 
-            val options = MqttConnectOptions().apply {
-                isAutomaticReconnect = true
-                isCleanSession = true
-                connectionTimeout = 10
-                keepAliveInterval = 30
-            }
+                    val pollUrl = "$serverUrl/api/poll/$pairCode?deviceId=$myDeviceId&since=$lastSince"
+                    val conn = (URL(pollUrl).openConnection() as HttpURLConnection).apply {
+                        requestMethod = "GET"
+                        connectTimeout = 10000
+                        readTimeout = 30000
+                    }
 
-            client.setCallback(object : MqttCallbackExtended {
-                override fun connectComplete(reconnect: Boolean, serverURI: String?) {
-                    val topic = "cozyhome/v2/room_$pairCode"
+                    val code = conn.responseCode
+                    if (code == 200) {
+                        val text = conn.inputStream.bufferedReader(Charsets.UTF_8).use { it.readText() }
+                        val json = JSONObject(text)
+                        val events = json.optJSONArray("events")
+                        if (events != null) {
+                            for (i in 0 until events.length()) {
+                                val ev = events.getJSONObject(i)
+                                val evTime = ev.optLong("time")
+                                if (evTime > lastSince) {
+                                    lastSince = evTime
+                                }
+                                val msg = ev.optJSONObject("msg")
+                                if (msg != null) {
+                                    handleIncomingMessage(msg, myDeviceId)
+                                }
+                            }
+                        }
+                    } else {
+                        Thread.sleep(3000)
+                    }
+                } catch (e: Exception) {
                     try {
-                        client.subscribe(topic, 1)
-                    } catch (e: Exception) {}
-                }
-
-                override fun connectionLost(cause: Throwable?) {}
-
-                override fun messageArrived(topic: String?, message: MqttMessage?) {
-                    if (message != null) {
-                        val payload = String(message.payload)
-                        handleIncomingPayload(payload, myDeviceId)
+                        Thread.sleep(3000)
+                    } catch (ie: InterruptedException) {
+                        break
                     }
                 }
-
-                override fun deliveryComplete(token: IMqttDeliveryToken?) {}
-            })
-
-            client.connect(options, null, object : IMqttActionListener {
-                override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    val topic = "cozyhome/v2/room_$pairCode"
-                    try {
-                        client.subscribe(topic, 1)
-                    } catch (e: Exception) {}
-                }
-
-                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {}
-            })
-        } catch (e: Exception) {}
+            }
+        }.apply {
+            isDaemon = true
+            name = "CozyPollWorker"
+            start()
+        }
     }
 
-    private fun handleIncomingPayload(rawMessage: String, myDeviceId: String) {
+    private fun handleIncomingMessage(msg: JSONObject, myDeviceId: String) {
         try {
-            val msg = JSONObject(rawMessage)
             val senderDeviceId = msg.optString("senderDeviceId")
             if (myDeviceId.isNotBlank() && senderDeviceId == myDeviceId) {
                 return
@@ -214,10 +215,8 @@ class CozySyncService : Service() {
 
     override fun onDestroy() {
         isRunning = false
-        try {
-            mqttClient?.disconnect()
-        } catch (e: Exception) {}
-        mqttClient = null
+        workerThread?.interrupt()
+        workerThread = null
         super.onDestroy()
     }
 

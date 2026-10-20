@@ -145,6 +145,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
+        fun setServerUrl(url: String) {
+            val prefs = getSharedPreferences("cozy_widget_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putString("custom_server_url", url).apply()
+            CozySyncService.start(this@MainActivity)
+        }
+
+        @JavascriptInterface
         fun setSyncInfo(deviceId: String, pairCode: String, role: String) {
             val prefs = getSharedPreferences("cozy_widget_prefs", Context.MODE_PRIVATE)
             prefs.edit()
