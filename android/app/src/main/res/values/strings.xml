@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Уютный Дом</string>
+    <string name="widget_name">Уютный Дом: Настроение (4x2)</string>
+    <string name="widget_default_mood">На волне радости!</string>
+    <string name="widget_action_hug">Обнять</string>
+    <string name="widget_action_on_way">Уже еду</string>
+    <string name="widget_action_shop">Покупки</string>
+</resources>

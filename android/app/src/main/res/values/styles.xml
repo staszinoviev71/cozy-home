@@ -1,0 +1,14 @@
+<resources>
+    <style name="Theme.CozyHome" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#0B0E17</item>
+        <item name="android:navigationBarColor">#0B0E17</item>
+        <item name="android:windowBackground">#0B0E17</item>
+    </style>
+
+    <style name="Theme.CozyHome.Fullscreen" parent="Theme.CozyHome">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+</resources>
