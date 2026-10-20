@@ -2074,7 +2074,9 @@
           avatarType: avatarType,
           items: items,
           gamePresets: gamePresets,
-          passportItems: passportItems
+          passportItems: passportItems,
+          dinnerPoll: dinnerPoll,
+          dinnerRecipes: dinnerRecipes
         });
       } else if (type === 'SYNC_FULL_STATE') {
         if (data.senderMood) {
@@ -2091,6 +2093,8 @@
         }
         if (data.gamePresets) Object.assign(gamePresets, data.gamePresets);
         if (data.passportItems) passportItems = data.passportItems;
+        if (data.dinnerPoll) dinnerPoll = data.dinnerPoll;
+        if (data.dinnerRecipes) dinnerRecipes = data.dinnerRecipes;
         saveLocalState();
         render();
         showToast('✨ Данные синхронизированы с партнером!');
@@ -2122,6 +2126,18 @@
         saveLocalState();
         render();
         showToast('📋 Паспорт дома обновлен партнером!');
+      } else if (type === 'DINNER_POLL_UPDATE') {
+        if (data.poll) dinnerPoll = data.poll;
+        saveLocalState();
+        render();
+        if (navigator.vibrate) navigator.vibrate([100]);
+        const partnerName = currentRole === 'husband' ? 'Любимая' : 'Муж';
+        showToast('🍲 ' + partnerName + ' обновил(а) выбор ужина!');
+      } else if (type === 'DINNER_RECIPES_UPDATE') {
+        if (data.recipes) dinnerRecipes = data.recipes;
+        saveLocalState();
+        render();
+        showToast('🍝 Рецепты ужина обновлены партнером!');
       }
     }
 
@@ -2136,6 +2152,8 @@
           items,
           gamePresets,
           passportItems,
+          dinnerPoll,
+          dinnerRecipes,
           lastSaved: Date.now()
         };
         localStorage.setItem('cozy_state_' + pairCode, JSON.stringify(state));
@@ -2153,6 +2171,9 @@
           if (state.items) items = state.items;
           if (state.gamePresets) Object.assign(gamePresets, state.gamePresets);
           if (state.passportItems) passportItems = state.passportItems;
+          if (state.dinnerPoll) dinnerPoll = state.dinnerPoll;
+          if (state.dinnerRecipes) dinnerRecipes = state.dinnerRecipes;
+          avatarType = { husband: 'pixar', wife: 'pixar' };
         }
       } catch (e) {}
     }
@@ -2173,6 +2194,38 @@
     let diceResult = null;
     let wheelResult = null;
     let currentWheelRotation = 0;
+    let currentDiceTransform = '';
+
+    let dinnerPoll = {
+      title: 'Что приготовим сегодня на ужин? 🍲',
+      options: ['Паста Карбонара 🍝', 'Лосось с овощами 🐟', 'Пицца из дровяной печи 🍕', 'Легкий салат Цезарь 🥗'],
+      votes: {
+        husband: null,
+        wife: null
+      },
+      createdAt: Date.now()
+    };
+
+    let dinnerRecipes = [
+      {
+        id: 'rec_1',
+        title: 'Паста Карбонара 🍝',
+        time: '25 мин',
+        ingredients: ['Спагетти Barilla', 'Бекон', 'Сыр Пармезан', 'Сливки 20%', 'Яйца']
+      },
+      {
+        id: 'rec_2',
+        title: 'Лосось на гриле с овощами 🐟',
+        time: '30 мин',
+        ingredients: ['Филе лосося', 'Брокколи', 'Черри', 'Лимон', 'Оливковое масло']
+      },
+      {
+        id: 'rec_3',
+        title: 'Нежное ризотто с грибами 🍄',
+        time: '35 мин',
+        ingredients: ['Рис Арборио', 'Шампиньоны', 'Сыр Пармезан', 'Лук шалот', 'Белое сухое']
+      }
+    ];
 
     const gamePresets = {
       dishes: {
@@ -2311,10 +2364,11 @@
       const targetX = rot.x + (spinCount * 360);
       const targetY = rot.y + (spinCount * 360);
 
+      currentDiceTransform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
       setTimeout(() => {
         const cube = document.getElementById('diceCubeElement');
         if (cube) {
-          cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+          cube.style.transform = currentDiceTransform;
         }
       }, 50);
 
@@ -2594,6 +2648,250 @@
       showToast(`Запись «${label}» успешно добавлена в паспорт дома!`);
     }
 
+    let currentEditingPassportId = null;
+
+    function openEditPassportModal(id) {
+      const item = passportItems.find(p => p.id === id);
+      if (!item) return;
+      currentEditingPassportId = id;
+      const modal = document.getElementById('editPassportModal');
+      if (!modal) return;
+      document.getElementById('editPassCategory').value = item.category || 'custom';
+      document.getElementById('editPassLabel').value = item.label || '';
+      document.getElementById('editPassValue').value = item.value || '';
+      document.getElementById('editPassNote').value = item.note || '';
+      modal.style.display = 'flex';
+    }
+
+    function closeEditPassportModal() {
+      const modal = document.getElementById('editPassportModal');
+      if (modal) modal.style.display = 'none';
+      currentEditingPassportId = null;
+    }
+
+    function saveEditedPassportItem() {
+      if (!currentEditingPassportId) return;
+      const cat = document.getElementById('editPassCategory').value;
+      const label = document.getElementById('editPassLabel').value.trim();
+      const val = document.getElementById('editPassValue').value.trim();
+      const note = document.getElementById('editPassNote').value.trim();
+
+      if (!label || !val) {
+        showToast('Заполните название и значение!');
+        return;
+      }
+
+      const icons = {
+        intercom: '🔢',
+        wifi: '📶',
+        filter: '🚰',
+        meter: '⚡',
+        paint: '🎨',
+        master: '🔧',
+        custom: '📋'
+      };
+
+      const idx = passportItems.findIndex(p => p.id === currentEditingPassportId);
+      if (idx !== -1) {
+        passportItems[idx] = {
+          ...passportItems[idx],
+          category: cat,
+          icon: icons[cat] || '📋',
+          label: label,
+          value: val,
+          note: note || undefined,
+          updatedAt: Date.now()
+        };
+        closeEditPassportModal();
+        broadcastSync('PASSPORT_UPDATE', { items: passportItems });
+        render();
+        showToast(`Запись «${label}» обновлена!`);
+      }
+    }
+
+    function deletePassportItem() {
+      if (!currentEditingPassportId) return;
+      const item = passportItems.find(p => p.id === currentEditingPassportId);
+      const label = item ? item.label : '';
+      passportItems = passportItems.filter(p => p.id !== currentEditingPassportId);
+      closeEditPassportModal();
+      broadcastSync('PASSPORT_UPDATE', { items: passportItems });
+      render();
+      showToast(`Запись «${label}» удалена из паспорта дома`);
+    }
+
+    // ==================== ДЛЯ УЖИНА (ГОЛОСОВАНИЕ И РЕЦЕПТЫ) ====================
+    let currentEditingRecipeId = null;
+
+    function openDinnerPollModal() {
+      const modal = document.getElementById('dinnerPollModal');
+      if (!modal) return;
+      document.getElementById('pollQuestionInput').value = dinnerPoll.title || 'Что приготовим сегодня на ужин? 🍲';
+      const opts = dinnerPoll.options || [];
+      for (let i = 0; i < 4; i++) {
+        const el = document.getElementById('pollOpt_' + i);
+        if (el) el.value = opts[i] || '';
+      }
+      modal.style.display = 'flex';
+    }
+
+    function closeDinnerPollModal() {
+      const modal = document.getElementById('dinnerPollModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function saveDinnerPoll() {
+      const q = document.getElementById('pollQuestionInput').value.trim() || 'Что приготовим сегодня на ужин? 🍲';
+      const opts = [];
+      for (let i = 0; i < 4; i++) {
+        const el = document.getElementById('pollOpt_' + i);
+        const val = el ? el.value.trim() : '';
+        if (val) opts.push(val);
+      }
+      if (opts.length < 2) {
+        showToast('Укажите хотя бы 2 варианта блюда для голосования!');
+        return;
+      }
+
+      dinnerPoll = {
+        title: q,
+        options: opts,
+        votes: {
+          husband: null,
+          wife: null
+        },
+        createdAt: Date.now()
+      };
+
+      closeDinnerPollModal();
+      broadcastSync('DINNER_POLL_UPDATE', { poll: dinnerPoll });
+      render();
+      showToast('🎉 Опрос запущен! Партнер видит новые варианты ужина.');
+    }
+
+    function voteDinner(option) {
+      if (!dinnerPoll) return;
+      if (!dinnerPoll.votes) dinnerPoll.votes = { husband: null, wife: null };
+      dinnerPoll.votes[currentRole] = option;
+      if (window.AndroidBridge && window.AndroidBridge.vibrate) {
+        window.AndroidBridge.vibrate(40);
+      } else if (navigator.vibrate) {
+        navigator.vibrate(30);
+      }
+      broadcastSync('DINNER_POLL_UPDATE', { poll: dinnerPoll });
+      render();
+      showToast('Твой выбор: ' + option + ' ✅');
+    }
+
+    function addPollWinnerToShopping(dishName) {
+      const rec = dinnerRecipes.find(r => r.title.toLowerCase().includes(dishName.toLowerCase()) || dishName.toLowerCase().includes(r.title.toLowerCase()));
+      if (rec && rec.ingredients && rec.ingredients.length > 0) {
+        rec.ingredients.forEach((ing) => {
+          addShoppingItem(ing, 'Для ужина: ' + dishName, '🍲');
+        });
+        showToast('🛒 Все ингредиенты для «' + dishName + '» добавлены в покупки!');
+      } else {
+        addShoppingItem(dishName, 'Выбранный ужин', '🍲');
+        showToast('🛒 «' + dishName + '» добавлен в список покупок!');
+      }
+    }
+
+    function openRecipeModal(recipeId = null) {
+      currentEditingRecipeId = recipeId;
+      const modal = document.getElementById('editRecipeModal');
+      const heading = document.getElementById('recipeModalHeading');
+      const delBtn = document.getElementById('recipeDeleteBtn');
+      if (!modal) return;
+
+      if (recipeId) {
+        const r = dinnerRecipes.find(item => item.id === recipeId);
+        if (!r) return;
+        heading.innerText = 'Редактировать рецепт ✏️';
+        document.getElementById('recipeTitleInput').value = r.title || '';
+        document.getElementById('recipeTimeInput').value = r.time || '';
+        document.getElementById('recipeIngredientsInput').value = (r.ingredients || []).join(', ');
+        if (delBtn) delBtn.style.display = 'block';
+      } else {
+        heading.innerText = 'Новый рецепт ужина 🍝';
+        document.getElementById('recipeTitleInput').value = '';
+        document.getElementById('recipeTimeInput').value = '25 мин';
+        document.getElementById('recipeIngredientsInput').value = '';
+        if (delBtn) delBtn.style.display = 'none';
+      }
+      modal.style.display = 'flex';
+    }
+
+    function closeRecipeModal() {
+      const modal = document.getElementById('editRecipeModal');
+      if (modal) modal.style.display = 'none';
+      currentEditingRecipeId = null;
+    }
+
+    function saveRecipe() {
+      const title = document.getElementById('recipeTitleInput').value.trim();
+      const time = document.getElementById('recipeTimeInput').value.trim() || '25 мин';
+      const rawIng = document.getElementById('recipeIngredientsInput').value.trim();
+
+      if (!title) {
+        showToast('Укажите название блюда!');
+        return;
+      }
+
+      const ingredients = rawIng
+        ? rawIng.split(',').map(s => s.trim()).filter(Boolean)
+        : [];
+
+      if (currentEditingRecipeId) {
+        const idx = dinnerRecipes.findIndex(r => r.id === currentEditingRecipeId);
+        if (idx !== -1) {
+          dinnerRecipes[idx] = {
+            ...dinnerRecipes[idx],
+            title,
+            time,
+            ingredients
+          };
+          showToast('Рецепт «' + title + '» обновлен!');
+        }
+      } else {
+        dinnerRecipes.unshift({
+          id: 'rec_' + Date.now(),
+          title,
+          time,
+          ingredients
+        });
+        showToast('Новый рецепт «' + title + '» сохранён!');
+      }
+
+      closeRecipeModal();
+      broadcastSync('DINNER_RECIPES_UPDATE', { recipes: dinnerRecipes });
+      render();
+    }
+
+    function deleteRecipe() {
+      if (!currentEditingRecipeId) return;
+      const r = dinnerRecipes.find(item => item.id === currentEditingRecipeId);
+      const title = r ? r.title : '';
+      dinnerRecipes = dinnerRecipes.filter(item => item.id !== currentEditingRecipeId);
+      closeRecipeModal();
+      broadcastSync('DINNER_RECIPES_UPDATE', { recipes: dinnerRecipes });
+      render();
+      showToast('Рецепт «' + title + '» удалён');
+    }
+
+    function addRecipeToShopping(recipeId) {
+      const r = dinnerRecipes.find(item => item.id === recipeId);
+      if (!r) return;
+      if (r.ingredients && r.ingredients.length > 0) {
+        r.ingredients.forEach(ing => {
+          addShoppingItem(ing, 'Для: ' + r.title, '🥘');
+        });
+        showToast('🛒 Ингредиенты для «' + r.title + '» в списке покупок!');
+      } else {
+        addShoppingItem(r.title, 'Блюдо на ужин', '🥘');
+        showToast('🛒 «' + r.title + '» добавлено в покупки!');
+      }
+    }
+
     // Генерация аватара: 3D Pixar, Вектор или Корги
     function getSvg(m, targetRole, forceType) {
       const role = targetRole || currentRole;
@@ -2748,7 +3046,8 @@
       container.innerHTML = `
         <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
           ${filtered.map(item => `
-            <div class="glass-card" style="padding:14px; margin:0; cursor:pointer;" onclick="copyToClipboard('${item.value}', '${item.label}')">
+            <div class="glass-card" style="padding:14px; margin:0; position:relative; cursor:pointer;" onclick="copyToClipboard('${item.value}', '${item.label}')">
+              <button style="position:absolute; top:8px; right:8px; background:rgba(255,255,255,0.08); border:none; border-radius:8px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; color:#A0A5B5; font-size:12px; cursor:pointer;" onclick="event.stopPropagation(); openEditPassportModal('${item.id}')" title="Редактировать">✏️</button>
               <div style="font-size:22px; margin-bottom:4px;">${item.icon}</div>
               <div style="font-size:10.5px; color:#8E93A3; font-weight:700;">${item.label}</div>
               <div style="font-size:13.5px; font-weight:800; color:#fff; word-break:break-all; margin:2px 0;">${item.value}</div>
@@ -2791,21 +3090,7 @@
               <span class="card-badge">Синхронно</span>
             </div>
 
-            <!-- Переключатель: 3D Pixar / Корги / Человек -->
-            <div class="avatar-archetype-row">
-              <span class="archetype-label">Вид аватара:</span>
-              <div class="archetype-tabs">
-                <button class="archetype-btn ${avatarType[currentRole] === 'pixar' ? 'active' : ''}" onclick="setAvatarType('pixar')">
-                  <span>✨</span> 3D Pixar
-                </button>
-                <button class="archetype-btn ${avatarType[currentRole] === 'corgi' ? 'active' : ''}" onclick="setAvatarType('corgi')">
-                  <span>🐶</span> Корги
-                </button>
-                <button class="archetype-btn ${avatarType[currentRole] === 'human' ? 'active' : ''}" onclick="setAvatarType('human')">
-                  <span>🎨</span> Вектор
-                </button>
-              </div>
-            </div>
+
 
             <div class="avatar-preview-row">
               <div class="avatar-box" style="--mood-glow: ${myMood.color};" onclick="triggerAvatarTap(this)">
@@ -2941,43 +3226,140 @@
           </div>
         `;
       } else if (currentTab === 'dinner') {
+        const partnerRole = currentRole === 'husband' ? 'wife' : 'husband';
+        const partnerName = currentRole === 'husband' ? 'Любимая' : 'Муж';
+
+        const myVote = (dinnerPoll && dinnerPoll.votes) ? dinnerPoll.votes[currentRole] : null;
+        const partnerVote = (dinnerPoll && dinnerPoll.votes) ? dinnerPoll.votes[partnerRole] : null;
+        const hasConsensus = myVote && partnerVote && myVote === partnerVote;
+        const isConflict = myVote && partnerVote && myVote !== partnerVote;
+
         container.innerHTML = `
-          <div class="card-head">
-            <h3>Что на ужин? 🍝</h3>
-          </div>
-          <div class="glass-card" style="padding:14px; margin-bottom:12px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-              <div style="font-size:14px; font-weight:800; color:#fff;">Паста Карбонара 🍝</div>
-              <span style="font-size:11px; color:#A0A5B5;">⏱ 25 мин</span>
+          <!-- БЛОК 1: ИНТЕРАКТИВНОЕ ГОЛОСОВАНИЕ НА УЖИН ДЛЯ ДВОИХ -->
+          <div class="card-head" style="margin-bottom:10px;">
+            <div>
+              <h3>Опрос на ужин 🍲</h3>
+              <p style="font-size:11px; color:#8E93A3;">Жена предлагает — муж голосует (и наоборот!)</p>
             </div>
-            <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:10px;">Спагетти, бекон, сыр Пармезан, сливки, яйца</div>
-            <button style="width:100%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:9px; color:#fff; font-size:11.5px; font-weight:700; cursor:pointer;" onclick="
-              addShoppingItem('Спагетти Barilla', 'Для карбонары', '🍝');
-              addShoppingItem('Сыр Пармезан', 'Для карбонары', '🧀');
-              showToast('Продукты для пасты улетели в список покупок!');
-            ">🛒 Добавить продукты в список покупок</button>
+            <button style="background:linear-gradient(135deg, #00F2FE, #4FACFE); border:none; border-radius:12px; padding:6px 12px; color:#0B0E17; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openDinnerPollModal()">
+              ＋ Новый опрос
+            </button>
           </div>
 
-          <div class="card-head" style="margin-top:20px;">
-            <h3>Вишлист маленьких радостей 🎁</h3>
-          </div>
-          <div class="shopping-item">
-            <div>
-              <div class="item-title">Аромасвеча Black Vanilla</div>
-              <div class="item-sub">Zara Home</div>
+          <div class="glass-card" style="padding:16px; margin-bottom:16px; border:1px solid rgba(0, 242, 254, 0.25);">
+            <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+              <span>🍲</span>
+              <span>${dinnerPoll.title || 'Что приготовим сегодня на ужин?'}</span>
             </div>
-            <span style="font-size:10px; font-weight:800; background:rgba(155,81,224,0.3); color:#D8B4FE; padding:4px 8px; border-radius:10px;">
-              🔒 Секрет куплен
-            </span>
-          </div>
-          <div class="shopping-item">
-            <div>
-              <div class="item-title">Теплые махровые носочки</div>
-              <div class="item-sub">Бежевые, размер 37</div>
+
+            <!-- Варианты блюд для голосования -->
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+              ${(dinnerPoll.options || []).map((opt) => {
+                const isSelectedByMe = myVote === opt;
+                const isSelectedByPartner = partnerVote === opt;
+                return `
+                  <div style="
+                    display:flex; align-items:center; justify-content:space-between;
+                    background:${isSelectedByMe ? 'rgba(0, 242, 254, 0.15)' : 'rgba(255, 255, 255, 0.04)'};
+                    border:1px solid ${isSelectedByMe ? '#00F2FE' : isSelectedByPartner ? '#FF5E62' : 'rgba(255, 255, 255, 0.1)'};
+                    border-radius:14px; padding:10px 14px; cursor:pointer; transition:all 0.2s ease;
+                  " onclick="voteDinner('${opt.replace(/'/g, "\'")}')">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="
+                        width:20px; height:20px; border-radius:50%;
+                        border:2px solid ${isSelectedByMe ? '#00F2FE' : 'rgba(255, 255, 255, 0.3)'};
+                        background:${isSelectedByMe ? '#00F2FE' : 'transparent'};
+                        display:flex; align-items:center; justify-content:center; font-size:10px; color:#0B0E17; font-weight:900;
+                      ">
+                        ${isSelectedByMe ? '✓' : ''}
+                      </div>
+                      <span style="font-size:13.5px; font-weight:700; color:${isSelectedByMe ? '#00F2FE' : '#FFFFFF'};">
+                        ${opt}
+                      </span>
+                    </div>
+
+                    <!-- Бейджи голосов участников -->
+                    <div style="display:flex; gap:6px; align-items:center;">
+                      ${isSelectedByMe ? `
+                        <span style="font-size:10px; font-weight:800; background:rgba(0, 242, 254, 0.25); color:#00F2FE; padding:3px 7px; border-radius:8px;">
+                          Ты ${currentRole === 'husband' ? '👱🏼‍♂️' : '👩🏻'}
+                        </span>
+                      ` : ''}
+                      ${isSelectedByPartner ? `
+                        <span style="font-size:10px; font-weight:800; background:rgba(255, 94, 98, 0.25); color:#FF5E62; padding:3px 7px; border-radius:8px;">
+                          ${partnerName} ${partnerRole === 'husband' ? '👱🏼‍♂️' : '👩🏻'}
+                        </span>
+                      ` : ''}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
             </div>
-            <button style="border:none; background:rgba(255,255,255,0.12); color:#fff; padding:6px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;" onclick="showToast('Помечено как секретная покупка: партнер не увидит пуш!')">
-              Купить тайно
+
+            <!-- Итог голосования / Статус консенсуса -->
+            ${hasConsensus ? `
+              <div style="background:rgba(34, 197, 94, 0.15); border:1px solid #22C55E; border-radius:14px; padding:12px; text-align:center; margin-bottom:6px;">
+                <div style="font-size:13.5px; font-weight:800; color:#4ADE80; margin-bottom:6px;">
+                  🎉 Ура! Вы оба выбрали: «${myVote}» 🥂
+                </div>
+                <button class="btn-primary-action" style="width:100%; font-size:12px; padding:8px 12px; background:linear-gradient(135deg, #22C55E, #16A34A);" onclick="addPollWinnerToShopping('${myVote.replace(/'/g, "\'")}')">
+                  🛒 Закинуть продукты для этого блюда в покупки
+                </button>
+              </div>
+            ` : isConflict ? `
+              <div style="background:rgba(245, 158, 11, 0.12); border:1px solid #F59E0B; border-radius:14px; padding:12px; text-align:center; margin-bottom:6px;">
+                <div style="font-size:12px; color:#FCD34D; font-weight:700; margin-bottom:6px;">
+                  Мнения разделились: ты за «${myVote}», а ${partnerName} за «${partnerVote}»
+                </div>
+                <button class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:#F59E0B; color:#FCD34D;" onclick="setTab('games')">
+                  🎲 Решить кубиком судьбы
+                </button>
+              </div>
+            ` : `
+              <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#8E93A3; padding:2px 4px;">
+                <span>${myVote ? 'Твой выбор: ' + myVote : 'Выбери вариант выше 👆'}</span>
+                <span>${partnerVote ? partnerName + ': ' + partnerVote : partnerName + ' ещё думает... ⏳'}</span>
+              </div>
+            `}
+          </div>
+
+          <!-- БЛОК 2: РЕЦЕПТЫ ДЛЯ ДВОИХ (С РЕДАКТИРОВАНИЕМ И ДОБАВЛЕНИЕМ В ПОКУПКИ) -->
+          <div class="card-head" style="margin-bottom:10px; margin-top:20px;">
+            <div>
+              <h3>Любимые рецепты 🍝</h3>
+              <p style="font-size:11px; color:#8E93A3;">Добавляй, редактируй и закупай в 1 клик</p>
+            </div>
+            <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:12px; padding:6px 12px; color:#FFFFFF; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openRecipeModal()">
+              ＋ Рецепт
             </button>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            ${dinnerRecipes.map(r => `
+              <div class="glass-card" style="padding:14px; margin:0; position:relative;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                  <div style="font-size:14px; font-weight:800; color:#FFFFFF; padding-right:32px;">
+                    ${r.title}
+                  </div>
+                  <span style="font-size:10.5px; color:#A0A5B5; background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:8px; white-space:nowrap;">
+                    ⏱ ${r.time}
+                  </span>
+                </div>
+
+                <!-- Кнопка редактирования -->
+                <button style="position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#A0A5B5; font-size:12px; cursor:pointer;" onclick="openRecipeModal('${r.id}')" title="Изменить рецепт">
+                  ✏️
+                </button>
+
+                <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:10px; line-height:1.4;">
+                  ${r.ingredients && r.ingredients.length > 0 ? r.ingredients.join(', ') : 'Ингредиенты не указаны'}
+                </div>
+
+                <button style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:12px; padding:8px; color:#FFFFFF; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="addRecipeToShopping('${r.id}')">
+                  <span>🛒</span> Закинуть всё в список покупок
+                </button>
+              </div>
+            `).join('')}
           </div>
         `;
       } else if (currentTab === 'games') {
@@ -3054,7 +3436,7 @@
             ${gameRandomizerMode === 'dice' ? `
               <!-- 3D Сцена Кубика -->
               <div class="dice-scene">
-                <div class="dice-cube" id="diceCubeElement">
+                <div class="dice-cube" id="diceCubeElement" style="${currentDiceTransform ? 'transform: ' + currentDiceTransform + ';' : ''} ${isRollingDice ? 'transition: transform 1.2s cubic-bezier(0.15, 0.9, 0.25, 1);' : 'transition: none;'}">
                   <div class="dice-face dice-face-1">${mappedOptions[0]}</div>
                   <div class="dice-face dice-face-2">${mappedOptions[1]}</div>
                   <div class="dice-face dice-face-3">${mappedOptions[2]}</div>
@@ -3072,7 +3454,7 @@
               <!-- Колесо Фортуны -->
               <div class="wheel-wrapper">
                 <div class="wheel-arrow"></div>
-                <div class="wheel-disc-box" id="wheelDiscElement">
+                <div class="wheel-disc-box" id="wheelDiscElement" style="${currentWheelRotation ? 'transform: rotate(' + currentWheelRotation + 'deg);' : ''} ${isSpinningWheel ? 'transition: transform 3.5s cubic-bezier(0.12, 0.8, 0.2, 1);' : 'transition: none;'}">
                   ${getWheelSvg(options)}
                 </div>
                 <div class="wheel-center-hub">🎯</div>
