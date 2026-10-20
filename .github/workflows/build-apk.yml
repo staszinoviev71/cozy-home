@@ -43,7 +43,7 @@ jobs:
       - name: Prepare APK Asset
         run: |
           mkdir -p build-output
-          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.0.2.apk
+          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.0.3.apk
           cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-latest.apk
 
       - name: Upload APK Artifact
@@ -56,24 +56,23 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.2
-          name: "🏡 Уютный Дом v1.0.2 (3D Pixar Аватары & Liquid Glass)"
+          tag_name: v1.0.3
+          name: "🏡 Уютный Дом v1.0.3 (Liquid Glass Виджет с 3D аватаром & чистый UI)"
           make_latest: "true"
           overwrite: true
           body: |
-            ### Нативное приложение «Уютный Дом» v1.0.2 для двоих
+            ### Нативное приложение «Уютный Дом» v1.0.3 для двоих
 
-            - ✨ **16 новых 3D Pixar аватаров:** Полные паки для Него (мелированный блонд) и для Неё (брюнетка) на все 8 эмоциональных состояний.
-            - 💫 **Эффекты Liquid Glass:** Тактильный отклик при нажатии (scale bounce), парящие светящиеся искры (particles aura) и неоновая подсветка активного настроения.
-            - 🔔 **Системные SOS-уведомления:** Приоритетный канал Android Heads-Up со звуком и виброоткликом.
-            - 📲 **Виджет One UI Liquid Glass:** Интерактивный виджет на рабочем столе Samsung Galaxy A54.
-            - 🔐 **Простое подключение по 6-значному коду:** Выбор роли Муж / Любимая при первом запуске.
+            - 📲 **Настоящий Liquid Glass виджет на рабочий стол:** 3D Pixar аватар партнера с неоновым ореолом, динамический счетчик покупок и кнопки быстрой связи.
+            - ✨ **Чистый интерфейс без лишнего:** Полностью удалены баннеры браузера, на главном экране аккуратная статус-панель настроения партнера.
+            - 💫 **16 3D Pixar аватаров:** Индивидуальные паки для Него и для Неё с плавающими искрами и тактильным откликом.
+            - 🔔 **Системные SOS-уведомления и виброотклик:** Моментальная связь между партнерами.
             
             **Скачать и установить:**
             1. Нажмите на **`cozy-home-latest.apk`** ниже.
             2. Запустите файл на смартфоне и нажмите **Установить**.
           files: |
-            build-output/cozy-home-v1.0.2.apk
+            build-output/cozy-home-v1.0.3.apk
             build-output/cozy-home-latest.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -17,24 +17,31 @@
 
         <!-- Контейнер аватара с неоновым стеклянным обрамлением -->
         <FrameLayout
-            android:layout_width="54dp"
-            android:layout_height="54dp"
+            android:layout_width="58dp"
+            android:layout_height="58dp"
             android:background="@drawable/widget_avatar_glass">
+
+            <ImageView
+                android:id="@+id/widget_avatar_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitCenter"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/widget_avatar_emoji"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="🐕"
-                android:textSize="30sp" />
+                android:text="✨"
+                android:textSize="28sp" />
         </FrameLayout>
 
         <!-- Описание настроения -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -57,7 +64,7 @@
                 android:maxLines="1"
                 android:text="На волне радости!"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -71,7 +78,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Нижний ряд быстрых кнопок Liquid Glass для Samsung One UI -->
+    <!-- Нижний ряд быстрых кнопок Liquid Glass для Samsung One UI (Screenshot 1) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="38dp"
@@ -87,7 +94,7 @@
             android:layout_weight="1"
             android:background="@drawable/widget_button_glass"
             android:gravity="center"
-            android:text="🤗 Обнять"
+            android:text="🫂 Обнять"
             android:textColor="#FFFFFF"
             android:textSize="11.5sp"
             android:textStyle="bold" />
@@ -109,10 +116,10 @@
             android:id="@+id/btn_widget_shopping"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1.1"
+            android:layout_weight="1.15"
             android:background="@drawable/widget_button_glass"
             android:gravity="center"
-            android:text="🛒 Покупки"
+            android:text="🛒 3 в списке"
             android:textColor="#FFFFFF"
             android:textSize="11.5sp"
             android:textStyle="bold" />

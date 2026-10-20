@@ -127,13 +127,33 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun updateWidget(partnerLabel: String, moodTitle: String, moodEmoji: String, statusTime: String) {
+            updateWidget(partnerLabel, moodTitle, moodEmoji, statusTime, null, null, null, null, 0)
+        }
+
+        @JavascriptInterface
+        fun updateWidget(
+            partnerLabel: String,
+            moodTitle: String,
+            moodEmoji: String,
+            statusTime: String,
+            moodId: String?,
+            partnerRole: String?,
+            avatarType: String?,
+            moodColor: String?,
+            unboughtCount: Int
+        ) {
             runOnUiThread {
                 PartnerMoodWidgetProvider.saveWidgetData(
                     this@MainActivity,
                     partnerLabel,
                     moodTitle,
                     moodEmoji,
-                    statusTime
+                    statusTime,
+                    moodId,
+                    partnerRole,
+                    avatarType,
+                    moodColor,
+                    unboughtCount
                 )
             }
         }

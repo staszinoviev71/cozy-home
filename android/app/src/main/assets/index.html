@@ -715,34 +715,72 @@
       border-color: rgba(34, 197, 94, 0.8);
     }
 
-    /* Виджет симулятор One UI */
-    .widget-preview-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.05) 100%);
+    /* Панель настроения партнера Liquid Glass (Screenshot 2) */
+    .partner-status-card {
+      background: radial-gradient(circle at 25% 35%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 100%),
+                  linear-gradient(135deg, rgba(20, 24, 38, 0.7), rgba(11, 14, 23, 0.85));
       backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
       border-radius: 26px;
-      padding: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+      padding: 16px 18px;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 30px var(--mood-glow, rgba(255, 94, 98, 0.35));
       margin-bottom: 16px;
+      position: relative;
+      overflow: visible;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .partner-status-card:active {
+      transform: scale(0.98);
     }
 
-    .widget-row {
+    .partner-status-inner {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 16px;
     }
 
-    .widget-actions {
-      display: flex;
-      gap: 6px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .widget-btn {
+    .partner-status-info {
       flex: 1;
-      padding: 8px;
+      min-width: 0;
+    }
+
+    .partner-status-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #FF7B93;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    .partner-status-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+
+    .partner-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    .partner-status-time {
+      font-size: 11.5px;
+      color: #8E97B0;
+      letter-spacing: 0.3px;
+    }
       background: rgba(255, 255, 255, 0.12);
       border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 12px;
@@ -1572,19 +1610,7 @@
         </div>
       </div>
 
-      <!-- PWA кнопка установки -->
-      <div id="pwaInstallBlock" style="margin-bottom:14px;">
-        <button class="store-btn" onclick="installPwaApp()" style="margin:0; width:100%;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:22px;">📲</span>
-            <div style="text-align:left;">
-              <div style="font-size:13px; font-weight:800;">Установить приложение</div>
-              <div style="font-size:10.5px; opacity:0.85;">Добавить на рабочий стол Galaxy A54</div>
-            </div>
-          </div>
-          <span>➔</span>
-        </button>
-      </div>
+
 
       <div class="form-actions">
         <button class="btn-secondary" style="width:100%;" onclick="closePairModal()">Закрыть</button>
@@ -1592,57 +1618,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно с инструкцией установки PWA без рамок браузера -->
-  <div class="modal-overlay" id="pwaInstructionsModal" onclick="if(event.target===this) closeInstallInstructionsModal()">
-    <div class="modal-card">
-      <div class="modal-head">
-        <h3>Полноэкранный режим 📱</h3>
-        <button class="modal-close-btn" onclick="closeInstallInstructionsModal()">✕</button>
-      </div>
-      <div style="text-align:center; padding:10px 0 16px 0;">
-        <div style="font-size:42px; margin-bottom:10px;">📲</div>
-        <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-bottom:6px;">Сделайте «Уютный Дом» нативным приложением</div>
-        <div style="font-size:12px; color:#A0A5B5; line-height:1.5;">
-          Сейчас страница открыта во вкладке браузера, поэтому вверху видна ссылка. Сделайте его приложением на рабочем столе:
-        </div>
-      </div>
 
-      <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:14px; margin-bottom:16px;">
-        <div style="font-size:12px; font-weight:800; color:#4FACFE; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">
-          Инструкция (2 клика):
-        </div>
-        <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:12px;">
-          <div style="background:#4FACFE; color:#0B0E17; font-weight:900; font-size:12px; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">1</div>
-          <div style="font-size:12px; color:#E0E5F0; line-height:1.4;">
-            Нажмите на <b>три точки (⋮)</b> в самом верхнем правом углу экрана.
-          </div>
-        </div>
-        <div style="display:flex; align-items:flex-start; gap:10px;">
-          <div style="background:#4FACFE; color:#0B0E17; font-weight:900; font-size:12px; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">2</div>
-          <div style="font-size:12px; color:#E0E5F0; line-height:1.4;">
-            Выберите <b>«Установить приложение»</b> или <b>«Добавить на главный экран»</b>.
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:14px;">
-        <button class="store-btn" onclick="installPwaApp()" style="margin:0; width:100%;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:22px;">⚡</span>
-            <div style="text-align:left;">
-              <div style="font-size:13px; font-weight:800;">Попробовать авто-установку</div>
-              <div style="font-size:10.5px; opacity:0.85;">Вызовет диалог системы Android</div>
-            </div>
-          </div>
-          <span>➔</span>
-        </button>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-secondary" style="width:100%;" onclick="closeInstallInstructionsModal()">Понятно, сделаю!</button>
-      </div>
-    </div>
-  </div>
 
   <!-- Верхняя шапка с переключателем роли -->
   <header>
@@ -1672,21 +1648,7 @@
     </div>
   </header>
 
-  <!-- Уведомление об установке PWA для удаления адресной строки браузера -->
-  <div id="pwaTopBanner" style="display:none; margin: 0 16px 14px 16px; background:linear-gradient(135deg, rgba(255,107,107,0.18), rgba(78,205,196,0.18)); border:1px solid rgba(255,255,255,0.22); border-radius:16px; padding:12px 14px; backdrop-filter:blur(20px); box-shadow:0 8px 24px rgba(0,0,0,0.3);">
-    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size:24px;">✨</span>
-        <div>
-          <div style="font-size:13px; font-weight:800; color:#FFFFFF;">Убрать строку браузера</div>
-          <div style="font-size:10.5px; color:#A0A5B5;">Сделать приложением на весь экран</div>
-        </div>
-      </div>
-      <button onclick="openInstallInstructionsModal()" style="background:linear-gradient(135deg, #FF6B6B, #FF8E53); border:none; color:#FFFFFF; font-size:11.5px; font-weight:800; padding:8px 14px; border-radius:10px; cursor:pointer; flex-shrink:0; box-shadow:0 4px 12px rgba(255,107,107,0.4);">
-        Как убрать?
-      </button>
-    </div>
-  </div>
+
 
   <!-- Основной контент страницы -->
   <main id="mainContainer">
@@ -1827,10 +1789,15 @@
 
     function updateNativeWidget() {
       if (window.AndroidBridge && window.AndroidBridge.updateWidget) {
+        const partnerRole = currentRole === 'husband' ? 'wife' : 'husband';
         const partnerLabel = currentRole === 'husband' ? 'НАСТРОЕНИЕ: ЛЮБИМАЯ' : 'НАСТРОЕНИЕ: МУЖ';
         const moodTitle = partnerMood ? partnerMood.title : 'На волне радости!';
-        const moodEmoji = partnerMood ? partnerMood.emoji : '🐕';
-        window.AndroidBridge.updateWidget(partnerLabel, moodTitle, moodEmoji, 'только что • связь отличная');
+        const moodEmoji = partnerMood ? partnerMood.emoji : '✨';
+        const moodId = partnerMood ? partnerMood.id : 'happy';
+        const moodColor = partnerMood ? partnerMood.color : '#FF8A65';
+        const aType = avatarType[partnerRole] || 'pixar';
+        const unbought = items ? items.filter(i => !i.checked).length : 0;
+        window.AndroidBridge.updateWidget(partnerLabel, moodTitle, moodEmoji, 'только что • связь отличная', moodId, partnerRole, aType, moodColor, unbought);
       }
     }
 
@@ -2174,65 +2141,7 @@
       });
     }
 
-    function openInstallInstructionsModal() {
-      const modal = document.getElementById('pwaInstructionsModal');
-      if (modal) modal.classList.add('active');
-    }
 
-    function closeInstallInstructionsModal() {
-      const modal = document.getElementById('pwaInstructionsModal');
-      if (modal) modal.classList.remove('active');
-    }
-
-    function checkPwaStandalone() {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                           window.navigator.standalone === true ||
-                           document.referrer.includes('android-app://');
-      const banner = document.getElementById('pwaTopBanner');
-      if (banner) {
-        if (!isStandalone) {
-          banner.style.display = 'block';
-        } else {
-          banner.style.display = 'none';
-        }
-      }
-    }
-
-    let deferredPrompt = null;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const pwaBlock = document.getElementById('pwaInstallBlock');
-      if (pwaBlock) pwaBlock.style.display = 'block';
-      const banner = document.getElementById('pwaTopBanner');
-      if (banner) banner.style.display = 'block';
-    });
-
-    window.addEventListener('appinstalled', () => {
-      deferredPrompt = null;
-      const banner = document.getElementById('pwaTopBanner');
-      if (banner) banner.style.display = 'none';
-      closeInstallInstructionsModal();
-      showToast('🎉 «Уютный Дом» добавлен на ваш рабочий стол!');
-    });
-
-    function installPwaApp() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            showToast('🎉 Приложение установлено на ваш рабочий стол!');
-            const banner = document.getElementById('pwaTopBanner');
-            if (banner) banner.style.display = 'none';
-            closeInstallInstructionsModal();
-          }
-          deferredPrompt = null;
-        });
-      } else {
-        openInstallInstructionsModal();
-        showToast('Нажмите ⋮ в правом углу ➔ «Установить приложение»', 5000);
-      }
-    }
 
     let gameRandomizerMode = 'dice'; // 'dice' | 'wheel'
     let selectedGamePresetKey = 'dishes';
@@ -2809,31 +2718,20 @@
 
       if (currentTab === 'home') {
         container.innerHTML = `
-          <!-- Виджет Samsung One UI на рабочем столе -->
-          <div class="card-head" style="margin-bottom:8px;">
-            <h3 style="font-size:12px; color:#A0A5B5; text-transform:uppercase;">Виджет рабочего стола One UI (4x2):</h3>
-          </div>
-          <div class="widget-preview-card">
-            <div class="widget-row">
-              <div class="avatar-box" style="--mood-glow: ${partnerMood.color}88;" onclick="triggerAvatarTap(this)">
+          <!-- Панель статуса и настроения партнера (Liquid Glass) -->
+          <div class="partner-status-card" style="--mood-glow: ${partnerMood.color}88;" onclick="triggerAvatarTap(this.querySelector('.avatar-box'))">
+            <div class="partner-status-inner">
+              <div class="avatar-box" style="--mood-glow: ${partnerMood.color};">
                 ${getSvg(partnerMood, partnerRole, avatarType[partnerRole])}
               </div>
-              <div>
-                <div style="font-size:11px; font-weight:800; color:#FFA39E; text-transform:uppercase;">Настроение: ${partnerName}</div>
-                <div style="font-size:16px; font-weight:700; color:#fff;">${partnerMood.title}</div>
-                <div style="font-size:11.5px; color:#A0A5B5;">только что • связь отличная</div>
+              <div class="partner-status-info">
+                <div class="partner-status-label">НАСТРОЕНИЕ: ${partnerName.toUpperCase()}</div>
+                <div class="partner-status-title">
+                  <span class="partner-status-dot" style="background:${partnerMood.color}; box-shadow:0 0 10px ${partnerMood.color};"></span>
+                  ${partnerMood.title}
+                </div>
+                <div class="partner-status-time">только что • связь отличная</div>
               </div>
-            </div>
-            <div class="widget-actions">
-              <button class="widget-btn" onclick="sendWidgetAction('hug')">
-                <span>🫂</span> Обнять
-              </button>
-              <button class="widget-btn" onclick="sendWidgetAction('on_my_way')">
-                <span>🚗</span> Уже еду
-              </button>
-              <button class="widget-btn" onclick="setTab('shopping')">
-                <span>🛒</span> ${items.filter(i => !i.checked).length} в списке
-              </button>
             </div>
           </div>
 
@@ -3187,7 +3085,6 @@
     }
     setRole(currentRole);
     render();
-    checkPwaStandalone();
     setTimeout(initMqtt, 300);
     setTimeout(updateNativeWidget, 600);
   </script>
