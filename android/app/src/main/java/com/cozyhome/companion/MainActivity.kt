@@ -159,6 +159,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         @JavascriptInterface
+        fun updateWidget(
+            partnerLabel: String,
+            moodTitle: String,
+            moodEmoji: String,
+            statusTime: String,
+            moodId: String?,
+            partnerRole: String?,
+            avatarType: String?,
+            moodColor: String?,
+            unboughtCount: Double
+        ) {
+            updateWidget(
+                partnerLabel,
+                moodTitle,
+                moodEmoji,
+                statusTime,
+                moodId,
+                partnerRole,
+                avatarType,
+                moodColor,
+                unboughtCount.toInt()
+            )
+        }
+
+        @JavascriptInterface
         fun vibrate(milliseconds: Long) {
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

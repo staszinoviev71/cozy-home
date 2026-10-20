@@ -77,12 +77,23 @@ class PartnerMoodWidgetProvider : AppWidgetProvider() {
 
         private fun loadAvatarBitmap(context: Context, partnerRole: String, moodId: String, moodColorHex: String): Bitmap? {
             val prefix = if (partnerRole.lowercase() == "husband") "guy" else "girl"
-            val assetPath = "assets/avatars/${prefix}_${moodId.lowercase()}.png"
-            return try {
-                val original = context.assets.open(assetPath).use { stream ->
-                    BitmapFactory.decodeStream(stream)
-                } ?: return null
+            val filename = "${prefix}_${moodId.lowercase()}.png"
+            val possiblePaths = listOf(
+                "assets/avatars/$filename",
+                "avatars/$filename"
+            )
+            var original: Bitmap? = null
+            for (path in possiblePaths) {
+                try {
+                    context.assets.open(path).use { stream ->
+                        original = BitmapFactory.decodeStream(stream)
+                    }
+                    if (original != null) break
+                } catch (e: Exception) {}
+            }
+            if (original == null) return null
 
+            return try {
                 val size = 180
                 val output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
                 val canvas = Canvas(output)
@@ -153,7 +164,8 @@ class PartnerMoodWidgetProvider : AppWidgetProvider() {
             moodColor: String? = null,
             unboughtCount: Int = 0
         ) {
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val appContext = context.applicationContext ?: context
+            val prefs = appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val editor = prefs.edit()
                 .putString("partner_label", partnerLabel)
                 .putString("mood_title", moodTitle)
@@ -166,16 +178,26 @@ class PartnerMoodWidgetProvider : AppWidgetProvider() {
             if (!avatarType.isNullOrBlank()) editor.putString("avatar_type", avatarType)
             if (!moodColor.isNullOrBlank()) editor.putString("mood_color", moodColor)
 
-            editor.apply()
-            updateAllWidgets(context)
+            editor.commit()
+            updateAllWidgets(appContext)
         }
 
         fun updateAllWidgets(context: Context) {
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val componentName = ComponentName(context, PartnerMoodWidgetProvider::class.java)
+            val appContext = context.applicationContext ?: context
+            val appWidgetManager = AppWidgetManager.getInstance(appContext)
+            val componentName = ComponentName(appContext, PartnerMoodWidgetProvider::class.java)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
-            for (appWidgetId in appWidgetIds) {
-                updateAppWidget(context, appWidgetManager, appWidgetId)
+            if (appWidgetIds != null && appWidgetIds.isNotEmpty()) {
+                for (appWidgetId in appWidgetIds) {
+                    updateAppWidget(appContext, appWidgetManager, appWidgetId)
+                }
+                try {
+                    val updateIntent = Intent(appContext, PartnerMoodWidgetProvider::class.java).apply {
+                        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
+                    }
+                    appContext.sendBroadcast(updateIntent)
+                } catch (e: Exception) {}
             }
         }
     }

@@ -1789,15 +1789,19 @@
 
     function updateNativeWidget() {
       if (window.AndroidBridge && window.AndroidBridge.updateWidget) {
-        const partnerRole = currentRole === 'husband' ? 'wife' : 'husband';
-        const partnerLabel = currentRole === 'husband' ? 'НАСТРОЕНИЕ: ЛЮБИМАЯ' : 'НАСТРОЕНИЕ: МУЖ';
-        const moodTitle = partnerMood ? partnerMood.title : 'На волне радости!';
-        const moodEmoji = partnerMood ? partnerMood.emoji : '✨';
-        const moodId = partnerMood ? partnerMood.id : 'happy';
-        const moodColor = partnerMood ? partnerMood.color : '#FF8A65';
-        const aType = avatarType[partnerRole] || 'pixar';
-        const unbought = items ? items.filter(i => !i.checked).length : 0;
-        window.AndroidBridge.updateWidget(partnerLabel, moodTitle, moodEmoji, 'только что • связь отличная', moodId, partnerRole, aType, moodColor, unbought);
+        try {
+          const partnerRole = currentRole === 'husband' ? 'wife' : 'husband';
+          const partnerLabel = currentRole === 'husband' ? 'НАСТРОЕНИЕ: ЛЮБИМАЯ' : 'НАСТРОЕНИЕ: МУЖ';
+          const moodTitle = partnerMood ? partnerMood.title : 'На волне радости!';
+          const moodEmoji = partnerMood ? partnerMood.emoji : '✨';
+          const moodId = partnerMood ? partnerMood.id : 'happy';
+          const moodColor = partnerMood ? partnerMood.color : '#FF8A65';
+          const aType = avatarType[partnerRole] || 'pixar';
+          const unbought = items ? items.filter(i => !i.checked).length : 0;
+          window.AndroidBridge.updateWidget(partnerLabel, moodTitle, moodEmoji, 'только что • связь отличная', moodId, partnerRole, aType, moodColor, Math.round(unbought || 0));
+        } catch (e) {
+          console.warn('Widget update error:', e);
+        }
       }
     }
 
@@ -1822,6 +1826,7 @@
       { id: 'love', title: 'Люблю & Скучаю 🥰', emoji: '❤️', faceDetails: 'love', color: '#FF4081' }
     ];
 
+    let myMood = moods[0];
     let partnerMood = moods[0];
 
     let items = [
@@ -1993,7 +1998,7 @@
             isMqttConnected = true;
             updateSyncBadge('online', 'В сети');
             mqttClient.subscribe(getMqttTopic(), { qos: 1 });
-            broadcastSync('SYNC_REQUEST', { requester: myDeviceId });
+            broadcastSync('SYNC_REQUEST', { requester: myDeviceId, senderRole: currentRole, senderMood: myMood });
           },
           onFailure: () => {
             isMqttConnected = false;
@@ -2059,17 +2064,31 @@
       const { type, data } = msg;
 
       if (type === 'SYNC_REQUEST') {
+        if (data && data.senderMood) {
+          partnerMood = data.senderMood;
+          updateNativeWidget();
+        }
         broadcastSync('SYNC_FULL_STATE', {
-          partnerMood: partnerMood,
+          senderRole: currentRole,
+          senderMood: myMood,
           avatarType: avatarType,
           items: items,
           gamePresets: gamePresets,
           passportItems: passportItems
         });
       } else if (type === 'SYNC_FULL_STATE') {
-        if (data.partnerMood) partnerMood = data.partnerMood;
+        if (data.senderMood) {
+          partnerMood = data.senderMood;
+          updateNativeWidget();
+        } else if (data.partnerMood) {
+          partnerMood = data.partnerMood;
+          updateNativeWidget();
+        }
         if (data.avatarType) avatarType = data.avatarType;
-        if (data.items) items = data.items;
+        if (data.items) {
+          items = data.items;
+          updateNativeWidget();
+        }
         if (data.gamePresets) Object.assign(gamePresets, data.gamePresets);
         if (data.passportItems) passportItems = data.passportItems;
         saveLocalState();
@@ -2077,14 +2096,16 @@
         showToast('✨ Данные синхронизированы с партнером!');
       } else if (type === 'MOOD_UPDATE') {
         partnerMood = data.mood;
-        if (data.avatarType) avatarType[data.role] = data.avatarType;
+        if (data.avatarType && data.role) avatarType[data.role] = data.avatarType;
         saveLocalState();
+        updateNativeWidget();
         render();
         if (navigator.vibrate) navigator.vibrate([80]);
         showToast('Партнер обновил настроение: ' + partnerMood.title);
       } else if (type === 'SHOPPING_UPDATE') {
         items = data.items;
         saveLocalState();
+        updateNativeWidget();
         render();
         showToast('🛒 Список покупок обновлен партнером!');
       } else if (type === 'SOS_PUSH') {
@@ -2109,6 +2130,7 @@
     function saveLocalState() {
       try {
         const state = {
+          myMood,
           partnerMood,
           avatarType,
           items,
@@ -2125,6 +2147,7 @@
         const raw = localStorage.getItem('cozy_state_' + pairCode);
         if (raw) {
           const state = JSON.parse(raw);
+          if (state.myMood) myMood = state.myMood;
           if (state.partnerMood) partnerMood = state.partnerMood;
           if (state.avatarType) avatarType = state.avatarType;
           if (state.items) items = state.items;
@@ -2381,7 +2404,8 @@
 
     function setAvatarType(type) {
       avatarType[currentRole] = type;
-      broadcastSync('MOOD_UPDATE', { role: currentRole, mood: partnerMood, avatarType: type });
+      saveLocalState();
+      broadcastSync('MOOD_UPDATE', { role: currentRole, mood: myMood, avatarType: type });
       render();
       showToast('Выбран стиль персонажа: ' + (type === 'pixar' ? '✨ 3D Pixar' : type === 'corgi' ? '🐶 Корги' : '🎨 Векторный арт'));
     }
@@ -2400,25 +2424,42 @@
     }
 
     function selectMood(m) {
-      partnerMood = m;
+      myMood = m;
       if (window.AndroidBridge && window.AndroidBridge.vibrate) {
         window.AndroidBridge.vibrate(35);
       } else if (navigator.vibrate) {
         navigator.vibrate(25);
       }
-      broadcastSync('MOOD_UPDATE', { role: currentRole, mood: m, avatarType: avatarType[currentRole] });
-      updateNativeWidget();
+      saveLocalState();
+      broadcastSync('MOOD_UPDATE', { role: currentRole, mood: myMood, avatarType: avatarType[currentRole] });
       render();
-      showToast('Настроение обновлено: ' + m.title);
+      showToast('Твое настроение: ' + m.title);
     }
 
     function toggleItem(id) {
       const it = items.find(x => x.id === id);
       if (it) {
         it.checked = !it.checked;
+        saveLocalState();
         broadcastSync('SHOPPING_UPDATE', { items: items });
+        updateNativeWidget();
         render();
       }
+    }
+
+    function addShoppingItem(name, comment = 'Новое', photo = '🛍️') {
+      if (!name || !name.trim()) return;
+      items.push({
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        name: name.trim(),
+        comment: comment,
+        checked: false,
+        photo: photo
+      });
+      saveLocalState();
+      broadcastSync('SHOPPING_UPDATE', { items: items });
+      updateNativeWidget();
+      render();
     }
 
     function selectSosIcon(icon) {
@@ -2767,18 +2808,18 @@
             </div>
 
             <div class="avatar-preview-row">
-              <div class="avatar-box" style="--mood-glow: ${partnerMood.color};" onclick="triggerAvatarTap(this)">
-                ${getSvg(partnerMood, currentRole, avatarType[currentRole])}
+              <div class="avatar-box" style="--mood-glow: ${myMood.color};" onclick="triggerAvatarTap(this)">
+                ${getSvg(myMood, currentRole, avatarType[currentRole])}
               </div>
               <div class="avatar-meta">
-                <h4>${partnerMood.title}</h4>
+                <h4>${myMood.title}</h4>
                 <p>Партнер видит этот аватар на своем смартфоне и виджете</p>
               </div>
             </div>
 
             <div class="moods-grid">
               ${moods.map(m => `
-                <div class="mood-item ${partnerMood.id === m.id ? 'active' : ''}" 
+                <div class="mood-item ${myMood.id === m.id ? 'active' : ''}" 
                      style="--item-color: ${m.color}; --item-glow: ${m.color}88;"
                      onclick="selectMood(${JSON.stringify(m).replace(/"/g, '&quot;')})">
                   ${avatarType[currentRole] === 'pixar'
@@ -2853,10 +2894,10 @@
 
           <!-- Поле ввода -->
           <div style="display:flex; gap:8px; margin-bottom:16px;">
-            <input type="text" id="newShopInput" placeholder="Добавить товар..." style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:12px 14px; color:#fff; font-family:inherit; font-size:13px; outline:none;" onkeydown="if(event.key==='Enter'){ const inp=document.getElementById('newShopInput'); if(inp.value){ items.push({ id: Date.now(), name: inp.value, comment: 'Новое', checked: false, photo: '🛍️' }); broadcastSync('SHOPPING_UPDATE', { items: items }); inp.value = ''; render(); } }">
+            <input type="text" id="newShopInput" placeholder="Добавить товар..." style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:12px 14px; color:#fff; font-family:inherit; font-size:13px; outline:none;" onkeydown="if(event.key==='Enter'){ const inp=document.getElementById('newShopInput'); if(inp.value){ addShoppingItem(inp.value, 'Новое', '🛍️'); inp.value = ''; } }">
             <button style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #FF5E62, #FF8E53); border:none; color:#fff; font-size:18px; cursor:pointer;" onclick="
               const inp = document.getElementById('newShopInput');
-              if (inp.value) { items.push({ id: Date.now(), name: inp.value, comment: 'Новое', checked: false, photo: '🛍️' }); broadcastSync('SHOPPING_UPDATE', { items: items }); inp.value = ''; render(); }
+              if (inp.value) { addShoppingItem(inp.value, 'Новое', '🛍️'); inp.value = ''; }
             ">＋</button>
           </div>
 
@@ -2890,10 +2931,10 @@
           <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:16px; padding:12px; margin-top:16px;">
             <div style="font-size:11.5px; font-weight:800; color:#4ADE80; margin-bottom:6px;">💡 Скоро закончится дома:</div>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="items.push({ id: Date.now(), name: 'Капсулы для посудомойки', comment: 'Бытовая химия', checked: false, photo: '🧼' }); broadcastSync('SHOPPING_UPDATE', { items: items }); render(); showToast('Капсулы добавлены в список!');">
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="addShoppingItem('Капсулы для посудомойки', 'Бытовая химия', '🧼'); showToast('Капсулы добавлены в список!');">
                 ＋ Капсулы для посудомойки
               </button>
-              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="items.push({ id: Date.now(), name: 'Зерновой кофе Lavazza', comment: 'Бакалея', checked: false, photo: '☕' }); broadcastSync('SHOPPING_UPDATE', { items: items }); render(); showToast('Кофе добавлен в список!');">
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="addShoppingItem('Зерновой кофе Lavazza', 'Бакалея', '☕'); showToast('Кофе добавлен в список!');">
                 ＋ Зерновой кофе
               </button>
             </div>
@@ -2911,10 +2952,8 @@
             </div>
             <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:10px;">Спагетти, бекон, сыр Пармезан, сливки, яйца</div>
             <button style="width:100%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:9px; color:#fff; font-size:11.5px; font-weight:700; cursor:pointer;" onclick="
-              items.push({ id: Date.now()+1, name: 'Спагетти Barilla', comment: 'Для карбонары', checked:false, photo:'🍝' });
-              items.push({ id: Date.now()+2, name: 'Сыр Пармезан', comment: 'Для карбонары', checked:false, photo:'🧀' });
-              broadcastSync('SHOPPING_UPDATE', { items: items });
-              render();
+              addShoppingItem('Спагетти Barilla', 'Для карбонары', '🍝');
+              addShoppingItem('Сыр Пармезан', 'Для карбонары', '🧀');
               showToast('Продукты для пасты улетели в список покупок!');
             ">🛒 Добавить продукты в список покупок</button>
           </div>
