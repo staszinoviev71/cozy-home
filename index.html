@@ -757,9 +757,9 @@
     nav {
       position: fixed;
       bottom: 12px;
-      left: 16px;
-      right: 16px;
-      max-width: 468px;
+      left: 10px;
+      right: 10px;
+      max-width: 488px;
       margin: 0 auto;
       height: 64px;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(20, 24, 38, 0.65) 100%);
@@ -771,7 +771,7 @@
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 0 6px;
+      padding: 0 4px;
       z-index: 100;
     }
 
@@ -782,19 +782,21 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       color: #8E93A3;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 700;
       cursor: pointer;
-      padding: 7px 14px;
-      border-radius: 20px;
+      padding: 6px 8px;
+      border-radius: 18px;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      flex: 1;
+      max-width: 84px;
     }
 
     .nav-icon {
-      width: 21px;
-      height: 21px;
+      width: 20px;
+      height: 20px;
       stroke: currentColor;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       display: block;
@@ -811,6 +813,199 @@
       stroke: #FF7B7F;
       filter: drop-shadow(0 0 8px rgba(255, 94, 98, 0.7));
       transform: translateY(-1.5px) scale(1.1);
+    }
+
+    /* ИГРЫ: СУПЕР-РАНДОМАЙЗЕР (КУБИК И КОЛЕСО) */
+    .game-mode-toggle {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .game-mode-btn {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      background: transparent;
+      color: #9EA3B5;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .game-mode-btn.active {
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.35), rgba(255, 142, 83, 0.25));
+      border-color: rgba(255, 94, 98, 0.55);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .preset-chips-row {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 14px;
+      scrollbar-width: none;
+    }
+    .preset-chips-row::-webkit-scrollbar { display: none; }
+
+    .preset-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 8px 12px;
+      color: #A0A5B5;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .preset-chip.active {
+      background: rgba(0, 242, 254, 0.18);
+      border-color: var(--accent-cyan);
+      color: #FFFFFF;
+      box-shadow: 0 0 12px var(--accent-cyan-glow);
+    }
+
+    /* 3D Кубик Судьбы */
+    .dice-scene {
+      width: 140px;
+      height: 140px;
+      perspective: 700px;
+      margin: 28px auto 24px;
+    }
+
+    .dice-cube {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    .dice-face {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 14px;
+      box-sizing: border-box;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      backdrop-filter: blur(20px);
+      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .dice-face-1 { transform: rotateY(0deg) translateZ(70px); background: linear-gradient(135deg, rgba(255, 94, 98, 0.92), rgba(255, 142, 83, 0.85)); }
+    .dice-face-2 { transform: rotateY(90deg) translateZ(70px); background: linear-gradient(135deg, rgba(0, 242, 254, 0.92), rgba(79, 172, 254, 0.85)); }
+    .dice-face-3 { transform: rotateY(180deg) translateZ(70px); background: linear-gradient(135deg, rgba(155, 81, 224, 0.92), rgba(225, 0, 255, 0.85)); }
+    .dice-face-4 { transform: rotateY(-90deg) translateZ(70px); background: linear-gradient(135deg, rgba(34, 197, 94, 0.92), rgba(21, 128, 61, 0.85)); }
+    .dice-face-5 { transform: rotateX(90deg) translateZ(70px); background: linear-gradient(135deg, rgba(245, 158, 11, 0.92), rgba(217, 119, 6, 0.85)); }
+    .dice-face-6 { transform: rotateX(-90deg) translateZ(70px); background: linear-gradient(135deg, rgba(236, 72, 153, 0.92), rgba(219, 39, 119, 0.85)); }
+
+    /* Колесо Фортуны */
+    .wheel-wrapper {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin: 18px auto 22px;
+    }
+
+    .wheel-arrow {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 13px solid transparent;
+      border-right: 13px solid transparent;
+      border-top: 22px solid #FF5E62;
+      z-index: 25;
+      filter: drop-shadow(0 2px 8px rgba(255, 94, 98, 0.85));
+    }
+
+    .wheel-disc-box {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 0 32px rgba(0, 242, 254, 0.35), inset 0 0 20px rgba(0, 0, 0, 0.5);
+      transition: transform 3.5s cubic-bezier(0.15, 0.9, 0.2, 1);
+    }
+
+    .wheel-center-hub {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #FFFFFF 0%, #D1D5E0 100%);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      z-index: 20;
+    }
+
+    .game-action-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #FF5E62 0%, #FF8E53 100%);
+      border: none;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 20px var(--primary-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s;
+    }
+
+    .game-action-btn:active {
+      transform: scale(0.97);
+    }
+
+    .game-winner-banner {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.25), rgba(21, 128, 61, 0.15));
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      border-radius: 18px;
+      padding: 14px 16px;
+      text-align: center;
+      margin-top: 16px;
+      animation: popToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     /* Всплывающий Heads-Up Push Баннер */
@@ -1040,6 +1235,17 @@
       </svg>
       <span>Покупки</span>
     </button>
+    <button class="nav-btn" onclick="setTab('games')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="4"/>
+        <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/>
+        <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/>
+        <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+        <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/>
+        <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/>
+      </svg>
+      <span>Игры</span>
+    </button>
     <button class="nav-btn" onclick="setTab('dinner')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 18h18"/>
@@ -1047,7 +1253,7 @@
         <circle cx="12" cy="7.5" r="1.5"/>
         <path d="M19 4l.6 1.4L21 6l-1.4.6L19 8l-.6-1.4L17 6l1.4-.6L19 4z" fill="currentColor" stroke="none"/>
       </svg>
-      <span>Ужин & Wish</span>
+      <span>Ужин</span>
     </button>
     <button class="nav-btn" onclick="setTab('passport')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1122,9 +1328,144 @@
     function setTab(tab) {
       currentTab = tab;
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      const idx = { home: 0, shopping: 1, dinner: 2, passport: 3 }[tab];
+      const idx = { home: 0, shopping: 1, games: 2, dinner: 3, passport: 4 }[tab];
       document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
       render();
+    }
+
+    let gameRandomizerMode = 'dice'; // 'dice' | 'wheel'
+    let selectedGamePresetKey = 'dishes';
+    let isRollingDice = false;
+    let isSpinningWheel = false;
+    let diceResult = null;
+    let wheelResult = null;
+    let currentWheelRotation = 0;
+
+    const gamePresets = {
+      dishes: {
+        title: 'Кто моет посуду? 🍽️',
+        options: ['Муж 👨', 'Жена 👩', 'Вместе ❤️', 'Завтра 😴', 'Посудомойка 🧼', 'Кто проиграет 🎲']
+      },
+      breakfast: {
+        title: 'Кто готовит завтрак? 🍳',
+        options: ['Муж 👨', 'Жена 👩', 'Вместе 🥞', 'Кофе в постель ☕', 'Доставка 🥐', 'Сюрприз ✨']
+      },
+      evening: {
+        title: 'Чем займемся вечером? 🍿',
+        options: ['Кино 🎬', 'Прогулка 🌙', 'Настолка 🎲', 'Сериал 🛋️', 'Пицца 🍕', 'Чай и болтать ☕']
+      },
+      coffee: {
+        title: 'Кто заваривает кофе? ☕',
+        options: ['Муж 👨', 'Жена 👩', 'Оба в пижамах 🧦', 'Сегодня чай 🍵', 'Доставка 🛵', 'Камень-ножницы ✌️']
+      }
+    };
+
+    function setGameMode(mode) {
+      gameRandomizerMode = mode;
+      diceResult = null;
+      wheelResult = null;
+      render();
+    }
+
+    function selectGamePreset(key) {
+      selectedGamePresetKey = key;
+      diceResult = null;
+      wheelResult = null;
+      render();
+    }
+
+    function rollDice() {
+      if (isRollingDice) return;
+      isRollingDice = true;
+      diceResult = null;
+      render();
+
+      const options = gamePresets[selectedGamePresetKey].options;
+      const winningIndex = Math.floor(Math.random() * 6);
+      const rotations = [
+        { x: 0, y: 0 },       // Front (face 1)
+        { x: 0, y: -90 },     // Right (face 2)
+        { x: 0, y: -180 },    // Back (face 3)
+        { x: 0, y: 90 },      // Left (face 4)
+        { x: -90, y: 0 },     // Top (face 5)
+        { x: 90, y: 0 }       // Bottom (face 6)
+      ];
+
+      const rot = rotations[winningIndex];
+      const spinCount = 3 + Math.floor(Math.random() * 2);
+      const targetX = rot.x + (spinCount * 360);
+      const targetY = rot.y + (spinCount * 360);
+
+      setTimeout(() => {
+        const cube = document.getElementById('diceCubeElement');
+        if (cube) {
+          cube.style.transform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
+        }
+      }, 50);
+
+      setTimeout(() => {
+        isRollingDice = false;
+        diceResult = options[winningIndex];
+        render();
+        showToast('🎲 Кубик решил: ' + diceResult + '!');
+      }, 1250);
+    }
+
+    function spinWheel() {
+      if (isSpinningWheel) return;
+      isSpinningWheel = true;
+      wheelResult = null;
+      render();
+
+      const options = gamePresets[selectedGamePresetKey].options;
+      const winningIndex = Math.floor(Math.random() * 6);
+      const sectorCenter = (winningIndex * 60) + 30;
+      const spinDegrees = (5 + Math.floor(Math.random() * 3)) * 360;
+      currentWheelRotation += spinDegrees + (360 - (currentWheelRotation % 360)) + (360 - sectorCenter);
+
+      setTimeout(() => {
+        const disc = document.getElementById('wheelDiscElement');
+        if (disc) {
+          disc.style.transform = `rotate(${currentWheelRotation}deg)`;
+        }
+      }, 50);
+
+      setTimeout(() => {
+        isSpinningWheel = false;
+        wheelResult = options[winningIndex];
+        render();
+        showToast('🎡 Колесо выбрало: ' + wheelResult + '!');
+      }, 3550);
+    }
+
+    function getWheelSvg(options) {
+      const colors = ['#FF5E62', '#00F2FE', '#9B51E0', '#F59E0B', '#22C55E', '#EC4899'];
+      const cx = 125, cy = 125, r = 120;
+      let slices = '';
+      for (let i = 0; i < 6; i++) {
+        const startAngle = (i * 60 - 90) * Math.PI / 180;
+        const endAngle = ((i + 1) * 60 - 90) * Math.PI / 180;
+        const x1 = cx + r * Math.cos(startAngle);
+        const y1 = cy + r * Math.sin(startAngle);
+        const x2 = cx + r * Math.cos(endAngle);
+        const y2 = cy + r * Math.sin(endAngle);
+        const textAngle = i * 60 + 30;
+        const textRad = (textAngle - 90) * Math.PI / 180;
+        const tx = cx + (r * 0.62) * Math.cos(textRad);
+        const ty = cy + (r * 0.62) * Math.sin(textRad);
+
+        slices += `
+          <path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z" fill="${colors[i]}" stroke="#ffffff" stroke-width="1.5" />
+          <text x="${tx}" y="${ty}" fill="#ffffff" font-size="11" font-weight="800" text-anchor="middle" dominant-baseline="middle" transform="rotate(${textAngle}, ${tx}, ${ty})">
+            ${options[i].substring(0, 11)}
+          </text>
+        `;
+      }
+      return `
+        <svg viewBox="0 0 250 250" width="100%" height="100%">
+          ${slices}
+        </svg>
+      `;
     }
 
     function setAvatarType(type) {
@@ -1608,6 +1949,98 @@
             <button style="border:none; background:rgba(255,255,255,0.12); color:#fff; padding:6px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;" onclick="showToast('Помечено как секретная покупка: партнер не увидит пуш!')">
               Купить тайно
             </button>
+          </div>
+        `;
+      } else if (currentTab === 'games') {
+        const currentPreset = gamePresets[selectedGamePresetKey];
+        const options = currentPreset.options;
+
+        container.innerHTML = `
+          <div class="card-head" style="margin-bottom:12px;">
+            <div>
+              <h3>Супер-Рандомайзер 🎲</h3>
+              <p style="font-size:11px; color:#8E93A3;">Решайте любые бытовые споры легко и с юмором</p>
+            </div>
+            <span style="font-size:11px; font-weight:800; background:rgba(0,242,254,0.18); color:#00F2FE; padding:4px 10px; border-radius:12px; border:1px solid rgba(0,242,254,0.3);">
+              Для двоих ✨
+            </span>
+          </div>
+
+          <!-- Выбор темы спора (чипы) -->
+          <div class="preset-chips-row">
+            ${Object.keys(gamePresets).map(k => `
+              <div class="preset-chip ${selectedGamePresetKey === k ? 'active' : ''}" onclick="selectGamePreset('${k}')">
+                ${gamePresets[k].title}
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Карточка рандомайзера -->
+          <div class="glass-card" style="padding:20px; text-align:center;">
+            <!-- Переключатель: Кубик / Колесо -->
+            <div class="game-mode-toggle">
+              <button class="game-mode-btn ${gameRandomizerMode === 'dice' ? 'active' : ''}" onclick="setGameMode('dice')">
+                <span style="font-size:16px;">🎲</span> 3D Кубик Судьбы
+              </button>
+              <button class="game-mode-btn ${gameRandomizerMode === 'wheel' ? 'active' : ''}" onclick="setGameMode('wheel')">
+                <span style="font-size:16px;">🎡</span> Колесо Фортуны
+              </button>
+            </div>
+
+            <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-bottom:4px;">
+              ${currentPreset.title}
+            </div>
+            <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:12px;">
+              ${gameRandomizerMode === 'dice' ? 'Бросьте 3D кубик, чтобы случай решил исход' : 'Крутите колесо фортуны со случайной физикой'}
+            </div>
+
+            ${gameRandomizerMode === 'dice' ? `
+              <!-- 3D Сцена Кубика -->
+              <div class="dice-scene">
+                <div class="dice-cube" id="diceCubeElement">
+                  <div class="dice-face dice-face-1">${options[0]}</div>
+                  <div class="dice-face dice-face-2">${options[1]}</div>
+                  <div class="dice-face dice-face-3">${options[2]}</div>
+                  <div class="dice-face dice-face-4">${options[3]}</div>
+                  <div class="dice-face dice-face-5">${options[4]}</div>
+                  <div class="dice-face dice-face-6">${options[5]}</div>
+                </div>
+              </div>
+
+              <button class="game-action-btn" onclick="rollDice()" ${isRollingDice ? 'disabled style="opacity:0.6;"' : ''}>
+                <span style="font-size:18px;">🎲</span>
+                <span>${isRollingDice ? 'Кубик крутится в воздухе...' : 'Бросить кубик судьбы!'}</span>
+              </button>
+            ` : `
+              <!-- Колесо Фортуны -->
+              <div class="wheel-wrapper">
+                <div class="wheel-arrow"></div>
+                <div class="wheel-disc-box" id="wheelDiscElement">
+                  ${getWheelSvg(options)}
+                </div>
+                <div class="wheel-center-hub">🎯</div>
+              </div>
+
+              <button class="game-action-btn" onclick="spinWheel()" ${isSpinningWheel ? 'disabled style="opacity:0.6;"' : ''}>
+                <span style="font-size:18px;">🎡</span>
+                <span>${isSpinningWheel ? 'Колесо вращается...' : 'Крутить колесо выбора!'}</span>
+              </button>
+            `}
+
+            <!-- Результат выпадения -->
+            ${(diceResult || wheelResult) ? `
+              <div class="game-winner-banner">
+                <div style="font-size:11px; font-weight:800; color:#4ADE80; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">
+                  Победитель раунда:
+                </div>
+                <div style="font-size:20px; font-weight:900; color:#FFFFFF; margin-bottom:4px;">
+                  🎉 ${diceResult || wheelResult}
+                </div>
+                <div style="font-size:11.5px; color:#A0A5B5;">
+                  Спор официально решён! Без обид ❤️
+                </div>
+              </div>
+            ` : ''}
           </div>
         `;
       } else if (currentTab === 'passport') {
