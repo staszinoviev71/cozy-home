@@ -1191,6 +1191,49 @@
     </div>
   </div>
 
+  <!-- Модальное окно создания своего спора -->
+  <div class="modal-overlay" id="addCustomDisputeModal" onclick="if(event.target===this) closeCustomDisputeModal()">
+    <div class="modal-card" style="max-height:88vh; overflow-y:auto;">
+      <div class="modal-head">
+        <h3>Свой спор / вопрос 🎲</h3>
+        <button class="modal-close-btn" onclick="closeCustomDisputeModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Тема спора или вопрос</label>
+        <input type="text" class="form-input" id="customDisputeTitle" placeholder="Напр.: Кто идёт гулять с собакой? 🐕" />
+      </div>
+
+      <div style="font-size:11px; font-weight:700; color:#A0A5B5; margin:12px 0 6px; text-transform:uppercase; letter-spacing:0.4px;">
+        Варианты ответа (для кубика и колеса):
+      </div>
+
+      <div class="form-group">
+        <input type="text" class="form-input custom-opt-input" id="opt_0" placeholder="Вариант 1 (напр.: Муж 👨)" value="Муж 👨">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-input custom-opt-input" id="opt_1" placeholder="Вариант 2 (напр.: Жена 👩)" value="Жена 👩">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-input custom-opt-input" id="opt_2" placeholder="Вариант 3 (напр.: Вместе ❤️)" value="Вместе ❤️">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-input custom-opt-input" id="opt_3" placeholder="Вариант 4 (напр.: Завтра 😴)" value="Завтра 😴">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-input custom-opt-input" id="opt_4" placeholder="Вариант 5 (необязательно)" value="">
+      </div>
+      <div class="form-group">
+        <input type="text" class="form-input custom-opt-input" id="opt_5" placeholder="Вариант 6 (необязательно)" value="">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeCustomDisputeModal()">Отмена</button>
+        <button class="btn-primary-action" onclick="saveCustomDispute()">Сохранить и крутить!</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Верхняя шапка с переключателем роли -->
   <header>
     <div class="logo-block">
@@ -1374,6 +1417,81 @@
       render();
     }
 
+    let currentEditingDisputeKey = null;
+
+    function openCustomDisputeModal(keyToEdit = null) {
+      currentEditingDisputeKey = keyToEdit;
+      const modal = document.getElementById('addCustomDisputeModal');
+      const titleInput = document.getElementById('customDisputeTitle');
+      
+      if (keyToEdit && gamePresets[keyToEdit]) {
+        const p = gamePresets[keyToEdit];
+        titleInput.value = p.title;
+        for (let i = 0; i < 6; i++) {
+          const optEl = document.getElementById('opt_' + i);
+          if (optEl) optEl.value = p.options[i] || '';
+        }
+      } else {
+        titleInput.value = '';
+        const defaults = ['Муж 👨', 'Жена 👩', 'Вместе ❤️', 'Завтра 😴', '', ''];
+        for (let i = 0; i < 6; i++) {
+          const optEl = document.getElementById('opt_' + i);
+          if (optEl) optEl.value = defaults[i];
+        }
+      }
+      modal.style.display = 'flex';
+    }
+
+    function closeCustomDisputeModal() {
+      const modal = document.getElementById('addCustomDisputeModal');
+      modal.style.display = 'none';
+      currentEditingDisputeKey = null;
+    }
+
+    function saveCustomDispute() {
+      const titleInput = document.getElementById('customDisputeTitle');
+      const title = titleInput ? titleInput.value.trim() : '';
+      if (!title) {
+        showToast('Введите тему спора или вопрос!');
+        return;
+      }
+
+      const collected = [];
+      for (let i = 0; i < 6; i++) {
+        const el = document.getElementById('opt_' + i);
+        if (el && el.value.trim()) {
+          collected.push(el.value.trim());
+        }
+      }
+
+      if (collected.length < 2) {
+        showToast('Укажите минимум 2 варианта ответа!');
+        return;
+      }
+
+      const key = currentEditingDisputeKey || ('custom_' + Date.now());
+      gamePresets[key] = {
+        title: title,
+        options: collected,
+        isCustom: true
+      };
+
+      selectedGamePresetKey = key;
+      closeCustomDisputeModal();
+      render();
+      showToast('🎉 Вопрос «' + title + '» сохранён!');
+    }
+
+    function deleteCustomDispute(key) {
+      if (!gamePresets[key]) return;
+      delete gamePresets[key];
+      if (selectedGamePresetKey === key) {
+        selectedGamePresetKey = 'dishes';
+      }
+      render();
+      showToast('🗑️ Спор удалён');
+    }
+
     function rollDice() {
       if (isRollingDice) return;
       isRollingDice = true;
@@ -1381,6 +1499,11 @@
       render();
 
       const options = gamePresets[selectedGamePresetKey].options;
+      const mappedOptions = [];
+      for (let i = 0; i < 6; i++) {
+        mappedOptions.push(options[i % options.length]);
+      }
+
       const winningIndex = Math.floor(Math.random() * 6);
       const rotations = [
         { x: 0, y: 0 },       // Front (face 1)
@@ -1405,7 +1528,7 @@
 
       setTimeout(() => {
         isRollingDice = false;
-        diceResult = options[winningIndex];
+        diceResult = mappedOptions[winningIndex];
         render();
         showToast('🎲 Кубик решил: ' + diceResult + '!');
       }, 1250);
@@ -1418,8 +1541,10 @@
       render();
 
       const options = gamePresets[selectedGamePresetKey].options;
-      const winningIndex = Math.floor(Math.random() * 6);
-      const sectorCenter = (winningIndex * 60) + 30;
+      const N = options.length;
+      const winningIndex = Math.floor(Math.random() * N);
+      const sectorAngle = 360 / N;
+      const sectorCenter = (winningIndex * sectorAngle) + (sectorAngle / 2);
       const spinDegrees = (5 + Math.floor(Math.random() * 3)) * 360;
       currentWheelRotation += spinDegrees + (360 - (currentWheelRotation % 360)) + (360 - sectorCenter);
 
@@ -1439,28 +1564,45 @@
     }
 
     function getWheelSvg(options) {
-      const colors = ['#FF5E62', '#00F2FE', '#9B51E0', '#F59E0B', '#22C55E', '#EC4899'];
+      const colors = ['#FF5E62', '#00F2FE', '#9B51E0', '#F59E0B', '#22C55E', '#EC4899', '#3B82F6', '#10B981'];
       const cx = 125, cy = 125, r = 120;
+      const N = options.length;
       let slices = '';
-      for (let i = 0; i < 6; i++) {
-        const startAngle = (i * 60 - 90) * Math.PI / 180;
-        const endAngle = ((i + 1) * 60 - 90) * Math.PI / 180;
-        const x1 = cx + r * Math.cos(startAngle);
-        const y1 = cy + r * Math.sin(startAngle);
-        const x2 = cx + r * Math.cos(endAngle);
-        const y2 = cy + r * Math.sin(endAngle);
-        const textAngle = i * 60 + 30;
-        const textRad = (textAngle - 90) * Math.PI / 180;
-        const tx = cx + (r * 0.62) * Math.cos(textRad);
-        const ty = cy + (r * 0.62) * Math.sin(textRad);
 
-        slices += `
-          <path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z" fill="${colors[i]}" stroke="#ffffff" stroke-width="1.5" />
-          <text x="${tx}" y="${ty}" fill="#ffffff" font-size="11" font-weight="800" text-anchor="middle" dominant-baseline="middle" transform="rotate(${textAngle}, ${tx}, ${ty})">
-            ${options[i].substring(0, 11)}
+      if (N === 2) {
+        slices = `
+          <path d="M${cx},${cy} L${cx},${cy - r} A${r},${r} 0 0,1 ${cx},${cy + r} Z" fill="${colors[0]}" stroke="#ffffff" stroke-width="1.5" />
+          <text x="${cx + r * 0.45}" y="${cy}" fill="#ffffff" font-size="12" font-weight="800" text-anchor="middle" dominant-baseline="middle" transform="rotate(90, ${cx + r * 0.45}, ${cy})">
+            ${options[0].substring(0, 13)}
+          </text>
+          <path d="M${cx},${cy} L${cx},${cy + r} A${r},${r} 0 0,1 ${cx},${cy - r} Z" fill="${colors[1]}" stroke="#ffffff" stroke-width="1.5" />
+          <text x="${cx - r * 0.45}" y="${cy}" fill="#ffffff" font-size="12" font-weight="800" text-anchor="middle" dominant-baseline="middle" transform="rotate(270, ${cx - r * 0.45}, ${cy})">
+            ${options[1].substring(0, 13)}
           </text>
         `;
+      } else {
+        const sectorAngle = 360 / N;
+        for (let i = 0; i < N; i++) {
+          const startAngle = (i * sectorAngle - 90) * Math.PI / 180;
+          const endAngle = ((i + 1) * sectorAngle - 90) * Math.PI / 180;
+          const x1 = cx + r * Math.cos(startAngle);
+          const y1 = cy + r * Math.sin(startAngle);
+          const x2 = cx + r * Math.cos(endAngle);
+          const y2 = cy + r * Math.sin(endAngle);
+          const textAngle = i * sectorAngle + (sectorAngle / 2);
+          const textRad = (textAngle - 90) * Math.PI / 180;
+          const tx = cx + (r * 0.6) * Math.cos(textRad);
+          const ty = cy + (r * 0.6) * Math.sin(textRad);
+
+          slices += `
+            <path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z" fill="${colors[i % colors.length]}" stroke="#ffffff" stroke-width="1.5" />
+            <text x="${tx}" y="${ty}" fill="#ffffff" font-size="${N > 4 ? 11 : 12}" font-weight="800" text-anchor="middle" dominant-baseline="middle" transform="rotate(${textAngle}, ${tx}, ${ty})">
+              ${options[i].substring(0, 12)}
+            </text>
+          `;
+        }
       }
+
       return `
         <svg viewBox="0 0 250 250" width="100%" height="100%">
           ${slices}
@@ -1954,6 +2096,10 @@
       } else if (currentTab === 'games') {
         const currentPreset = gamePresets[selectedGamePresetKey];
         const options = currentPreset.options;
+        const mappedOptions = [];
+        for (let i = 0; i < 6; i++) {
+          mappedOptions.push(options[i % options.length]);
+        }
 
         container.innerHTML = `
           <div class="card-head" style="margin-bottom:12px;">
@@ -1961,9 +2107,9 @@
               <h3>Супер-Рандомайзер 🎲</h3>
               <p style="font-size:11px; color:#8E93A3;">Решайте любые бытовые споры легко и с юмором</p>
             </div>
-            <span style="font-size:11px; font-weight:800; background:rgba(0,242,254,0.18); color:#00F2FE; padding:4px 10px; border-radius:12px; border:1px solid rgba(0,242,254,0.3);">
-              Для двоих ✨
-            </span>
+            <button style="background:linear-gradient(135deg, #00F2FE, #4FACFE); border:none; border-radius:12px; padding:6px 12px; color:#0B0E17; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openCustomDisputeModal()">
+              ＋ Свой вопрос
+            </button>
           </div>
 
           <!-- Выбор темы спора (чипы) -->
@@ -1973,6 +2119,9 @@
                 ${gamePresets[k].title}
               </div>
             `).join('')}
+            <div class="preset-chip" style="background:rgba(0,242,254,0.12); border:1px dashed #00F2FE; color:#00F2FE; font-weight:800;" onclick="openCustomDisputeModal()">
+              ＋ Свой спор
+            </div>
           </div>
 
           <!-- Карточка рандомайзера -->
@@ -1990,20 +2139,41 @@
             <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-bottom:4px;">
               ${currentPreset.title}
             </div>
-            <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:12px;">
+            <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:8px;">
               ${gameRandomizerMode === 'dice' ? 'Бросьте 3D кубик, чтобы случай решил исход' : 'Крутите колесо фортуны со случайной физикой'}
+            </div>
+
+            <!-- Если это пользовательский спор - даем изменить или удалить -->
+            ${currentPreset.isCustom ? `
+              <div style="display:flex; justify-content:center; gap:8px; margin-bottom:12px;">
+                <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); border-radius:10px; color:#fff; font-size:11px; font-weight:700; padding:5px 12px; cursor:pointer;" onclick="openCustomDisputeModal('${selectedGamePresetKey}')">
+                  ✏️ Изменить вопрос
+                </button>
+                <button style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); border-radius:10px; color:#F87171; font-size:11px; font-weight:700; padding:5px 12px; cursor:pointer;" onclick="deleteCustomDispute('${selectedGamePresetKey}')">
+                  🗑️ Удалить
+                </button>
+              </div>
+            ` : ''}
+
+            <!-- Варианты в виде аккуратных чипов -->
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:4px 0 16px;">
+              ${options.map(opt => `
+                <span style="font-size:11px; font-weight:600; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:4px 9px; color:#E0E5F5;">
+                  ${opt}
+                </span>
+              `).join('')}
             </div>
 
             ${gameRandomizerMode === 'dice' ? `
               <!-- 3D Сцена Кубика -->
               <div class="dice-scene">
                 <div class="dice-cube" id="diceCubeElement">
-                  <div class="dice-face dice-face-1">${options[0]}</div>
-                  <div class="dice-face dice-face-2">${options[1]}</div>
-                  <div class="dice-face dice-face-3">${options[2]}</div>
-                  <div class="dice-face dice-face-4">${options[3]}</div>
-                  <div class="dice-face dice-face-5">${options[4]}</div>
-                  <div class="dice-face dice-face-6">${options[5]}</div>
+                  <div class="dice-face dice-face-1">${mappedOptions[0]}</div>
+                  <div class="dice-face dice-face-2">${mappedOptions[1]}</div>
+                  <div class="dice-face dice-face-3">${mappedOptions[2]}</div>
+                  <div class="dice-face dice-face-4">${mappedOptions[3]}</div>
+                  <div class="dice-face dice-face-5">${mappedOptions[4]}</div>
+                  <div class="dice-face dice-face-6">${mappedOptions[5]}</div>
                 </div>
               </div>
 
