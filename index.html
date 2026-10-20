@@ -1570,6 +1570,7 @@
       }
       pairCode = val;
       localStorage.setItem('cozy_pair_code', pairCode);
+      getSyncBroadcastChannel();
       closePairModal();
       showToast('Связываем с кодом ' + pairCode + '...');
       initMqtt();
@@ -1665,11 +1666,10 @@
         timestamp: Date.now()
       };
 
-      if (typeof BroadcastChannel !== 'undefined') {
+      const bc = getSyncBroadcastChannel();
+      if (bc) {
         try {
-          const bc = new BroadcastChannel('cozy_sync_' + pairCode);
           bc.postMessage(msg);
-          bc.close();
         } catch (e) {}
       }
 
@@ -1683,6 +1683,20 @@
           console.warn('MQTT broadcast failed:', e);
         }
       }
+    }
+
+    let syncBc = null;
+    function getSyncBroadcastChannel() {
+      if (typeof BroadcastChannel === 'undefined') return null;
+      const chName = 'cozy_sync_' + pairCode;
+      if (!syncBc || syncBc.name !== chName) {
+        if (syncBc) { try { syncBc.close(); } catch(e){} }
+        try {
+          syncBc = new BroadcastChannel(chName);
+          syncBc.onmessage = (ev) => handleIncomingSync(ev.data);
+        } catch(e) {}
+      }
+      return syncBc;
     }
 
     function handleIncomingSync(msg) {
@@ -1736,12 +1750,7 @@
       }
     }
 
-    if (typeof BroadcastChannel !== 'undefined') {
-      try {
-        const localBc = new BroadcastChannel('cozy_sync_' + pairCode);
-        localBc.onmessage = (ev) => handleIncomingSync(ev.data);
-      } catch (e) {}
-    }
+    getSyncBroadcastChannel();
 
     function saveLocalState() {
       try {
