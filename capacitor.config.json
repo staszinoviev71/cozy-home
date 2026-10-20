@@ -1,0 +1,12 @@
+{
+  "appId": "com.cozyhome.companion",
+  "appName": "Уютный Дом",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0B0E17",
+    "allowMixedContent": true
+  }
+}

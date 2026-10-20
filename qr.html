@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Уютный Дом — Вход со смартфона</title>
+  <style>
+    body {
+      background: #0B0E17;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 28px;
+      padding: 36px 32px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      backdrop-filter: blur(20px);
+      box-sizing: border-box;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    p {
+      color: #A0A5B5;
+      font-size: 14px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .qr-wrap {
+      background: #fff;
+      padding: 14px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .qr-wrap img {
+      width: 240px;
+      height: 240px;
+      display: block;
+    }
+    .url-box {
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      border-radius: 14px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 15px;
+      color: #00F2FE;
+      margin-bottom: 16px;
+      user-select: all;
+      word-break: break-all;
+    }
+    .status-badge {
+      background: rgba(74, 222, 128, 0.15);
+      border: 1px solid rgba(74, 222, 128, 0.4);
+      color: #4ADE80;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    .hint {
+      font-size: 12px;
+      color: #8E93A3;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1><span>🏡</span> Уютный Дом</h1>
+    <p>Наведите камеру смартфона <strong>Galaxy A54</strong> на QR-код или откройте прямую ссылку:</p>
+    
+    <div class="qr-wrap">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://para-maintenance-benjamin-emily.trycloudflare.com" alt="QR Code">
+    </div>
+
+    <div class="url-box">
+      <a href="https://para-maintenance-benjamin-emily.trycloudflare.com" target="_blank" style="color: inherit; text-decoration: none;">
+        https://para-maintenance-benjamin-emily.trycloudflare.com
+      </a>
+    </div>
+
+    <div class="status-badge">
+      ⚡ Прямой безопасный вход без паролей и проверок IP (Cloudflare Tunnel HTTP/2)
+    </div>
+
+    <div class="hint">
+      💡 <strong>Совет для Galaxy A54:</strong> В меню Chrome (три точки вверху) нажмите <strong>«Добавить на главный экран»</strong> — приложение откроется в полноэкранном режиме как нативное приложение!
+    </div>
+  </div>
+</body>
+</html>
