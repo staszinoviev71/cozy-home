@@ -1,0 +1,78 @@
+name: Build and Release Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Copy latest web assets to Android
+        run: |
+          mkdir -p android/app/src/main/assets
+          cp index.html manifest.json sw.js icon-192.png icon-512.png android/app/src/main/assets/
+
+      - name: Build APK with Gradle
+        run: |
+          cd android
+          gradle assembleRelease --stacktrace
+
+      - name: Prepare APK Asset
+        run: |
+          mkdir -p build-output
+          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.0.0.apk
+          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-latest.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cozy-home-apk
+          path: build-output/cozy-home-latest.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: "🏡 Уютный Дом (Нативный APK)"
+          make_latest: "true"
+          overwrite: true
+          body: |
+            ### Настоящее нативное приложение «Уютный Дом» для Samsung Galaxy A54
+            
+            - 📱 **Прямая установка из APK:** Полноэкранный режим без рамок браузера, ссылок и заголовков.
+            - 🐕 **Интерактивные персонажи:** Корги и персонализированные аватары (брюнетка / мелированный блонд).
+            - 🎲 **Супер-Рандомайзер:** 3D Кубик и Колесо Фортуны со своими вопросами и вариантами ответов.
+            - 🛒 **Список покупок:** Синхронизация в реальном времени, фото товаров.
+            - 📋 **Паспорт дома:** Коды домофона, Wi-Fi и фильтры в 1 клик.
+            - 📲 **Виджет One UI (4x2):** Поддержка системного виджета Samsung на рабочий стол.
+            
+            **Инструкция по установке:**
+            1. Скачайте файл **`cozy-home-latest.apk`** ниже на ваш Samsung телефон.
+            2. Откройте скачанный файл и нажмите **Установить**.
+            3. Запустите приложение с рабочего стола!
+          files: |
+            build-output/cozy-home-v1.0.0.apk
+            build-output/cozy-home-latest.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
