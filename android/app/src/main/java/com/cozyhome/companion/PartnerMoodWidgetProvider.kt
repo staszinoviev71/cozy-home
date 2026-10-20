@@ -82,16 +82,19 @@ class PartnerMoodWidgetProvider : AppWidgetProvider() {
                 "assets/avatars/$filename",
                 "avatars/$filename"
             )
-            var original: Bitmap? = null
+            var foundBitmap: Bitmap? = null
             for (path in possiblePaths) {
                 try {
-                    context.assets.open(path).use { stream ->
-                        original = BitmapFactory.decodeStream(stream)
+                    val decoded = context.assets.open(path).use { stream ->
+                        BitmapFactory.decodeStream(stream)
                     }
-                    if (original != null) break
+                    if (decoded != null) {
+                        foundBitmap = decoded
+                        break
+                    }
                 } catch (e: Exception) {}
             }
-            if (original == null) return null
+            val original = foundBitmap ?: return null
 
             return try {
                 val size = 180
