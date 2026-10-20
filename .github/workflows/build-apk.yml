@@ -33,6 +33,7 @@ jobs:
         run: |
           mkdir -p android/app/src/main/assets
           cp index.html manifest.json sw.js icon-192.png icon-512.png android/app/src/main/assets/
+          if [ -d "assets" ]; then cp -r assets android/app/src/main/assets/; fi
 
       - name: Build APK with Gradle
         run: |
@@ -42,7 +43,7 @@ jobs:
       - name: Prepare APK Asset
         run: |
           mkdir -p build-output
-          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.0.1.apk
+          cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-v1.0.2.apk
           cp android/app/build/outputs/apk/release/app-release.apk build-output/cozy-home-latest.apk
 
       - name: Upload APK Artifact
@@ -55,26 +56,24 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.1
-          name: "🏡 Уютный Дом v1.0.1 (Нативный APK)"
+          tag_name: v1.0.2
+          name: "🏡 Уютный Дом v1.0.2 (3D Pixar Аватары & Liquid Glass)"
           make_latest: "true"
           overwrite: true
           body: |
-            ### Настоящее нативное приложение «Уютный Дом» для Samsung Galaxy A54
+            ### Нативное приложение «Уютный Дом» v1.0.2 для двоих
+
+            - ✨ **16 новых 3D Pixar аватаров:** Полные паки для Него (мелированный блонд) и для Неё (брюнетка) на все 8 эмоциональных состояний.
+            - 💫 **Эффекты Liquid Glass:** Тактильный отклик при нажатии (scale bounce), парящие светящиеся искры (particles aura) и неоновая подсветка активного настроения.
+            - 🔔 **Системные SOS-уведомления:** Приоритетный канал Android Heads-Up со звуком и виброоткликом.
+            - 📲 **Виджет One UI Liquid Glass:** Интерактивный виджет на рабочем столе Samsung Galaxy A54.
+            - 🔐 **Простое подключение по 6-значному коду:** Выбор роли Муж / Любимая при первом запуске.
             
-            - 📱 **Прямая установка из APK:** Полноэкранный режим без рамок браузера, ссылок и заголовков.
-            - 🐕 **Интерактивные персонажи:** Корги и персонализированные аватары (брюнетка / мелированный блонд).
-            - 🎲 **Супер-Рандомайзер:** 3D Кубик и Колесо Фортуны со своими вопросами и вариантами ответов.
-            - 🛒 **Список покупок:** Синхронизация в реальном времени, фото товаров.
-            - 📋 **Паспорт дома:** Коды домофона, Wi-Fi и фильтры в 1 клик.
-            - 📲 **Виджет One UI (4x2):** Поддержка системного виджета Samsung на рабочий стол.
-            
-            **Инструкция по установке:**
-            1. Скачайте файл **`cozy-home-latest.apk`** ниже на ваш Samsung телефон.
-            2. Откройте скачанный файл и нажмите **Установить**.
-            3. Запустите приложение с рабочего стола!
+            **Скачать и установить:**
+            1. Нажмите на **`cozy-home-latest.apk`** ниже.
+            2. Запустите файл на смартфоне и нажмите **Установить**.
           files: |
-            build-output/cozy-home-v1.0.0.apk
+            build-output/cozy-home-v1.0.2.apk
             build-output/cozy-home-latest.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

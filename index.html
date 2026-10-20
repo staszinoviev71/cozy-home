@@ -397,6 +397,62 @@
       height: 58px;
     }
 
+    /* 3D Pixar Avatar Wrap with particles and glow */
+    .pixar-avatar-wrap {
+      position: relative;
+      width: 62px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pixar-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      position: relative;
+      z-index: 2;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .avatar-particles {
+      position: absolute;
+      inset: -8px;
+      pointer-events: none;
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--mood-glow, #FF8A65);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--mood-glow, #FF8A65);
+      opacity: 0.8;
+      animation: floatParticle 3s infinite ease-in-out;
+    }
+    .particle:nth-child(1) { top: 4%; left: 16%; animation-delay: 0s; transform: scale(1.1); }
+    .particle:nth-child(2) { top: 76%; left: 8%; animation-delay: 0.9s; transform: scale(0.8); }
+    .particle:nth-child(3) { top: 14%; right: 8%; animation-delay: 1.6s; transform: scale(1.2); }
+    .particle:nth-child(4) { bottom: 8%; right: 18%; animation-delay: 2.3s; transform: scale(0.9); }
+
+    @keyframes floatParticle {
+      0%, 100% {
+        transform: translateY(0) scale(0.9);
+        opacity: 0.4;
+      }
+      50% {
+        transform: translateY(-7px) scale(1.3);
+        opacity: 0.95;
+      }
+    }
+
     /* Анимации мордочки */
     @keyframes bounceHappy {
       0%, 100% { transform: translateY(0); }
@@ -448,25 +504,43 @@
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 16px;
-      padding: 10px 4px;
+      padding: 8px 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 4px;
       cursor: pointer;
-      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                  box-shadow 0.25s ease, 
+                  border-color 0.25s ease, 
+                  background 0.25s ease;
     }
 
-    .mood-item:active, .mood-item.active {
-      background: linear-gradient(135deg, rgba(255, 94, 98, 0.35), rgba(255, 142, 83, 0.2));
-      border-color: var(--primary);
-      box-shadow: 0 4px 14px var(--primary-glow);
-      transform: scale(0.97);
+    .mood-item:active {
+      transform: scale(0.91) !important;
+    }
+
+    .mood-item.active {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.04));
+      border-color: var(--item-color, var(--primary));
+      box-shadow: 0 0 18px var(--item-glow, var(--primary-glow)), inset 0 0 12px rgba(255, 255, 255, 0.05);
+      transform: scale(1.02);
     }
 
     .mood-item .emoji { font-size: 22px; }
     .mood-item .name { font-size: 10px; font-weight: 700; color: #B5B9C8; }
     .mood-item.active .name { color: #FFFFFF; }
+
+    .mood-mini-thumb {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35));
+    }
 
     /* Блок срочного SOS пуша с кастомным текстом и иконками */
     .sos-custom-box {
@@ -1726,10 +1800,10 @@
       }
     }
 
-    // Тип альтер-эго: 'corgi' (собачка корги) или 'human' (люди)
+    // Тип альтер-эго: 'pixar' (3D аватары Pixar), 'corgi' (собачка корги) или 'human' (люди)
     let avatarType = {
-      husband: 'corgi',
-      wife: 'corgi'
+      husband: 'pixar',
+      wife: 'pixar'
     };
 
     // Выбранная иконка для своего срочного пуша
@@ -2366,7 +2440,7 @@
       avatarType[currentRole] = type;
       broadcastSync('MOOD_UPDATE', { role: currentRole, mood: partnerMood, avatarType: type });
       render();
-      showToast('Выбран стиль персонажа: ' + (type === 'corgi' ? '🐶 Корги' : (currentRole === 'wife' ? '👩 Девушка (брюнетка)' : '👨 Парень (мелированный блонд)')));
+      showToast('Выбран стиль персонажа: ' + (type === 'pixar' ? '✨ 3D Pixar' : type === 'corgi' ? '🐶 Корги' : '🎨 Векторный арт'));
     }
 
     function selectMood(m) {
@@ -2510,11 +2584,30 @@
       showToast(`Запись «${label}» успешно добавлена в паспорт дома!`);
     }
 
-    // Генерация векторного SVG аватара: Корги или Человек
+    // Генерация аватара: 3D Pixar, Вектор или Корги
     function getSvg(m, targetRole, forceType) {
       const role = targetRole || currentRole;
-      const type = forceType || avatarType[role];
+      const type = forceType || avatarType[role] || 'pixar';
       const anim = 'anim-' + (m.faceDetails || 'happy');
+      const rolePrefix = role === 'wife' ? 'girl' : 'guy';
+
+      if (type === 'pixar') {
+        const glowColor = m.color || '#FF8A65';
+        return `
+          <div class="pixar-avatar-wrap ${anim}" style="--mood-glow: ${glowColor};">
+            <div class="avatar-particles">
+              <span class="particle"></span>
+              <span class="particle"></span>
+              <span class="particle"></span>
+              <span class="particle"></span>
+            </div>
+            <img src="assets/avatars/${rolePrefix}_${m.id}.png"
+                 alt="${m.title}"
+                 class="pixar-avatar-img"
+                 onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\\'font-size:36px\\'>${m.emoji}</span>';" />
+          </div>
+        `;
+      }
 
       if (type === 'human') {
         const isWife = role === 'wife';
@@ -2697,21 +2790,24 @@
               <span class="card-badge">Синхронно</span>
             </div>
 
-            <!-- Переключатель: Корги / Человек -->
+            <!-- Переключатель: 3D Pixar / Корги / Человек -->
             <div class="avatar-archetype-row">
               <span class="archetype-label">Вид аватара:</span>
               <div class="archetype-tabs">
+                <button class="archetype-btn ${avatarType[currentRole] === 'pixar' ? 'active' : ''}" onclick="setAvatarType('pixar')">
+                  <span>✨</span> 3D Pixar
+                </button>
                 <button class="archetype-btn ${avatarType[currentRole] === 'corgi' ? 'active' : ''}" onclick="setAvatarType('corgi')">
                   <span>🐶</span> Корги
                 </button>
                 <button class="archetype-btn ${avatarType[currentRole] === 'human' ? 'active' : ''}" onclick="setAvatarType('human')">
-                  <span>${currentRole === 'wife' ? '👩' : '👨'}</span> ${currentRole === 'wife' ? 'Брюнетка' : 'Блонд'}
+                  <span>🎨</span> Вектор
                 </button>
               </div>
             </div>
 
             <div class="avatar-preview-row">
-              <div class="avatar-box">
+              <div class="avatar-box" style="--mood-glow: ${partnerMood.color};">
                 ${getSvg(partnerMood, currentRole, avatarType[currentRole])}
               </div>
               <div class="avatar-meta">
@@ -2722,8 +2818,13 @@
 
             <div class="moods-grid">
               ${moods.map(m => `
-                <div class="mood-item ${partnerMood.id === m.id ? 'active' : ''}" onclick="selectMood(${JSON.stringify(m).replace(/"/g, '&quot;')})">
-                  <span class="emoji">${m.emoji}</span>
+                <div class="mood-item ${partnerMood.id === m.id ? 'active' : ''}" 
+                     style="--item-color: ${m.color}; --item-glow: ${m.color}88;"
+                     onclick="selectMood(${JSON.stringify(m).replace(/"/g, '&quot;')})">
+                  ${avatarType[currentRole] === 'pixar'
+                    ? `<img src="assets/avatars/${currentRole === 'wife' ? 'girl' : 'guy'}_${m.id}.png" class="mood-mini-thumb" alt="${m.title}" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='block';" /><span class="emoji" style="display:none;">${m.emoji}</span>`
+                    : `<span class="emoji">${m.emoji}</span>`
+                  }
                   <span class="name">${m.id === 'happy' ? 'Радость' : m.id === 'tired' ? 'Усталость' : m.id === 'hungry' ? 'Голод' : m.id === 'sad' ? 'Грусть' : m.id === 'treat' ? 'Сладкое' : m.id === 'grumpy' ? 'Ворчу' : m.id === 'cozy' ? 'Уют' : 'Люблю'}</span>
                 </div>
               `).join('')}
