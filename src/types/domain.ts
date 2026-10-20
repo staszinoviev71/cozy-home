@@ -1,10 +1,12 @@
 export type UserRole = 'husband' | 'wife';
+export type AvatarArchetype = 'corgi' | 'human';
 
 export interface UserProfile {
   id: string;
   name: string;
   role: UserRole;
   currentMoodId: string;
+  avatarArchetype?: AvatarArchetype;
   updatedAt: number;
 }
 

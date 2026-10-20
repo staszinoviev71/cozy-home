@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0B0E17">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Уютный Дом — Liquid Glass</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FF5E62;
+      --primary-glow: rgba(255, 94, 98, 0.45);
+      --accent-cyan: #00F2FE;
+      --accent-cyan-glow: rgba(0, 242, 254, 0.35);
+      --accent-green: #22C55E;
+      --accent-purple: #9B51E0;
+      --accent-amber: #F59E0B;
+      
+      --glass-bg: rgba(255, 255, 255, 0.08);
+      --glass-card: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.14);
+      --glass-border-light: rgba(255, 255, 255, 0.24);
+      --glass-blur: blur(28px) saturate(200%);
+      
+      --text: #FFFFFF;
+      --text-muted: #8E93A3;
+      --bg: #0B0E17;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Фоновые живые градиентные пятна Liquid Glass */
+    .ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(85px);
+      opacity: 0.55;
+      animation: floatAura 18s ease-in-out infinite alternate;
+    }
+
+    .blob-1 {
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, #FF5E62 0%, #FF9966 70%);
+      top: -80px;
+      left: -60px;
+    }
+
+    .blob-2 {
+      width: 360px;
+      height: 360px;
+      background: radial-gradient(circle, #7F00FF 0%, #E100FF 70%);
+      bottom: -100px;
+      right: -80px;
+      animation-delay: -7s;
+    }
+
+    .blob-3 {
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, #00F2FE 0%, #4FACFE 70%);
+      top: 40%;
+      left: 30%;
+      opacity: 0.28;
+      animation-delay: -12s;
+    }
+
+    @keyframes floatAura {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, 40px) scale(1.1); }
+      100% { transform: translate(-20px, 60px) scale(0.95); }
+    }
+
+    /* Верхний стеклянный хедер */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(11, 14, 23, 0.75);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--glass-border);
+      padding: env(safe-area-inset-top, 14px) 16px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.6), rgba(255, 142, 83, 0.5));
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .logo-title h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-title p {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .role-switcher {
+      display: flex;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .role-btn {
+      border: none;
+      background: transparent;
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #9EA3B5;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .role-btn.active {
+      background: linear-gradient(135deg, #FF5E62, #FF8E53);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+
+    /* Контейнер страниц */
+    main {
+      flex: 1;
+      padding: 16px 16px 105px;
+      position: relative;
+      z-index: 10;
+      max-width: 500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Стеклянные карточки Liquid Glass */
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-head h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .card-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: #FFA39E;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Переключатель альтер-эго (Корги / Люди) */
+    .avatar-archetype-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 5px 6px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .archetype-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #A0A5B5;
+      padding-left: 8px;
+    }
+
+    .archetype-tabs {
+      display: flex;
+      gap: 4px;
+    }
+
+    .archetype-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #9EA3B5;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+
+    .archetype-btn.active {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.28);
+      color: #FFFFFF;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Аватар блок */
+    .avatar-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .avatar-box {
+      width: 72px;
+      height: 72px;
+      border-radius: 22px;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.04));
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 18px var(--primary-glow);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .character-svg {
+      width: 58px;
+      height: 58px;
+    }
+
+    /* Анимации мордочки */
+    @keyframes bounceHappy {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes swayTired {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    @keyframes pulseHungry {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes shakeGrumpy {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-3deg); }
+      75% { transform: rotate(3deg); }
+    }
+    .anim-happy { animation: bounceHappy 2s infinite ease-in-out; }
+    .anim-tired { animation: swayTired 3s infinite ease-in-out; }
+    .anim-hungry { animation: pulseHungry 1.8s infinite ease-in-out; }
+    .anim-grumpy { animation: shakeGrumpy 2.2s infinite ease-in-out; }
+    .anim-sad { animation: swayTired 3.5s infinite ease-in-out; }
+    .anim-cozy { animation: bounceHappy 3s infinite ease-in-out; }
+    .anim-treat { animation: bounceHappy 1.8s infinite ease-in-out; }
+    .anim-love { animation: bounceHappy 1.6s infinite ease-in-out; }
+
+    .avatar-meta h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 2px;
+    }
+
+    .avatar-meta p {
+      font-size: 11.5px;
+      color: #A0A5B5;
+      line-height: 1.35;
+    }
+
+    /* Сетка настроений */
+    .moods-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .mood-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 10px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .mood-item:active, .mood-item.active {
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.35), rgba(255, 142, 83, 0.2));
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px var(--primary-glow);
+      transform: scale(0.97);
+    }
+
+    .mood-item .emoji { font-size: 22px; }
+    .mood-item .name { font-size: 10px; font-weight: 700; color: #B5B9C8; }
+    .mood-item.active .name { color: #FFFFFF; }
+
+    /* Блок срочного SOS пуша с кастомным текстом и иконками */
+    .sos-custom-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+
+    .sos-icon-selector {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+      scrollbar-width: none;
+    }
+    .sos-icon-selector::-webkit-scrollbar { display: none; }
+
+    .sos-icon-chip {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .sos-icon-chip.active {
+      background: linear-gradient(135deg, #FF5E62, #FF8E53);
+      border-color: #FFFFFF;
+      box-shadow: 0 2px 10px var(--primary-glow);
+      transform: scale(1.08);
+    }
+
+    .sos-input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sos-input {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .sos-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .sos-send-btn {
+      background: linear-gradient(135deg, #FF5E62 0%, #FF8E53 100%);
+      border: none;
+      border-radius: 14px;
+      padding: 0 14px;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px var(--primary-glow);
+      transition: transform 0.15s;
+      white-space: nowrap;
+    }
+
+    .sos-send-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Быстрые чипы SOS */
+    .sos-row {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .sos-row::-webkit-scrollbar { display: none; }
+
+    .sos-chip {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #FFFFFF;
+      white-space: nowrap;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .sos-chip:active {
+      background: var(--primary);
+      transform: scale(0.96);
+    }
+
+    /* Кнопка «Я зашел в магазин» */
+    .store-btn {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(21, 128, 61, 0.15) 100%);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      border-radius: 20px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #FFFFFF;
+      cursor: pointer;
+      margin-bottom: 16px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 24px rgba(34, 197, 94, 0.2);
+    }
+
+    .store-btn:active {
+      transform: scale(0.98);
+      border-color: rgba(34, 197, 94, 0.8);
+    }
+
+    /* Виджет симулятор One UI */
+    .widget-preview-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(28px) saturate(200%);
+      border-radius: 26px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+      margin-bottom: 16px;
+    }
+
+    .widget-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .widget-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .widget-btn {
+      flex: 1;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .widget-btn:active {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Список покупок */
+    .shopping-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .shopping-item.checked {
+      opacity: 0.45;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .shopping-item.checked .item-title {
+      text-decoration: line-through;
+    }
+
+    .chk {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .shopping-item.checked .chk {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+      color: #fff;
+      font-size: 13px;
+    }
+
+    .item-title { font-size: 13.5px; font-weight: 700; color: #FFFFFF; }
+    .item-sub { font-size: 11px; color: #FFA39E; font-weight: 600; }
+
+    /* Поиск в Паспорте дома */
+    .search-box {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 16px;
+      padding: 12px 14px 12px 38px;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px var(--accent-cyan-glow);
+    }
+
+    .search-icon-pos {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: #8E93A3;
+      pointer-events: none;
+    }
+
+    /* Модальное окно добавления элемента паспорта */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(12px);
+      z-index: 900;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: linear-gradient(135deg, rgba(30, 36, 56, 0.95), rgba(15, 18, 28, 0.95));
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 26px;
+      padding: 22px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes modalPop {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-head h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+
+    .modal-close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #FFFFFF;
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #A0A5B5;
+      margin-bottom: 5px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 13px;
+      padding: 10px 12px;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .form-select {
+      color-scheme: dark;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 11px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary-action {
+      flex: 2;
+      padding: 11px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #00F2FE 0%, #4FACFE 100%);
+      border: none;
+      color: #0B0E17;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 16px var(--accent-cyan-glow);
+    }
+
+    /* НИЖНЕЕ МЕНЮ В СТИЛЕ ЛИКВИД ГЛАСС (Парящий док) */
+    nav {
+      position: fixed;
+      bottom: 12px;
+      left: 16px;
+      right: 16px;
+      max-width: 468px;
+      margin: 0 auto;
+      height: 64px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(20, 24, 38, 0.65) 100%);
+      backdrop-filter: blur(32px) saturate(210%);
+      -webkit-backdrop-filter: blur(32px) saturate(210%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 28px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 6px;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: #9EA3B5;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 7px 14px;
+      border-radius: 20px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-btn .icon {
+      font-size: 19px;
+      transition: transform 0.2s;
+    }
+
+    .nav-btn.active {
+      color: #FFFFFF;
+      background: linear-gradient(135deg, rgba(255, 94, 98, 0.32), rgba(255, 142, 83, 0.2));
+      border: 1px solid rgba(255, 94, 98, 0.55);
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+
+    .nav-btn.active .icon {
+      transform: translateY(-1px) scale(1.1);
+    }
+
+    /* Всплывающий Heads-Up Push Баннер */
+    .heads-up-card {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      max-width: 472px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, rgba(35, 40, 60, 0.96) 0%, rgba(18, 22, 35, 0.96) 100%);
+      border: 1px solid rgba(255, 94, 98, 0.6);
+      backdrop-filter: blur(30px) saturate(200%);
+      border-radius: 24px;
+      padding: 14px 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 20px var(--primary-glow);
+      z-index: 9999;
+      display: none;
+      animation: headsUpDrop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes headsUpDrop {
+      from { transform: translateY(-70px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .heads-up-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .heads-up-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: rgba(255, 94, 98, 0.2);
+      border: 1px solid rgba(255, 94, 98, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .heads-up-content {
+      flex: 1;
+    }
+
+    .heads-up-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 2px;
+    }
+
+    .heads-up-body {
+      font-size: 12px;
+      color: #D1D5E0;
+      line-height: 1.35;
+    }
+
+    .heads-up-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .heads-up-action-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 11px;
+      font-size: 11.5px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+    }
+
+    .heads-up-action-btn.buy {
+      background: linear-gradient(135deg, #22C55E, #16A34A);
+      color: #FFFFFF;
+      box-shadow: 0 2px 10px rgba(34, 197, 94, 0.35);
+    }
+
+    .heads-up-action-btn.dismiss {
+      background: rgba(255, 255, 255, 0.1);
+      color: #B0B5C5;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    /* Тост уведомлений */
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(24px);
+      color: #111;
+      border-radius: 20px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 16px 36px rgba(0,0,0,0.4);
+      z-index: 999;
+      display: none;
+      animation: popToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes popToast {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Фоновые анимированные градиенты Liquid Glass -->
+  <div class="ambient-canvas">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="toast" id="toastBox">Уведомление</div>
+
+  <!-- Android Heads-Up Push Баннер -->
+  <div class="heads-up-card" id="headsUpNotification">
+    <div class="heads-up-row">
+      <div class="heads-up-icon-box" id="headsUpIcon">🚨</div>
+      <div class="heads-up-content">
+        <div class="heads-up-title" id="headsUpTitle">Любимая: Срочно нужно!</div>
+        <div class="heads-up-body" id="headsUpBody">Пожалуйста, купи: свежий багет</div>
+      </div>
+    </div>
+    <div class="heads-up-actions">
+      <button class="heads-up-action-btn buy" onclick="showToast('Ответ отправлен: «Куплю!» 👍'); closeHeadsUp();">Куплю! 👍</button>
+      <button class="heads-up-action-btn dismiss" onclick="showToast('Ответ отправлен: «Не смогу»'); closeHeadsUp();">Не смогу</button>
+      <button class="heads-up-action-btn dismiss" style="flex:0.5;" onclick="closeHeadsUp();">✕</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно добавления в Паспорт дома -->
+  <div class="modal-overlay" id="addPassportModal" onclick="if(event.target===this) closeAddPassportModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Добавить в Паспорт дома 📋</h3>
+        <button class="modal-close-btn" onclick="closeAddPassportModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Категория</label>
+        <select class="form-select" id="newPassCategory">
+          <option value="intercom">🔢 Домофон и ключи</option>
+          <option value="wifi">📶 Wi-Fi и интернет</option>
+          <option value="filter">🚰 Фильтры воды</option>
+          <option value="meter">⚡ Счётчики и ЖКХ</option>
+          <option value="paint">🎨 Краска и ремонт</option>
+          <option value="master">🔧 Мастер / Сантехник</option>
+          <option value="custom">📋 Другое</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Название (что это?)</label>
+        <input type="text" class="form-input" id="newPassLabel" placeholder="Напр.: Мастер стиральных машин">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Значение (копируется в буфер по тапу)</label>
+        <input type="text" class="form-input" id="newPassValue" placeholder="Напр.: +7 (900) 123-45-67">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Заметка (комментарий)</label>
+        <input type="text" class="form-input" id="newPassNote" placeholder="Напр.: Диспетчер, звонить с 9 до 18">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeAddPassportModal()">Отмена</button>
+        <button class="btn-primary-action" onclick="saveNewPassportItem()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Верхняя шапка с переключателем роли -->
+  <header>
+    <div class="logo-block">
+      <div class="logo-icon">🏡</div>
+      <div class="logo-title">
+        <h1>Уютный Дом</h1>
+        <p>Galaxy A54 Edition</p>
+      </div>
+    </div>
+
+    <!-- Переключение Муж / Жена -->
+    <div class="role-switcher">
+      <button class="role-btn active" id="btnHusband" onclick="setRole('husband')">Муж</button>
+      <button class="role-btn" id="btnWife" onclick="setRole('wife')">Жена</button>
+    </div>
+  </header>
+
+  <!-- Основной контент страницы -->
+  <main id="mainContainer">
+    <!-- Рендерится через JS -->
+  </main>
+
+  <!-- Парящее стеклянное нижнее меню Liquid Glass -->
+  <nav id="bottomNav">
+    <button class="nav-btn active" onclick="setTab('home')">
+      <span class="icon">🏠</span>
+      <span>Главная</span>
+    </button>
+    <button class="nav-btn" onclick="setTab('shopping')">
+      <span class="icon">🛒</span>
+      <span>Покупки</span>
+    </button>
+    <button class="nav-btn" onclick="setTab('dinner')">
+      <span class="icon">✨</span>
+      <span>Ужин & Wish</span>
+    </button>
+    <button class="nav-btn" onclick="setTab('passport')">
+      <span class="icon">📋</span>
+      <span>Паспорт</span>
+    </button>
+  </nav>
+
+  <script>
+    let currentRole = 'husband';
+    let currentTab = 'home';
+
+    // Тип альтер-эго: 'corgi' (собачка корги) или 'human' (люди)
+    let avatarType = {
+      husband: 'corgi',
+      wife: 'corgi'
+    };
+
+    // Выбранная иконка для своего срочного пуша
+    let selectedSosIcon = '🚨';
+    const sosIconsList = ['🚨', '🛒', '💊', '☕', '🥖', '🥛', '🍰', '🍕', '🔑', '❤️', '🚗', '📦', '🧴'];
+
+    const moods = [
+      { id: 'happy', title: 'На волне радости!', emoji: '✨', faceDetails: 'happy', color: '#FF8A65' },
+      { id: 'tired', title: 'Села батарейка 🪫', emoji: '😴', faceDetails: 'tired', color: '#90A4AE' },
+      { id: 'hungry', title: 'Хочу кушать! 🍕', emoji: '🍕', faceDetails: 'hungry', color: '#FFB74D' },
+      { id: 'sad', title: 'Нужны обнимашки 🥺', emoji: '🥺', faceDetails: 'sad', color: '#64B5F6' },
+      { id: 'treat', title: 'Сладкоежка 🧁', emoji: '🧁', faceDetails: 'treat', color: '#F06292' },
+      { id: 'grumpy', title: 'Вредничаю 😾', emoji: '😾', faceDetails: 'grumpy', color: '#E57373' },
+      { id: 'cozy', title: 'Уютная булочка 🥐', emoji: '🥐', faceDetails: 'cozy', color: '#FFD54F' },
+      { id: 'love', title: 'Люблю & Скучаю 🥰', emoji: '❤️', faceDetails: 'love', color: '#FF4081' }
+    ];
+
+    let partnerMood = moods[0];
+
+    let items = [
+      { id: 1, name: 'Молоко 3.2% Parmalat', comment: 'В синей пачке', checked: false, photo: '🥛' },
+      { id: 2, name: 'Свежий багет / хлеб', comment: 'Хрустящий', checked: false, photo: '🥖' },
+      { id: 3, name: 'Сыр Маасдам Excelsior', comment: 'Нарезка', checked: true, photo: '🧀' },
+      { id: 4, name: 'Яблоки Голден', comment: '1 кг спелые', checked: false, photo: '🍏' }
+    ];
+
+    let passportSearchQuery = '';
+
+    let passportItems = [
+      { id: 'pass_1', category: 'intercom', icon: '🔢', label: 'Домофон подъезда', value: '# 4829', note: 'Калитка во двор: 1234#' },
+      { id: 'pass_2', category: 'wifi', icon: '📶', label: 'Wi-Fi для гостей', value: 'CozyHome2026!', note: 'Сеть: Home_5G' },
+      { id: 'pass_3', category: 'filter', icon: '🚰', label: 'Сменные фильтры воды', value: 'Аквафор К5 / К2 / КО-50', note: 'Замена в декабре' },
+      { id: 'pass_4', category: 'paint', icon: '🎨', label: 'Цвет краски стен', value: 'Dulux 30YY 68/024', note: 'Гостиная и прихожая' },
+      { id: 'pass_5', category: 'meter', icon: '⚡', label: 'Лицевой счет электроэнергии', value: 'Л/С 8372-1094-22', note: 'Подавать до 25 числа' },
+      { id: 'pass_6', category: 'master', icon: '🔧', label: 'Сантехник (УК Дом)', value: '+7 (999) 555-32-10', note: 'Михаил Иванович, 9:00-18:00' }
+    ];
+
+    function showToast(text) {
+      const box = document.getElementById('toastBox');
+      box.innerText = text;
+      box.style.display = 'block';
+      setTimeout(() => { box.style.display = 'none'; }, 3200);
+    }
+
+    function setRole(role) {
+      currentRole = role;
+      document.getElementById('btnHusband').classList.toggle('active', role === 'husband');
+      document.getElementById('btnWife').classList.toggle('active', role === 'wife');
+      render();
+      showToast('Переключено на профиль: ' + (role === 'husband' ? 'Муж' : 'Жена'));
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      const idx = { home: 0, shopping: 1, dinner: 2, passport: 3 }[tab];
+      document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
+      render();
+    }
+
+    function setAvatarType(type) {
+      avatarType[currentRole] = type;
+      render();
+      showToast('Выбран стиль персонажа: ' + (type === 'corgi' ? '🐶 Корги' : (currentRole === 'wife' ? '👩 Девушка (брюнетка)' : '👨 Парень (мелированный блонд)')));
+    }
+
+    function selectMood(m) {
+      partnerMood = m;
+      render();
+      showToast('Настроение обновлено: ' + m.title);
+    }
+
+    function toggleItem(id) {
+      const it = items.find(x => x.id === id);
+      if (it) {
+        it.checked = !it.checked;
+        render();
+      }
+    }
+
+    function selectSosIcon(icon) {
+      selectedSosIcon = icon;
+      render();
+    }
+
+    function triggerHeadsUp(icon, sender, text) {
+      document.getElementById('headsUpIcon').innerText = icon;
+      document.getElementById('headsUpTitle').innerText = `${sender}: Срочно нужно!`;
+      document.getElementById('headsUpBody').innerText = `Пожалуйста, купи: ${text}`;
+      const card = document.getElementById('headsUpNotification');
+      card.style.display = 'block';
+    }
+
+    function closeHeadsUp() {
+      document.getElementById('headsUpNotification').style.display = 'none';
+    }
+
+    function sendCustomSos() {
+      const input = document.getElementById('customSosTextInput');
+      const text = input ? input.value.trim() : '';
+      if (!text) {
+        showToast('Введите, что срочно нужно купить!');
+        return;
+      }
+      const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
+      triggerHeadsUp(selectedSosIcon, sender, text);
+      showToast(`⚡ Срочный пуш отправлен партнеру: ${selectedSosIcon} ${text}`);
+      if (input) input.value = '';
+    }
+
+    function sendPresetSos(text, icon = '🚨') {
+      const sender = currentRole === 'husband' ? 'Муж' : 'Любимая';
+      triggerHeadsUp(icon, sender, text);
+      showToast(`⚡ Пуш отправлен: ${icon} ${text}`);
+    }
+
+    function copyToClipboard(text, label) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text);
+      }
+      showToast(`Скопировано [${label}]: ${text}`);
+    }
+
+    function handlePassportSearch(q) {
+      passportSearchQuery = q;
+      renderPassportList();
+    }
+
+    function openAddPassportModal() {
+      document.getElementById('addPassportModal').style.display = 'flex';
+      document.getElementById('newPassLabel').value = '';
+      document.getElementById('newPassValue').value = '';
+      document.getElementById('newPassNote').value = '';
+    }
+
+    function closeAddPassportModal() {
+      document.getElementById('addPassportModal').style.display = 'none';
+    }
+
+    function saveNewPassportItem() {
+      const cat = document.getElementById('newPassCategory').value;
+      const label = document.getElementById('newPassLabel').value.trim();
+      const val = document.getElementById('newPassValue').value.trim();
+      const note = document.getElementById('newPassNote').value.trim();
+
+      if (!label || !val) {
+        showToast('Заполните название и значение!');
+        return;
+      }
+
+      const icons = {
+        intercom: '🔢',
+        wifi: '📶',
+        filter: '🚰',
+        meter: '⚡',
+        paint: '🎨',
+        master: '🔧',
+        custom: '📋'
+      };
+
+      passportItems.unshift({
+        id: 'pass_' + Date.now(),
+        category: cat,
+        icon: icons[cat] || '📋',
+        label: label,
+        value: val,
+        note: note || undefined
+      });
+
+      closeAddPassportModal();
+      render();
+      showToast(`Запись «${label}» успешно добавлена в паспорт дома!`);
+    }
+
+    // Генерация векторного SVG аватара: Корги или Человек
+    function getSvg(m, targetRole, forceType) {
+      const role = targetRole || currentRole;
+      const type = forceType || avatarType[role];
+      const anim = 'anim-' + (m.faceDetails || 'happy');
+
+      if (type === 'human') {
+        const isWife = role === 'wife';
+
+        if (isWife) {
+          // Девушка с черными волосами
+          return `
+            <svg class="character-svg ${anim}" viewBox="0 0 64 64" fill="none">
+              <!-- Спинка прически (черные шелковистые волосы) -->
+              <path d="M15 28 C 14 12, 50 12, 49 28 C 52 42, 48 48, 46 50 C 44 40, 44 33, 44 29 C 38 29, 26 29, 20 29 C 20 33, 20 40, 18 50 C 16 48, 12 42, 15 28 Z" fill="#12131A" stroke="#252836" stroke-width="1" />
+              <!-- Шея -->
+              <rect x="28" y="44" width="8" height="8" rx="3" fill="#FFDFC4" />
+              <!-- Лицо -->
+              <ellipse cx="32" cy="33" rx="16.5" ry="15.5" fill="#FFDFC4" stroke="#FFFFFF" stroke-width="1.2" />
+              <!-- Челка и передние пряди (черные) -->
+              <path d="M15 27 C 15 15, 49 15, 49 27 C 45 21, 38 21, 32 24 C 26 21, 19 21, 15 27 Z" fill="#12131A" />
+              <path d="M19 19 Q 26 16 33 18" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-linecap="round" fill="none" />
+              <!-- Сережки золотые -->
+              <circle cx="15" cy="35" r="1.6" fill="#FFD700" />
+              <circle cx="49" cy="35" r="1.6" fill="#FFD700" />
+              <!-- Румянец -->
+              <circle cx="20" cy="37" r="4.5" fill="#FF4081" opacity="0.45"/>
+              <circle cx="44" cy="37" r="4.5" fill="#FF4081" opacity="0.45"/>
+              <!-- Глазки с ресничками -->
+              ${m.faceDetails === 'tired' 
+                ? '<path d="M20 31 L 28 31" stroke="#1D1D26" stroke-width="2.8" stroke-linecap="round" /><path d="M36 31 L 44 31" stroke="#1D1D26" stroke-width="2.8" stroke-linecap="round" />'
+                : m.faceDetails === 'hungry'
+                ? '<circle cx="24" cy="30" r="4" fill="#1D1D26" /><circle cx="22.5" cy="28.5" r="1.5" fill="#fff" /><circle cx="40" cy="30" r="4" fill="#1D1D26" /><circle cx="38.5" cy="28.5" r="1.5" fill="#fff" />'
+                : '<path d="M20 30 Q 24 24 28 30" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="none" /><path d="M36 30 Q 40 24 44 30" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="none" /><path d="M28 28 L 30 26 M44 28 L 46 26" stroke="#1D1D26" stroke-width="1.5" stroke-linecap="round" />'
+              }
+              <!-- Носик и улыбка -->
+              <ellipse cx="32" cy="34" rx="1.5" ry="1" fill="#E0A58A" />
+              <path d="M27 38 Q 32 44 37 38" stroke="#1D1D26" stroke-width="2" stroke-linecap="round" fill="#FF5E62" />
+            </svg>
+          `;
+        } else {
+          // Парень с темными волосами и мелированными прядями блонд
+          return `
+            <svg class="character-svg ${anim}" viewBox="0 0 64 64" fill="none">
+              <!-- Шея -->
+              <rect x="27" y="44" width="10" height="8" rx="3" fill="#FAD7BD" />
+              <!-- Контур лица -->
+              <path d="M17 30 C 17 21, 47 21, 47 30 C 47 39, 42 47, 32 48 C 22 47, 17 39, 17 30 Z" fill="#FAD7BD" stroke="#FFFFFF" stroke-width="1.2" />
+              <!-- Темная база волос -->
+              <path d="M15 27 C 14 15, 50 15, 49 27 C 50 19, 46 12, 32 12 C 18 12, 14 19, 15 27 Z" fill="#20222B" />
+              <path d="M16 23 C 18 14, 28 11, 35 12 C 43 11, 48 15, 48 22 C 45 19, 39 18, 33 20 C 27 18, 20 19, 16 23 Z" fill="#20222B" />
+              <!-- Мелированные пряди блонд -->
+              <path d="M23 15 Q 26 10 31 12 Q 28 17 26 19 Z" fill="#FAD02C" />
+              <path d="M30 13 Q 35 9 39 12 Q 36 17 33 19 Z" fill="#FCE38A" />
+              <path d="M37 14 Q 43 11 45 16 Q 41 19 38 19 Z" fill="#FAD02C" />
+              <path d="M19 18 Q 23 14 26 16 Q 24 20 21 21 Z" fill="#FCE38A" />
+              <!-- Мужские брови -->
+              <path d="M21 26 L 27 27" stroke="#20222B" stroke-width="2" stroke-linecap="round" />
+              <path d="M37 27 L 43 26" stroke="#20222B" stroke-width="2" stroke-linecap="round" />
+              <!-- Глаза -->
+              ${m.faceDetails === 'tired'
+                ? '<path d="M21 31 L 28 31" stroke="#1D1D26" stroke-width="2.8" stroke-linecap="round" /><path d="M36 31 L 43 31" stroke="#1D1D26" stroke-width="2.8" stroke-linecap="round" />'
+                : '<path d="M21 30 Q 25 25 29 30" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="none" /><path d="M35 30 Q 39 25 43 30" stroke="#1D1D26" stroke-width="2.5" stroke-linecap="round" fill="none" />'
+              }
+              <!-- Нос и улыбка -->
+              <ellipse cx="32" cy="35" rx="1.8" ry="1.2" fill="#DFA98F" />
+              <path d="M27 39 Q 32 44 37 39" stroke="#1D1D26" stroke-width="2" stroke-linecap="round" fill="#FF5E62" />
+            </svg>
+          `;
+        }
+      }
+
+      // 🐶 Собачка Корги (для обоих)
+      return `
+        <svg class="character-svg ${anim}" viewBox="0 0 64 64" fill="none">
+          <!-- Большие стоячие ушки корги со скругленными кончиками -->
+          <path d="M12 28 C 7 10, 19 3, 27 18 Z" fill="#FB8C00" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round" />
+          <path d="M14 24 C 11 12, 19 8, 23 18 Z" fill="#FFE0B2" />
+          <path d="M52 28 C 57 10, 45 3, 37 18 Z" fill="#FB8C00" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round" />
+          <path d="M50 24 C 53 12, 45 8, 41 18 Z" fill="#FFE0B2" />
+          <!-- Голова корги рыже-золотистая -->
+          <ellipse cx="32" cy="37" rx="23" ry="19" fill="#FB8C00" stroke="#FFFFFF" stroke-width="1.5" />
+          <!-- Белые пушистые щечки и мордочка -->
+          <path d="M18 37 Q 22 47 32 47 Q 42 47 46 37 Q 49 44 42 50 Q 32 54 22 50 Q 15 44 18 37 Z" fill="#FFFFFF" />
+          <!-- Белая полоска на лбу (blaze) -->
+          <path d="M29 20 Q 32 17 35 20 L 36 34 Q 32 32 28 34 Z" fill="#FFFFFF" />
+          <!-- Румянец -->
+          <circle cx="16" cy="40" r="5" fill="#FF4081" opacity="0.35"/>
+          <circle cx="48" cy="40" r="5" fill="#FF4081" opacity="0.35"/>
+          <!-- Глазки в зависимости от настроения -->
+          ${m.faceDetails === 'tired'
+            ? '<path d="M17 33 L 27 33" stroke="#1D1D26" stroke-width="3" stroke-linecap="round" /><path d="M37 33 L 47 33" stroke="#1D1D26" stroke-width="3" stroke-linecap="round" />'
+            : m.faceDetails === 'hungry'
+            ? '<circle cx="22" cy="32" r="4.5" fill="#1D1D26" /><circle cx="20.5" cy="30.5" r="1.8" fill="#FFFFFF" /><circle cx="42" cy="32" r="4.5" fill="#1D1D26" /><circle cx="40.5" cy="30.5" r="1.8" fill="#FFFFFF" />'
+            : '<path d="M17 32 Q 22 25 27 32" stroke="#1D1D26" stroke-width="3" stroke-linecap="round" fill="none" /><path d="M37 32 Q 42 25 47 32" stroke="#1D1D26" stroke-width="3" stroke-linecap="round" fill="none" />'
+          }
+          <!-- Кожаный черный носик корги -->
+          <ellipse cx="32" cy="38" rx="3.5" ry="2.2" fill="#1D1D26" />
+          <ellipse cx="31" cy="37.2" rx="1" ry="0.6" fill="#FFFFFF" opacity="0.75" />
+          <!-- Рот / Язычок -->
+          <path d="M26 42 Q 32 49 38 42" stroke="#1D1D26" stroke-width="2" fill="#FF4D6D" />
+          <path d="M30 45 Q 32 50 34 45" fill="#FF8DA1" />
+        </svg>
+      `;
+    }
+
+    function renderPassportList() {
+      const container = document.getElementById('passportListContainer');
+      if (!container) return;
+
+      const q = passportSearchQuery.trim().toLowerCase();
+      const filtered = passportItems.filter(p => {
+        if (!q) return true;
+        return p.label.toLowerCase().includes(q) ||
+               p.value.toLowerCase().includes(q) ||
+               (p.note && p.note.toLowerCase().includes(q)) ||
+               p.category.toLowerCase().includes(q);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:32px 16px; color:#8E93A3;">
+            <div style="font-size:32px; margin-bottom:8px;">🔍</div>
+            <div style="font-size:14px; font-weight:700; color:#fff; margin-bottom:4px;">Ничего не найдено</div>
+            <div style="font-size:12px;">Попробуйте изменить поисковый запрос</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
+          ${filtered.map(item => `
+            <div class="glass-card" style="padding:14px; margin:0; cursor:pointer;" onclick="copyToClipboard('${item.value}', '${item.label}')">
+              <div style="font-size:22px; margin-bottom:4px;">${item.icon}</div>
+              <div style="font-size:10.5px; color:#8E93A3; font-weight:700;">${item.label}</div>
+              <div style="font-size:13.5px; font-weight:800; color:#fff; word-break:break-all; margin:2px 0;">${item.value}</div>
+              <div style="font-size:10px; color:#00F2FE;">Тапни скопировать</div>
+              ${item.note ? `<div style="font-size:9.5px; color:#A0A5B5; margin-top:4px;">${item.note}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function render() {
+      const container = document.getElementById('mainContainer');
+      const partnerRole = currentRole === 'husband' ? 'wife' : 'husband';
+      const partnerName = currentRole === 'husband' ? 'Любимая' : 'Муж';
+
+      if (currentTab === 'home') {
+        container.innerHTML = `
+          <!-- Виджет Samsung One UI на рабочем столе -->
+          <div class="card-head" style="margin-bottom:8px;">
+            <h3 style="font-size:12px; color:#A0A5B5; text-transform:uppercase;">Виджет рабочего стола One UI (4x2):</h3>
+          </div>
+          <div class="widget-preview-card">
+            <div class="widget-row">
+              <div class="avatar-box">
+                ${getSvg(partnerMood, partnerRole, avatarType[partnerRole])}
+              </div>
+              <div>
+                <div style="font-size:11px; font-weight:800; color:#FFA39E; text-transform:uppercase;">Настроение: ${partnerName}</div>
+                <div style="font-size:16px; font-weight:700; color:#fff;">${partnerMood.title}</div>
+                <div style="font-size:11.5px; color:#A0A5B5;">только что • связь отличная</div>
+              </div>
+            </div>
+            <div class="widget-actions">
+              <button class="widget-btn" onclick="showToast('Отправлено объятие: «Обнимаю крепко! ❤️»')">
+                <span>🫂</span> Обнять
+              </button>
+              <button class="widget-btn" onclick="showToast('Отправлен статус: «Выезжаю домой! 🚗»')">
+                <span>🚗</span> Уже еду
+              </button>
+              <button class="widget-btn" onclick="setTab('shopping')">
+                <span>🛒</span> ${items.filter(i => !i.checked).length} в списке
+              </button>
+            </div>
+          </div>
+
+          <!-- Сменить свое настроение и выбор альтер-эго -->
+          <div class="glass-card">
+            <div class="card-head">
+              <h3>Твое альтер-эго сейчас</h3>
+              <span class="card-badge">Синхронно</span>
+            </div>
+
+            <!-- Переключатель: Корги / Человек -->
+            <div class="avatar-archetype-row">
+              <span class="archetype-label">Вид аватара:</span>
+              <div class="archetype-tabs">
+                <button class="archetype-btn ${avatarType[currentRole] === 'corgi' ? 'active' : ''}" onclick="setAvatarType('corgi')">
+                  <span>🐶</span> Корги
+                </button>
+                <button class="archetype-btn ${avatarType[currentRole] === 'human' ? 'active' : ''}" onclick="setAvatarType('human')">
+                  <span>${currentRole === 'wife' ? '👩' : '👨'}</span> ${currentRole === 'wife' ? 'Брюнетка' : 'Блонд'}
+                </button>
+              </div>
+            </div>
+
+            <div class="avatar-preview-row">
+              <div class="avatar-box">
+                ${getSvg(partnerMood, currentRole, avatarType[currentRole])}
+              </div>
+              <div class="avatar-meta">
+                <h4>${partnerMood.title}</h4>
+                <p>Партнер видит этот аватар на своем смартфоне и виджете</p>
+              </div>
+            </div>
+
+            <div class="moods-grid">
+              ${moods.map(m => `
+                <div class="mood-item ${partnerMood.id === m.id ? 'active' : ''}" onclick="selectMood(${JSON.stringify(m).replace(/"/g, '&quot;')})">
+                  <span class="emoji">${m.emoji}</span>
+                  <span class="name">${m.id === 'happy' ? 'Радость' : m.id === 'tired' ? 'Усталость' : m.id === 'hungry' ? 'Голод' : m.id === 'sad' ? 'Грусть' : m.id === 'treat' ? 'Сладкое' : m.id === 'grumpy' ? 'Ворчу' : m.id === 'cozy' ? 'Уют' : 'Люблю'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Срочный пуш: выбор иконки + свой текст + быстрые чипы -->
+          <div class="glass-card">
+            <div class="card-head">
+              <h3>⚡ Срочный пуш партнеру:</h3>
+              <span style="font-size:11px; color:#00F2FE;">Приоритет: Высокий</span>
+            </div>
+
+            <!-- Быстрые чипы -->
+            <div class="sos-row">
+              <div class="sos-chip" onclick="sendPresetSos('Купи, пожалуйста, хлеб! 🥖', '🥖')">🥖 Хлеб</div>
+              <div class="sos-chip" onclick="sendPresetSos('Захвати молоко! 🥛', '🥛')">🥛 Молоко</div>
+              <div class="sos-chip" onclick="sendPresetSos('Привези вкусняшку к чаю! 🍰', '🍰')">🍰 Вкусняшку</div>
+              <div class="sos-chip" onclick="sendPresetSos('Закончилась вода! 💧', '💧')">💧 Воду</div>
+              <div class="sos-chip" onclick="sendPresetSos('Срочно купи лекарство! 💊', '💊')">💊 Аптека</div>
+            </div>
+
+            <!-- Поле ввода своего текста и выбор иконки -->
+            <div class="sos-custom-box">
+              <div style="font-size:11px; font-weight:700; color:#A0A5B5; margin-bottom:6px;">Иконка для пуша:</div>
+              <div class="sos-icon-selector">
+                ${sosIconsList.map(icon => `
+                  <div class="sos-icon-chip ${selectedSosIcon === icon ? 'active' : ''}" onclick="selectSosIcon('${icon}')">
+                    ${icon}
+                  </div>
+                `).join('')}
+              </div>
+
+              <div class="sos-input-row">
+                <input type="text" id="customSosTextInput" class="sos-input" placeholder="Напишите, что срочно нужно..." onkeydown="if(event.key==='Enter') sendCustomSos();">
+                <button class="sos-send-btn" onclick="sendCustomSos()">
+                  <span>⚡</span> Пуш
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Кнопка «Я зашел в магазин» -->
+          <button class="store-btn" onclick="triggerHeadsUp('🛒', currentRole==='husband'?'Муж':'Любимая', 'Партнер зашел в супермаркет! Есть 5 минут проверить корзину'); showToast('🔔 Пуш отправлен: «Партнер зашел в магазин!»');">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="font-size:24px;">🛒</span>
+              <div style="text-align:left;">
+                <div style="font-size:14px; font-weight:800;">Я зашёл в супермаркет!</div>
+                <div style="font-size:11px; opacity:0.85;">Тихий пуш партнеру: есть 5 мин докинуть товар</div>
+              </div>
+            </div>
+            <span>➔</span>
+          </button>
+        `;
+      } else if (currentTab === 'shopping') {
+        container.innerHTML = `
+          <div class="card-head" style="margin-bottom:12px;">
+            <div>
+              <h3>Список покупок 🛒</h3>
+              <p style="font-size:11px; color:#888;">Синхронизируется на обоих Galaxy A54</p>
+            </div>
+            <span style="font-size:11px; font-weight:800; background:rgba(34,197,94,0.2); color:#4ADE80; padding:4px 10px; border-radius:12px;">
+              ${items.filter(i => !i.checked).length} осталось
+            </span>
+          </div>
+
+          <!-- Поле ввода -->
+          <div style="display:flex; gap:8px; margin-bottom:16px;">
+            <input type="text" id="newShopInput" placeholder="Добавить товар..." style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:14px; padding:12px 14px; color:#fff; font-family:inherit; font-size:13px; outline:none;" onkeydown="if(event.key==='Enter'){ const inp=document.getElementById('newShopInput'); if(inp.value){ items.push({ id: Date.now(), name: inp.value, comment: 'Новое', checked: false, photo: '🛍️' }); inp.value = ''; render(); } }">
+            <button style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #FF5E62, #FF8E53); border:none; color:#fff; font-size:18px; cursor:pointer;" onclick="
+              const inp = document.getElementById('newShopInput');
+              if (inp.value) { items.push({ id: Date.now(), name: inp.value, comment: 'Новое', checked: false, photo: '🛍️' }); inp.value = ''; render(); }
+            ">＋</button>
+          </div>
+
+          <div style="font-size:11px; font-weight:800; color:#8E93A3; text-transform:uppercase; margin-bottom:8px;">Надо купить</div>
+          ${items.filter(i => !i.checked).map(it => `
+            <div class="shopping-item" onclick="toggleItem(${it.id})">
+              <div style="display:flex; align-items:center;">
+                <div class="chk"></div>
+                <div>
+                  <div class="item-title">${it.name}</div>
+                  <div class="item-sub">${it.comment}</div>
+                </div>
+              </div>
+              <div style="font-size:20px;">${it.photo}</div>
+            </div>
+          `).join('')}
+
+          <div style="font-size:11px; font-weight:800; color:#8E93A3; text-transform:uppercase; margin:16px 0 8px;">Уже в тележке</div>
+          ${items.filter(i => i.checked).map(it => `
+            <div class="shopping-item checked" onclick="toggleItem(${it.id})">
+              <div style="display:flex; align-items:center;">
+                <div class="chk">✓</div>
+                <div>
+                  <div class="item-title">${it.name}</div>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+
+          <!-- Расходники -->
+          <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); border-radius:16px; padding:12px; margin-top:16px;">
+            <div style="font-size:11.5px; font-weight:800; color:#4ADE80; margin-bottom:6px;">💡 Скоро закончится дома:</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="items.push({ id: Date.now(), name: 'Капсулы для посудомойки', comment: 'Бытовая химия', checked: false, photo: '🧼' }); render(); showToast('Капсулы добавлены в список!');">
+                ＋ Капсулы для посудомойки
+              </button>
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:6px 10px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;" onclick="items.push({ id: Date.now(), name: 'Зерновой кофе Lavazza', comment: 'Бакалея', checked: false, photo: '☕' }); render(); showToast('Кофе добавлен в список!');">
+                ＋ Зерновой кофе
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (currentTab === 'dinner') {
+        container.innerHTML = `
+          <div class="card-head">
+            <h3>Что на ужин? 🍝</h3>
+          </div>
+          <div class="glass-card" style="padding:14px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <div style="font-size:14px; font-weight:800; color:#fff;">Паста Карбонара 🍝</div>
+              <span style="font-size:11px; color:#A0A5B5;">⏱ 25 мин</span>
+            </div>
+            <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:10px;">Спагетти, бекон, сыр Пармезан, сливки, яйца</div>
+            <button style="width:100%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:12px; padding:9px; color:#fff; font-size:11.5px; font-weight:700; cursor:pointer;" onclick="
+              items.push({ id: Date.now()+1, name: 'Спагетти Barilla', comment: 'Для карбонары', checked:false, photo:'🍝' });
+              items.push({ id: Date.now()+2, name: 'Сыр Пармезан', comment: 'Для карбонары', checked:false, photo:'🧀' });
+              render();
+              showToast('Продукты для пасты улетели в список покупок!');
+            ">🛒 Добавить продукты в список покупок</button>
+          </div>
+
+          <div class="card-head" style="margin-top:20px;">
+            <h3>Вишлист маленьких радостей 🎁</h3>
+          </div>
+          <div class="shopping-item">
+            <div>
+              <div class="item-title">Аромасвеча Black Vanilla</div>
+              <div class="item-sub">Zara Home</div>
+            </div>
+            <span style="font-size:10px; font-weight:800; background:rgba(155,81,224,0.3); color:#D8B4FE; padding:4px 8px; border-radius:10px;">
+              🔒 Секрет куплен
+            </span>
+          </div>
+          <div class="shopping-item">
+            <div>
+              <div class="item-title">Теплые махровые носочки</div>
+              <div class="item-sub">Бежевые, размер 37</div>
+            </div>
+            <button style="border:none; background:rgba(255,255,255,0.12); color:#fff; padding:6px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;" onclick="showToast('Помечено как секретная покупка: партнер не увидит пуш!')">
+              Купить тайно
+            </button>
+          </div>
+        `;
+      } else if (currentTab === 'passport') {
+        container.innerHTML = `
+          <div class="card-head" style="margin-bottom:10px;">
+            <div>
+              <h3>Паспорт дома 📋</h3>
+              <p style="font-size:11px; color:#8E93A3;">1 тап копирует код или пароль</p>
+            </div>
+            <button style="background:linear-gradient(135deg, #00F2FE, #4FACFE); border:none; border-radius:12px; padding:6px 12px; color:#0B0E17; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openAddPassportModal()">
+              ＋ Добавить
+            </button>
+          </div>
+
+          <!-- Поиск по паспорту дома -->
+          <div class="search-box">
+            <span class="search-icon-pos">🔍</span>
+            <input type="text" class="search-input" id="passportSearchInput" value="${passportSearchQuery}" placeholder="Поиск (код, фильтр, wi-fi, краска...)" oninput="handlePassportSearch(this.value)">
+          </div>
+
+          <!-- Контейнер карточек паспорта -->
+          <div id="passportListContainer"></div>
+        `;
+        renderPassportList();
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>

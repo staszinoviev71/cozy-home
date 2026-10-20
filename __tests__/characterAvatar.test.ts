@@ -73,11 +73,33 @@ describe('CharacterAvatar Component & SVG Generation', () => {
     expect(sadSvg).toContain('anim-sad');
   });
 
+  it('supports corgi archetype with characteristic ears and muzzle', () => {
+    const corgiSvg = getCharacterSvgString('happy', 'wife', 64, 'corgi');
+    expect(corgiSvg).toContain('Corgi');
+    expect(corgiSvg).toContain('#FB8C00');
+    expect(corgiSvg).toContain('anim-happy');
+  });
+
+  it('supports human archetype with black-haired girl for wife and highlighted blonde guy for husband', () => {
+    const girlSvg = getCharacterSvgString('happy', 'wife', 64, 'human');
+    const guySvg = getCharacterSvgString('happy', 'husband', 64, 'human');
+
+    // Wife: jet black hair and earrings
+    expect(girlSvg).toContain('#12131A');
+    expect(girlSvg).toContain('earrings');
+
+    // Husband: dark hair base and blonde highlighted strands
+    expect(guySvg).toContain('#20222B');
+    expect(guySvg).toContain('#FAD02C');
+    expect(guySvg).toContain('Blonde Highlights');
+  });
+
   it('returns valid CharacterAvatar component descriptor', () => {
-    const avatar = CharacterAvatar({ moodId: 'love', gender: 'wife', size: 80 });
+    const avatar = CharacterAvatar({ moodId: 'love', gender: 'wife', archetype: 'human', size: 80 });
     expect(avatar).toBeDefined();
     expect(avatar.props.moodId).toBe('love');
     expect(avatar.props.gender).toBe('wife');
+    expect(avatar.props.archetype).toBe('human');
     expect(avatar.props.size).toBe(80);
     expect(avatar.props.svgXml).toContain('viewBox="0 0 64 64"');
   });

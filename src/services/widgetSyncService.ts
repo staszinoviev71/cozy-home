@@ -66,7 +66,12 @@ export function getWidgetRenderData(
   const mood = getMoodById(partner.currentMoodId, partner.role);
   const unboughtText = formatUnboughtCount(unboughtCount);
   const timeAgo = formatTimeAgo(partner.updatedAt, safeNow);
-  const characterSvg = getCharacterSvgString(partner.currentMoodId, partner.role, 64);
+  const characterSvg = getCharacterSvgString(
+    partner.currentMoodId,
+    partner.role,
+    64,
+    partner.avatarArchetype ?? 'corgi'
+  );
 
   const actions: WidgetAction[] = [
     {

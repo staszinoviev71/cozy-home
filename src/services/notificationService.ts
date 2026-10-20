@@ -21,7 +21,11 @@ export const QUICK_SOS_PRESETS: SosPreset[] = [
 /**
  * Builds High Priority SOS push notification payload with action buttons in shade.
  */
-export function buildSosPayload(senderName: string, itemText: string): PushNotificationPayload {
+export function buildSosPayload(
+  senderName: string,
+  itemText: string,
+  icon: string = '🚨'
+): PushNotificationPayload {
   const actions: PushNotificationAction[] = [
     { id: 'action_buy', title: 'Куплю!' },
     { id: 'action_cant', title: 'Не смогу' },
@@ -30,13 +34,14 @@ export function buildSosPayload(senderName: string, itemText: string): PushNotif
   return {
     channelId: NOTIFICATION_CHANNEL_URGENT,
     priority: 'high',
-    title: `🚨 ${senderName}: Срочно нужно!`,
+    title: `${icon} ${senderName}: Срочно нужно!`,
     body: `Пожалуйста, купи: ${itemText}`,
     actions,
     data: {
       type: 'sos_request',
       sender: senderName,
       item: itemText,
+      icon,
       timestamp: Date.now().toString(),
       sound: 'urgent_chime.wav',
     },

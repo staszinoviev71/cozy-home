@@ -22,6 +22,14 @@ describe('NotificationService', () => {
     expect(payload.data?.item).toBe('хлеб');
   });
 
+  it('supports custom text and custom icon in SOS push payload', () => {
+    const payload = buildSosPayload('Муж', 'Купи лекарство от горла', '💊');
+    expect(payload.title).toContain('💊');
+    expect(payload.title).toContain('Муж');
+    expect(payload.body).toContain('Купи лекарство от горла');
+    expect(payload.data?.icon).toBe('💊');
+  });
+
   it('creates store arrival notification payload', () => {
     const payload = buildStoreEntryPayload('Муж');
     expect(payload.channelId).toBe('household_urgent');
