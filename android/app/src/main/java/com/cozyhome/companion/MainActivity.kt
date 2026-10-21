@@ -44,14 +44,25 @@ class MainActivity : AppCompatActivity() {
 
             val displayTitle = if (emoji.isNotBlank()) "$emoji $title" else title
 
+            val largeIconBitmap = try {
+                android.graphics.BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
+            } catch (e: Exception) {
+                null
+            }
+
             val builder = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification_home)
+                .setColor(Color.parseColor("#FF8A65"))
                 .setContentTitle(displayTitle)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
+
+            if (largeIconBitmap != null) {
+                builder.setLargeIcon(largeIconBitmap)
+            }
 
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(notificationIdCounter++, builder.build())

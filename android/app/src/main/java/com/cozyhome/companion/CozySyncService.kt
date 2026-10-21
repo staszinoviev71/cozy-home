@@ -1,11 +1,14 @@
 package com.cozyhome.companion
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -53,13 +56,23 @@ class CozySyncService : Service() {
         }
     }
 
-    private fun createForegroundNotification() =
-        NotificationCompat.Builder(this, MainActivity.SERVICE_CHANNEL_ID)
+    private fun createForegroundNotification(): Notification {
+        val largeIcon = try {
+            BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+        } catch (e: Exception) {
+            null
+        }
+
+        return NotificationCompat.Builder(this, MainActivity.SERVICE_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification_home)
+            .setColor(Color.parseColor("#FF8A65"))
             .setContentTitle("Уютный Дом")
             .setContentText("Связь с партнером активна")
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
+            .apply {
+                if (largeIcon != null) setLargeIcon(largeIcon)
+            }
             .setContentIntent(
                 PendingIntent.getActivity(
                     this,
@@ -69,6 +82,7 @@ class CozySyncService : Service() {
                 )
             )
             .build()
+    }
 
     private fun startLongPolling() {
         workerThread?.interrupt()
