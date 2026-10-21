@@ -1602,14 +1602,19 @@
       </div>
       <div class="form-group">
         <label class="form-label">Иконка / Эмодзи</label>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
-          ${['💊', '🏡', '📅', '🔧', '🚗', '🐾', '📄', '🪴', '🎁', '⚡'].map(ic => `
-            <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="document.getElementById('newCategoryIcon').value = '${ic}'; document.querySelectorAll('.cat-chip-btn').forEach(b => b.classList.remove('active')); this.classList.add('active');">
-              ${ic}
-            </button>
-          `).join('')}
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;" id="newCategoryIconSelector">
+          <button type="button" class="sos-icon-chip active" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('💊', this)">💊</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('🏡', this)">🏡</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('📅', this)">📅</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('🔧', this)">🔧</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('🚗', this)">🚗</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('🐾', this)">🐾</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('📄', this)">📄</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('🪴', this)">🪴</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('🎁', this)">🎁</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectCategoryIcon('⚡', this)">⚡</button>
         </div>
-        <input type="hidden" id="newCategoryIcon" value="📁">
+        <input type="hidden" id="newCategoryIcon" value="💊">
       </div>
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeAddCategoryModal()">Отмена</button>
@@ -1867,12 +1872,15 @@
       </div>
       <div class="form-group">
         <label class="form-label">Иконка цели</label>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          ${['🏖️', '🛋️', '✈️', '🚗', '📺', '💍', '🏡', '🎉'].map(ic => `
-            <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="document.getElementById('goalIconInput').value='${ic}';">
-              ${ic}
-            </button>
-          `).join('')}
+        <div style="display:flex; gap:8px; flex-wrap:wrap;" id="addGoalIconSelector">
+          <button type="button" class="sos-icon-chip active" style="font-size:18px; padding:6px 10px;" onclick="selectAddGoalIcon('🏖️', this)">🏖️</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectAddGoalIcon('🛋️', this)">🛋️</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectAddGoalIcon('✈️', this)">✈️</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectAddGoalIcon('🚗', this)">🚗</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectAddGoalIcon('📺', this)">📺</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectAddGoalIcon('💍', this)">💍</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectAddGoalIcon('🏡', this)">🏡</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectAddGoalIcon('🎉', this)">🎉</button>
         </div>
         <input type="hidden" id="goalIconInput" value="🏖️">
       </div>
@@ -1905,6 +1913,53 @@
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeContributeGoalModal()">Отмена</button>
         <button class="btn-primary-action" onclick="submitGoalContribution()">Внести в копилку</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно редактирования цели -->
+  <div class="modal-overlay" id="editGoalModal" onclick="if(event.target===this) closeEditGoalModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Редактировать цель 🎯</h3>
+        <button class="modal-close-btn" onclick="closeEditGoalModal()">✕</button>
+      </div>
+      <input type="hidden" id="editGoalId">
+      <div class="form-group">
+        <label class="form-label">Название цели</label>
+        <input type="text" class="form-input" id="editGoalTitleInput" placeholder="Напр.: Поездка на море">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Целевая сумма (₽)</label>
+        <input type="number" class="form-input" id="editGoalTargetInput" placeholder="150000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Уже накоплено (₽)</label>
+        <input type="number" class="form-input" id="editGoalCurrentInput" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Иконка цели</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;" id="editGoalIconSelector">
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('🏖️', this)">🏖️</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('🛋️', this)">🛋️</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('✈️', this)">✈️</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('🚗', this)">🚗</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('📺', this)">📺</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('💍', this)">💍</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('🏡', this)">🏡</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('🎉', this)">🎉</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('🌊', this)">🌊</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('🤖', this)">🤖</button>
+          <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="selectEditGoalIcon('🧹', this)">🧹</button>
+        </div>
+        <input type="hidden" id="editGoalIconInput" value="🏖️">
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+        <button class="btn-secondary" style="color:#EF4444; border-color:rgba(239,68,68,0.4);" onclick="deleteGoalFromModal()">Удалить цель</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-secondary" onclick="closeEditGoalModal()">Отмена</button>
+          <button class="btn-primary-action" onclick="saveEditedGoal()">Сохранить</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2263,6 +2318,7 @@
       { id: 4, name: 'Яблоки Голден', comment: '1 кг спелые', checked: false, photo: '🍏' }
     ];
 
+    let notesSearchQuery = '';
     let passportSearchQuery = '';
     let selectedNotesCategory = 'all';
 
@@ -2298,11 +2354,11 @@
     let currentContributingGoalId = null;
 
     let houseState = {
-      sparks: 240,
-      tier: 2,
-      installedFurniture: ['plaid'],
+      sparks: 0,
+      tier: 1,
+      installedFurniture: [],
       dayNight: 'day',
-      weeklyPurchases: 1,
+      weeklyPurchases: 0,
       corgiMood: 'sleeping'
     };
     let houseTierNames = {
@@ -2779,6 +2835,20 @@
           if (state.dinnerRecipes) dinnerRecipes = state.dinnerRecipes;
           avatarType = { husband: 'pixar', wife: 'pixar' };
         }
+
+        // Принудительный сброс прогресса домика по запросу пользователя для версии 1.2.1
+        if (localStorage.getItem('cozy_house_reset_v121') !== 'true') {
+          houseState = {
+            sparks: 0,
+            tier: 1,
+            installedFurniture: [],
+            dayNight: 'day',
+            weeklyPurchases: 0,
+            corgiMood: 'sleeping'
+          };
+          localStorage.setItem('cozy_house_reset_v121', 'true');
+          saveLocalState();
+        }
       } catch (e) {}
     }
 
@@ -2907,6 +2977,9 @@
       const it = items.find(x => x.id === id);
       if (it) {
         it.checked = !it.checked;
+        if (it.checked) {
+          addSparks(5, 'Куплен товар из списка');
+        }
         saveLocalState();
         broadcastSync('SHOPPING_UPDATE', { items: items });
         updateNativeWidget();
@@ -3296,6 +3369,120 @@
       document.getElementById('addGoalModal').style.display = 'none';
     }
 
+    
+    // Хелперы выбора иконок
+    function selectCategoryIcon(icon, btn) {
+      document.getElementById('newCategoryIcon').value = icon;
+      document.querySelectorAll('#newCategoryIconSelector .sos-icon-chip').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function selectAddGoalIcon(icon, btn) {
+      document.getElementById('goalIconInput').value = icon;
+      document.querySelectorAll('#addGoalIconSelector .sos-icon-chip').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    function selectEditGoalIcon(icon, btn) {
+      document.getElementById('editGoalIconInput').value = icon;
+      document.querySelectorAll('#editGoalIconSelector .sos-icon-chip').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    // Редактирование целей
+    function openEditGoalModal(goalId) {
+      const g = moneyGoals.find(x => x.id === goalId);
+      if (!g) return;
+      document.getElementById('editGoalId').value = g.id;
+      document.getElementById('editGoalTitleInput').value = g.title;
+      document.getElementById('editGoalTargetInput').value = g.targetAmount;
+      document.getElementById('editGoalCurrentInput').value = g.currentAmount;
+      document.getElementById('editGoalIconInput').value = g.icon || '🏖️';
+
+      document.querySelectorAll('#editGoalIconSelector .sos-icon-chip').forEach(b => {
+        if (b.innerText.trim() === (g.icon || '🏖️')) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+
+      document.getElementById('editGoalModal').style.display = 'flex';
+    }
+
+    function closeEditGoalModal() {
+      document.getElementById('editGoalModal').style.display = 'none';
+    }
+
+    function saveEditedGoal() {
+      const id = document.getElementById('editGoalId').value;
+      const g = moneyGoals.find(x => x.id === id);
+      if (!g) return;
+
+      const title = document.getElementById('editGoalTitleInput').value.trim();
+      const target = parseInt(document.getElementById('editGoalTargetInput').value, 10) || 0;
+      const current = parseInt(document.getElementById('editGoalCurrentInput').value, 10) || 0;
+      const icon = document.getElementById('editGoalIconInput').value || '🏖️';
+
+      if (!title || target <= 0) {
+        showToast('Укажите название и корректную сумму цели!');
+        return;
+      }
+
+      g.title = title;
+      g.targetAmount = target;
+      g.currentAmount = Math.max(0, current);
+      g.icon = icon;
+      g.completed = g.currentAmount >= g.targetAmount;
+
+      closeEditGoalModal();
+      saveLocalState();
+      broadcastSync('MONEY_GOALS_UPDATE', { goals: moneyGoals });
+      render();
+      showToast('Цель «' + title + '» обновлена! ✨');
+    }
+
+    function deleteGoalFromModal() {
+      const id = document.getElementById('editGoalId').value;
+      const g = moneyGoals.find(x => x.id === id);
+      if (!g) return;
+      if (!confirm('Удалить общую цель «' + g.title + '»?')) return;
+
+      moneyGoals = moneyGoals.filter(x => x.id !== id);
+      closeEditGoalModal();
+      saveLocalState();
+      broadcastSync('MONEY_GOALS_UPDATE', { goals: moneyGoals });
+      render();
+      showToast('Цель удалена');
+    }
+
+    // Начисление искорок за совместную активность
+    function addSparks(amount, reason) {
+      houseState.sparks = (houseState.sparks || 0) + amount;
+      saveLocalState();
+      broadcastSync('HOUSE_UPDATE', { houseState });
+      if (reason) {
+        showToast('+' + amount + ' ✨ искорок (' + reason + ')!');
+      }
+    }
+
+    // Сброс обустройства домика
+    function resetHouseProgress() {
+      if (!confirm('Вы уверены, что хотите сбросить весь прогресс домика и начать заново?')) return;
+      houseState = {
+        sparks: 0,
+        tier: 1,
+        installedFurniture: [],
+        dayNight: 'day',
+        weeklyPurchases: 0,
+        corgiMood: 'sleeping'
+      };
+      saveLocalState();
+      broadcastSync('HOUSE_UPDATE', { houseState });
+      render();
+      showToast('Прогресс домика успешно сброшен! 🏡');
+    }
+
     function saveNewGoal() {
       const title = document.getElementById('goalTitleInput').value.trim();
       const target = parseInt(document.getElementById('goalTargetInput').value, 10) || 0;
@@ -3349,6 +3536,7 @@
       }
 
       g.currentAmount = (g.currentAmount || 0) + amt;
+      addSparks(15, 'Взнос в общую копилку');
       if (g.currentAmount >= g.targetAmount) {
         g.completed = true;
         showToast('🎉 УРА! Мечта «' + g.title + '» накоплена на 100%! 🥂');
@@ -3383,6 +3571,7 @@
         navigator.vibrate([40, 60, 40]);
       }
       houseState.corgiMood = 'happy';
+      addSparks(2, 'Ласка для Коржика');
       showToast('Коржик прижал ушки, виляет хвостиком и шлёт любовь! 🥰🐾');
 
       const frame = document.querySelector('.house-frame');
@@ -3941,7 +4130,7 @@
                   background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14);
                   border-radius:12px; padding:10px 12px; margin:8px 0; display:flex; align-items:center; justify-content:space-between;
                   cursor:pointer; transition:all 0.2s;
-                " onclick="copyNoteItemById('${item.id}')"">
+                " onclick="copyNoteItemById('${item.id}')">
                   <span style="font-size:13.5px; font-weight:800; color:#00F2FE; word-break:break-all;">
                     ${item.value}
                   </span>
@@ -4376,9 +4565,12 @@
                           <div style="font-size:11px; color:#A0A5B5;">Цель: ${g.targetAmount.toLocaleString('ru-RU')} ₽</div>
                         </div>
                       </div>
-                      <span style="font-size:12px; font-weight:800; color:${pct >= 100 ? '#4ADE80' : '#FF8E53'};">
-                        ${pct}%
-                      </span>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:3px 7px; color:#CCD2E3; font-size:12px; cursor:pointer;" onclick="openEditGoalModal('${g.id}')" title="Редактировать цель">✏️</button>
+                        <span style="font-size:12px; font-weight:800; color:${pct >= 100 ? '#4ADE80' : '#FF8E53'};">
+                          ${pct}%
+                        </span>
+                      </div>
                     </div>
 
                     <!-- Прогресс бар -->
@@ -4471,13 +4663,13 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:rgba(255,255,255,0.05); padding:10px 14px; border-radius:18px; border:1px solid rgba(255,255,255,0.12);">
             <div style="display:flex; align-items:center; gap:6px;">
               <span style="font-size:16px;">✨</span>
-              <span style="font-size:13px; font-weight:800; color:#F59E0B;">${houseState.sparks || 240}</span>
+              <span style="font-size:13px; font-weight:800; color:#F59E0B;">${houseState.sparks ?? 0}</span>
               <span style="font-size:11px; color:#A0A5B5;">искорок</span>
             </div>
 
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:10px; font-weight:800; background:rgba(34,197,94,0.2); color:#4ADE80; padding:3px 8px; border-radius:8px;">
-                Lv. ${houseState.tier || 2}
+                Lv. ${houseState.tier || 1}
               </span>
               <button onclick="toggleDayNight()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:4px 9px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">
                 ${houseState.dayNight === 'night' ? '🌙 Вечер' : '☀️ День'}
@@ -4599,6 +4791,12 @@
                 + Лавка уюта
               </button>
             </div>
+
+            <div style="margin-top:14px; text-align:center;">
+              <button onclick="resetHouseProgress()" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:12px; padding:8px 14px; color:#CCD2E3; font-size:11px; font-weight:600; cursor:pointer;">
+                🔄 Сбросить обустройство домика
+              </button>
+            </div>
           ` : selectedHouseMode === 'shop' ? `
             <!-- РЕЖИМ 2: ЛАВКА УЮТА (КАТАЛОГ МЕБЕЛИ) -->
             <div class="card-head" style="margin-bottom:10px;">
@@ -4607,7 +4805,7 @@
                 <p style="font-size:11px; color:#8E93A3;">Купленный предмет сразу отображается в комнате!</p>
               </div>
               <span style="font-size:12px; font-weight:800; color:#F59E0B;">
-                ✨ ${houseState.sparks || 240}
+                ✨ ${houseState.sparks ?? 0}
               </span>
             </div>
 
@@ -4666,7 +4864,13 @@
                     <div style="font-size:13.5px; font-weight:800; color:#fff;">Lv. 2: Мансарда с балкончиком</div>
                     <div style="font-size:11px; color:#8E93A3;">Спальня под покатой крышей, окна в сад и огоньки</div>
                   </div>
-                  <span style="font-size:11px; font-weight:800; color:#4ADE80;">Открыто ✓</span>
+                  ${houseState.tier >= 2 ? `
+                    <span style="font-size:11px; font-weight:800; color:#4ADE80;">Открыто ✓</span>
+                  ` : `
+                    <button class="btn-primary-action" style="font-size:11px; padding:6px 12px;" onclick="upgradeHouseTier()">
+                      150 ✨ Открыть
+                    </button>
+                  `}
                 </div>
               </div>
 
@@ -4685,6 +4889,14 @@
                   `}
                 </div>
               </div>
+            </div>
+
+            <!-- Кнопка сброса обустройства -->
+            <div style="margin-top:20px; text-align:center;">
+              <button onclick="resetHouseProgress()" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:10px 16px; color:#F87171; font-size:12px; font-weight:700; cursor:pointer; width:100%;">
+                🔄 Сбросить весь прогресс домика
+              </button>
+              <div style="font-size:10.5px; color:#8E93A3; margin-top:6px;">Сбросит уровень до 1, купленные вещи и начнёт обустройство заново</div>
             </div>
           `}
         `;
