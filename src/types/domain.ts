@@ -59,6 +59,12 @@ export interface WishlistItem {
 
 export type PassportCategory = 'intercom' | 'filter' | 'meter' | 'wifi' | 'custom' | string;
 
+export interface NoteCategory {
+  id: string;
+  name: string;
+  icon: string;
+}
+
 export interface HousePassportItem {
   id: string;
   category: PassportCategory;
@@ -66,6 +72,27 @@ export interface HousePassportItem {
   value: string;
   note?: string;
   updatedAt?: number;
+  type?: 'text' | 'date_reminder';
+  reminderDate?: string;
+  reminderNoticeDays?: number;
+}
+
+export interface MoneyGoal {
+  id: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  icon: string;
+  completed?: boolean;
+}
+
+export interface HouseState {
+  sparks: number;
+  tier: number;
+  installedFurniture: string[];
+  dayNight: 'day' | 'night';
+  weeklyPurchases: number;
+  corgiMood?: string;
 }
 
 export interface PushNotificationAction {

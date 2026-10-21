@@ -1124,48 +1124,174 @@
       box-shadow: 0 0 12px var(--accent-cyan-glow);
     }
 
-    /* 3D Кубик Судьбы */
-    .dice-scene {
-      width: 140px;
-      height: 140px;
-      perspective: 700px;
-      margin: 28px auto 24px;
+    /* ИЗОМЕТРИЧЕСКИЙ ДОМИК МЕЧТЫ & КОРЖИК */
+    @keyframes floatSoft {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-3px); }
     }
-
-    .dice-cube {
+    @keyframes itemPop {
+      0% { transform: scale(0.4) translateY(20px); opacity: 0; }
+      70% { transform: scale(1.15) translateY(-4px); opacity: 1; }
+      100% { transform: scale(1) translateY(0); opacity: 1; }
+    }
+    @keyframes garlandTwinkle {
+      0%, 100% { opacity: 0.65; filter: drop-shadow(0 0 6px #f59e0b); }
+      50% { opacity: 1; filter: drop-shadow(0 0 14px #fbbf24); }
+    }
+    @keyframes petHeartFloat {
+      0% { transform: translate(-50%, 0) scale(0.6); opacity: 1; }
+      100% { transform: translate(-50%, -65px) scale(1.3); opacity: 0; }
+    }
+    .item-appear {
+      animation: itemPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .garland-glow {
+      animation: garlandTwinkle 2.2s infinite ease-in-out;
+    }
+    .pet-heart-particle {
+      position: absolute;
+      pointer-events: none;
+      animation: petHeartFloat 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      font-size: 24px;
+      z-index: 60;
+    }
+    .house-frame {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+      background: #0B0E17;
+    }
+    .house-diorama-img {
       width: 100%;
       height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 1.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      object-fit: cover;
+      display: block;
+      transition: filter 0.8s ease;
     }
-
-    .dice-face {
+    .night-overlay {
       position: absolute;
-      width: 140px;
-      height: 140px;
-      border: 2px solid rgba(255, 255, 255, 0.4);
-      border-radius: 28px;
+      inset: 0;
+      background: rgba(15, 23, 62, 0.52);
+      mix-blend-multiply: multiply;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+      opacity: 0;
+    }
+    .night-overlay.active {
+      opacity: 1;
+    }
+    .hotspot-btn {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      padding: 14px;
-      box-sizing: border-box;
-      font-size: 13.5px;
-      font-weight: 800;
-      color: #FFFFFF;
-      backdrop-filter: blur(20px);
-      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5);
+      font-size: 13px;
+      border: 1.5px solid #FFFFFF;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 20;
+    }
+    .hotspot-btn:active {
+      transform: scale(0.9);
     }
 
-    .dice-face-1 { transform: rotateY(0deg) translateZ(70px); background: linear-gradient(135deg, rgba(255, 94, 98, 0.92), rgba(255, 142, 83, 0.85)); }
-    .dice-face-2 { transform: rotateY(90deg) translateZ(70px); background: linear-gradient(135deg, rgba(0, 242, 254, 0.92), rgba(79, 172, 254, 0.85)); }
-    .dice-face-3 { transform: rotateY(180deg) translateZ(70px); background: linear-gradient(135deg, rgba(155, 81, 224, 0.92), rgba(225, 0, 255, 0.85)); }
-    .dice-face-4 { transform: rotateY(-90deg) translateZ(70px); background: linear-gradient(135deg, rgba(34, 197, 94, 0.92), rgba(21, 128, 61, 0.85)); }
-    .dice-face-5 { transform: rotateX(90deg) translateZ(70px); background: linear-gradient(135deg, rgba(245, 158, 11, 0.92), rgba(217, 119, 6, 0.85)); }
-    .dice-face-6 { transform: rotateX(-90deg) translateZ(70px); background: linear-gradient(135deg, rgba(236, 72, 153, 0.92), rgba(219, 39, 119, 0.85)); }
+    /* ВИШЛИСТ & КОПИЛКА & ЗАМЕТКИ */
+    .wish-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .wish-card.booked-by-me {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.14), rgba(16, 185, 129, 0.06));
+      border-color: rgba(34, 197, 94, 0.45);
+    }
+    .goal-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .goal-progress-bar-bg {
+      width: 100%;
+      height: 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      margin: 10px 0 6px;
+    }
+    .goal-progress-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #FF5E62 0%, #FF8E53 50%, #F59E0B 100%);
+      box-shadow: 0 0 12px rgba(255, 94, 98, 0.6);
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .countdown-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+    .countdown-today {
+      background: rgba(34, 197, 94, 0.25);
+      border: 1px solid #22C55E;
+      color: #4ADE80;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+    }
+    .countdown-urgent {
+      background: rgba(245, 158, 11, 0.25);
+      border: 1px solid #F59E0B;
+      color: #FCD34D;
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+    }
+    .countdown-soon {
+      background: rgba(0, 242, 254, 0.18);
+      border: 1px solid rgba(0, 242, 254, 0.5);
+      color: #00F2FE;
+    }
+    .countdown-past {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #F87171;
+    }
+    .together-tab-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #A0A5B5;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .together-tab-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.22);
+      color: #FFFFFF;
+    }
 
     /* Колесо Фортуны */
     .wheel-wrapper {
@@ -1463,88 +1589,167 @@
     </div>
   </div>
 
-  <!-- Модальное окно добавления в Паспорт дома -->
-  <div class="modal-overlay" id="addPassportModal" onclick="if(event.target===this) closeAddPassportModal()">
+  <!-- Модальное окно добавления группы заметок -->
+  <div class="modal-overlay" id="addCategoryModal" onclick="if(event.target===this) closeAddCategoryModal()">
     <div class="modal-card">
       <div class="modal-head">
-        <h3>Добавить в Паспорт дома 📋</h3>
-        <button class="modal-close-btn" onclick="closeAddPassportModal()">✕</button>
+        <h3>Новая группа заметок 📁</h3>
+        <button class="modal-close-btn" onclick="closeAddCategoryModal()">✕</button>
       </div>
-
       <div class="form-group">
-        <label class="form-label">Категория</label>
-        <select class="form-select" id="newPassCategory">
-          <option value="intercom">🔢 Домофон и ключи</option>
-          <option value="wifi">📶 Wi-Fi и интернет</option>
-          <option value="filter">🚰 Фильтры воды</option>
-          <option value="meter">⚡ Счётчики и ЖКХ</option>
-          <option value="paint">🎨 Краска и ремонт</option>
-          <option value="master">🔧 Мастер / Сантехник</option>
-          <option value="custom">📋 Другое</option>
-        </select>
+        <label class="form-label">Название группы</label>
+        <input type="text" class="form-input" id="newCategoryName" placeholder="Напр.: Домашняя аптечка, Авто, Питомцы">
       </div>
-
       <div class="form-group">
-        <label class="form-label">Название (что это?)</label>
-        <input type="text" class="form-input" id="newPassLabel" placeholder="Напр.: Мастер стиральных машин">
+        <label class="form-label">Иконка / Эмодзи</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
+          ${['💊', '🏡', '📅', '🔧', '🚗', '🐾', '📄', '🪴', '🎁', '⚡'].map(ic => `
+            <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="document.getElementById('newCategoryIcon').value = '${ic}'; document.querySelectorAll('.cat-chip-btn').forEach(b => b.classList.remove('active')); this.classList.add('active');">
+              ${ic}
+            </button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="newCategoryIcon" value="📁">
       </div>
-
-      <div class="form-group">
-        <label class="form-label">Значение (копируется в буфер по тапу)</label>
-        <input type="text" class="form-input" id="newPassValue" placeholder="Напр.: +7 (900) 123-45-67">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Заметка (комментарий)</label>
-        <input type="text" class="form-input" id="newPassNote" placeholder="Напр.: Диспетчер, звонить с 9 до 18">
-      </div>
-
       <div class="form-actions">
-        <button class="btn-secondary" onclick="closeAddPassportModal()">Отмена</button>
-        <button class="btn-primary-action" onclick="saveNewPassportItem()">Сохранить</button>
+        <button class="btn-secondary" onclick="closeAddCategoryModal()">Отмена</button>
+        <button class="btn-primary-action" onclick="saveNewCategory()">Создать группу</button>
       </div>
     </div>
   </div>
 
-  <!-- Модальное окно редактирования записи Паспорта дома -->
-  <div class="modal-overlay" id="editPassportModal" onclick="if(event.target===this) closeEditPassportModal()">
-    <div class="modal-card">
+  <!-- Модальное окно добавления заметки / напоминания -->
+  <div class="modal-overlay" id="addNoteModal" onclick="if(event.target===this) closeAddNoteModal()">
+    <div class="modal-card" style="max-height:88vh; overflow-y:auto;">
       <div class="modal-head">
-        <h3>Редактировать запись 📋</h3>
-        <button class="modal-close-btn" onclick="closeEditPassportModal()">✕</button>
+        <h3>Новая запись в Заметки 📝</h3>
+        <button class="modal-close-btn" onclick="closeAddNoteModal()">✕</button>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Категория</label>
-        <select class="form-select" id="editPassCategory">
-          <option value="intercom">🔢 Домофон и ключи</option>
-          <option value="wifi">📶 Wi-Fi и интернет</option>
-          <option value="filter">🚰 Фильтры воды</option>
-          <option value="meter">⚡ Счётчики и ЖКХ</option>
-          <option value="paint">🎨 Краска и ремонт</option>
-          <option value="master">🔧 Мастер / Сантехник</option>
-          <option value="custom">📋 Другое</option>
+        <label class="form-label">Группа / Папка</label>
+        <select class="form-select" id="newNoteCategorySelect">
+          <!-- Заполняется динамически -->
         </select>
       </div>
 
       <div class="form-group">
+        <label class="form-label">Тип записи</label>
+        <div style="display:flex; gap:8px;">
+          <button type="button" id="btnNoteTypeText" class="role-btn active" style="flex:1; padding:8px;" onclick="setNoteTypeInput('text')">
+            📋 Заметка
+          </button>
+          <button type="button" id="btnNoteTypeDate" class="role-btn" style="flex:1; padding:8px;" onclick="setNoteTypeInput('date_reminder')">
+            📅 Напоминание с датой
+          </button>
+        </div>
+        <input type="hidden" id="newNoteType" value="text">
+      </div>
+
+      <div class="form-group">
         <label class="form-label">Название (что это?)</label>
-        <input type="text" class="form-input" id="editPassLabel" placeholder="Напр.: Мастер стиральных машин">
+        <input type="text" class="form-input" id="newNoteLabel" placeholder="Напр.: Нурофен 400 или День рождения друга">
       </div>
 
       <div class="form-group">
         <label class="form-label">Значение (копируется в буфер по тапу)</label>
-        <input type="text" class="form-input" id="editPassValue" placeholder="Напр.: +7 (900) 123-45-67">
+        <input type="text" class="form-input" id="newNoteValue" placeholder="Напр.: Пароль, дозировка, телефон или адрес">
+      </div>
+
+      <!-- Блок даты и напоминания -->
+      <div id="newNoteDateBlock" style="display:none; background:rgba(0,242,254,0.06); border:1px solid rgba(0,242,254,0.2); border-radius:14px; padding:12px; margin-bottom:14px;">
+        <div class="form-group" style="margin-bottom:8px;">
+          <label class="form-label" style="color:#00F2FE;">Дата события / Срок годности</label>
+          <input type="date" class="form-input" id="newNoteDate" style="color-scheme:dark;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" style="color:#00F2FE;">Когда напомнить?</label>
+          <select class="form-select" id="newNoteNoticeDays">
+            <option value="0">В день события</option>
+            <option value="1">За 1 день (накануне)</option>
+            <option value="3">За 3 дня</option>
+            <option value="7" selected>За 1 неделю (7 дней)</option>
+            <option value="14">За 2 недели</option>
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Заметка (комментарий)</label>
-        <input type="text" class="form-input" id="editPassNote" placeholder="Напр.: Диспетчер, звонить с 9 до 18">
+        <label class="form-label">Примечание / Подсказка (необязательно)</label>
+        <input type="text" class="form-input" id="newNoteNote" placeholder="Напр.: Срок годности до 2027 г., принимать после еды">
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeAddNoteModal()">Отмена</button>
+        <button class="btn-primary-action" onclick="saveNewNote()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно редактирования заметки -->
+  <div class="modal-overlay" id="editNoteModal" onclick="if(event.target===this) closeEditNoteModal()">
+    <div class="modal-card" style="max-height:88vh; overflow-y:auto;">
+      <div class="modal-head">
+        <h3>Редактировать запись 📝</h3>
+        <button class="modal-close-btn" onclick="closeEditNoteModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Группа / Папка</label>
+        <select class="form-select" id="editNoteCategorySelect">
+          <!-- Заполняется динамически -->
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Тип записи</label>
+        <div style="display:flex; gap:8px;">
+          <button type="button" id="btnEditNoteTypeText" class="role-btn active" style="flex:1; padding:8px;" onclick="setEditNoteTypeInput('text')">
+            📋 Заметка
+          </button>
+          <button type="button" id="btnEditNoteTypeDate" class="role-btn" style="flex:1; padding:8px;" onclick="setEditNoteTypeInput('date_reminder')">
+            📅 Напоминание с датой
+          </button>
+        </div>
+        <input type="hidden" id="editNoteType" value="text">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Название</label>
+        <input type="text" class="form-input" id="editNoteLabel">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Значение (копируется в буфер по тапу)</label>
+        <input type="text" class="form-input" id="editNoteValue">
+      </div>
+
+      <!-- Блок даты и напоминания -->
+      <div id="editNoteDateBlock" style="display:none; background:rgba(0,242,254,0.06); border:1px solid rgba(0,242,254,0.2); border-radius:14px; padding:12px; margin-bottom:14px;">
+        <div class="form-group" style="margin-bottom:8px;">
+          <label class="form-label" style="color:#00F2FE;">Дата события / Срок годности</label>
+          <input type="date" class="form-input" id="editNoteDate" style="color-scheme:dark;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" style="color:#00F2FE;">Когда напомнить?</label>
+          <select class="form-select" id="editNoteNoticeDays">
+            <option value="0">В день события</option>
+            <option value="1">За 1 день (накануне)</option>
+            <option value="3">За 3 дня</option>
+            <option value="7">За 1 неделю (7 дней)</option>
+            <option value="14">За 2 недели</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Примечание / Подсказка</label>
+        <input type="text" class="form-input" id="editNoteNote">
       </div>
 
       <div class="form-actions" style="display:flex; gap:8px;">
-        <button class="btn-secondary" style="background:rgba(239,68,68,0.2); color:#F87171; border:1px solid rgba(239,68,68,0.3);" onclick="deletePassportItem()">Удалить</button>
-        <button class="btn-primary-action" style="flex:1;" onclick="saveEditedPassportItem()">Сохранить</button>
+        <button class="btn-secondary" style="background:rgba(239,68,68,0.2); color:#F87171; border:1px solid rgba(239,68,68,0.3);" onclick="deleteNoteItem()">Удалить</button>
+        <button class="btn-primary-action" style="flex:1;" onclick="saveEditedNoteItem()">Сохранить</button>
       </div>
     </div>
   </div>
@@ -1558,54 +1763,55 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Вопрос / Тема</label>
-        <input type="text" class="form-input" id="pollQuestionInput" placeholder="Что приготовим сегодня на ужин? 🍲" value="Что приготовим сегодня на ужин? 🍲">
+        <label class="form-label">Тема опроса</label>
+        <input type="text" class="form-input" id="dinnerPollTitle" value="Что приготовим сегодня на ужин? 🍲" />
       </div>
 
       <div style="font-size:11px; font-weight:700; color:#A0A5B5; margin:10px 0 6px; text-transform:uppercase;">
-        Варианты блюд для выбора:
+        Варианты блюд:
+      </div>
+
+      <div class="form-group">
+        <input type="text" class="form-input" id="poll_opt_0" placeholder="Блюдо 1" value="Паста Карбонара 🍝">
       </div>
       <div class="form-group">
-        <input type="text" class="form-input poll-opt-input" id="pollOpt_0" placeholder="Вариант 1 (напр.: Паста Карбонара 🍝)">
+        <input type="text" class="form-input" id="poll_opt_1" placeholder="Блюдо 2" value="Лосось на гриле с овощами 🐟">
       </div>
       <div class="form-group">
-        <input type="text" class="form-input poll-opt-input" id="pollOpt_1" placeholder="Вариант 2 (напр.: Лосось с овощами 🐟)">
+        <input type="text" class="form-input" id="poll_opt_2" placeholder="Блюдо 3 (необязательно)" value="Пицца из дровяной печи 🍕">
       </div>
       <div class="form-group">
-        <input type="text" class="form-input poll-opt-input" id="pollOpt_2" placeholder="Вариант 3 (необязательно)">
-      </div>
-      <div class="form-group">
-        <input type="text" class="form-input poll-opt-input" id="pollOpt_3" placeholder="Вариант 4 (необязательно)">
+        <input type="text" class="form-input" id="poll_opt_3" placeholder="Блюдо 4 (необязательно)" value="Легкий салат Цезарь 🥗">
       </div>
 
       <div class="form-actions">
         <button class="btn-secondary" onclick="closeDinnerPollModal()">Отмена</button>
-        <button class="btn-primary-action" onclick="saveDinnerPoll()">Запустить голосование!</button>
+        <button class="btn-primary-action" onclick="saveDinnerPoll()">Опубликовать опрос</button>
       </div>
     </div>
   </div>
 
-  <!-- Модальное окно создания / редактирования рецепта -->
+  <!-- Модальное окно редактирования/добавления рецепта -->
   <div class="modal-overlay" id="editRecipeModal" onclick="if(event.target===this) closeRecipeModal()">
     <div class="modal-card">
       <div class="modal-head">
-        <h3 id="recipeModalHeading">Рецепт ужина 🍝</h3>
+        <h3 id="recipeModalTitle">Рецепт блюда 🍝</h3>
         <button class="modal-close-btn" onclick="closeRecipeModal()">✕</button>
       </div>
 
       <div class="form-group">
         <label class="form-label">Название блюда</label>
-        <input type="text" class="form-input" id="recipeTitleInput" placeholder="Напр.: Ризотто с грибами 🍄">
+        <input type="text" class="form-input" id="recipeTitleInput" placeholder="Напр.: Сливочная паста с креветками" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Время приготовления</label>
-        <input type="text" class="form-input" id="recipeTimeInput" placeholder="Напр.: 30 мин">
+        <input type="text" class="form-input" id="recipeTimeInput" placeholder="Напр.: 25 мин" value="25 мин" />
       </div>
 
       <div class="form-group">
         <label class="form-label">Ингредиенты (через запятую)</label>
-        <textarea class="form-input" id="recipeIngredientsInput" rows="3" placeholder="Рис арборио, шампиньоны, пармезан, сливки, лук"></textarea>
+        <textarea class="form-input" id="recipeIngredientsInput" rows="3" placeholder="Спагетти, Креветки, Сливки 20%, Чеснок, Пармезан"></textarea>
       </div>
 
       <div class="form-actions" style="display:flex; gap:8px;">
@@ -1615,46 +1821,138 @@
     </div>
   </div>
 
+  <!-- Модальное окно добавления в Вишлист -->
+  <div class="modal-overlay" id="addWishlistModal" onclick="if(event.target===this) closeAddWishlistModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Загадать желание 🎁</h3>
+        <button class="modal-close-btn" onclick="closeAddWishlistModal()">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Что хочется в подарок?</label>
+        <input type="text" class="form-input" id="wishTitleInput" placeholder="Напр.: Уютный кашемировый плед или духи">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Примерная цена (₽, необязательно)</label>
+        <input type="number" class="form-input" id="wishPriceInput" placeholder="Напр.: 4500">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ссылка или примечание (размер, цвет)</label>
+        <input type="text" class="form-input" id="wishUrlInput" placeholder="Напр.: Озон/WB, бежевый цвет, размер M">
+      </div>
+      <div style="font-size:11px; color:#A0A5B5; margin-bottom:12px; line-height:1.4;">
+        🤫 <strong>Режим сюрприза:</strong> Когда партнёр решит подарить это и забронирует желание, для тебя карточка останется неизменной. Сюрприз сохранится!
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeAddWishlistModal()">Отмена</button>
+        <button class="btn-primary-action" onclick="saveNewWish()">Загадать!</button>
+      </div>
+    </div>
+  </div>
 
-  <!-- Модальное окно создания своего спора -->
-  <div class="modal-overlay" id="addCustomDisputeModal" onclick="if(event.target===this) closeCustomDisputeModal()">
+  <!-- Модальное окно добавления цели в Копилку -->
+  <div class="modal-overlay" id="addGoalModal" onclick="if(event.target===this) closeAddGoalModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Новая общая мечта 🎯</h3>
+        <button class="modal-close-btn" onclick="closeAddGoalModal()">✕</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">На что копим вместе?</label>
+        <input type="text" class="form-input" id="goalTitleInput" placeholder="Напр.: Поездка на море или Новый диван">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Целевая сумма (₽)</label>
+        <input type="number" class="form-input" id="goalTargetInput" placeholder="Напр.: 150000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Иконка цели</label>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          ${['🏖️', '🛋️', '✈️', '🚗', '📺', '💍', '🏡', '🎉'].map(ic => `
+            <button type="button" class="sos-icon-chip" style="font-size:18px; padding:6px 10px;" onclick="document.getElementById('goalIconInput').value='${ic}';">
+              ${ic}
+            </button>
+          `).join('')}
+        </div>
+        <input type="hidden" id="goalIconInput" value="🏖️">
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeAddGoalModal()">Отмена</button>
+        <button class="btn-primary-action" onclick="saveNewGoal()">Создать цель</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно пополнения копилки -->
+  <div class="modal-overlay" id="contributeGoalModal" onclick="if(event.target===this) closeContributeGoalModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 id="contributeGoalModalTitle">Пополнить копилку 🪙</h3>
+        <button class="modal-close-btn" onclick="closeContributeGoalModal()">✕</button>
+      </div>
+      <div style="font-size:12px; color:#A0A5B5; margin-bottom:12px;">
+        Каждый взнос приближает вашу общую мечту!
+      </div>
+      <div style="display:flex; gap:6px; margin-bottom:12px;">
+        <button class="btn-secondary" style="flex:1; padding:8px 4px; font-size:11.5px; font-weight:800;" onclick="submitGoalContribution(1000)">+1 000 ₽</button>
+        <button class="btn-secondary" style="flex:1; padding:8px 4px; font-size:11.5px; font-weight:800;" onclick="submitGoalContribution(3000)">+3 000 ₽</button>
+        <button class="btn-secondary" style="flex:1; padding:8px 4px; font-size:11.5px; font-weight:800;" onclick="submitGoalContribution(5000)">+5 000 ₽</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Или укажите свою сумму (₽)</label>
+        <input type="number" class="form-input" id="customContributionAmount" placeholder="Напр.: 2500">
+      </div>
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeContributeGoalModal()">Отмена</button>
+        <button class="btn-primary-action" onclick="submitGoalContribution()">Внести в копилку</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно настройки Колеса Фортуны -->
+  <div class="modal-overlay" id="editWheelModal" onclick="if(event.target===this) closeEditWheelModal()">
     <div class="modal-card" style="max-height:88vh; overflow-y:auto;">
       <div class="modal-head">
-        <h3>Свой спор / вопрос 🎲</h3>
-        <button class="modal-close-btn" onclick="closeCustomDisputeModal()">✕</button>
+        <h3>Колесо Фортуны: Свой вопрос 🎡</h3>
+        <button class="modal-close-btn" onclick="closeEditWheelModal()">✕</button>
       </div>
-
       <div class="form-group">
         <label class="form-label">Тема спора или вопрос</label>
-        <input type="text" class="form-input" id="customDisputeTitle" placeholder="Напр.: Кто идёт гулять с собакой? 🐕" />
+        <input type="text" class="form-input" id="wheelQuestionInput" placeholder="Напр.: Кто моет посуду? или Какой фильм смотрим?">
       </div>
-
-      <div style="font-size:11px; font-weight:700; color:#A0A5B5; margin:12px 0 6px; text-transform:uppercase; letter-spacing:0.4px;">
-        Варианты ответа (для кубика и колеса):
+      <div style="font-size:11px; font-weight:700; color:#A0A5B5; margin:10px 0 6px; text-transform:uppercase;">
+        Варианты ответа (от 2 до 6):
       </div>
-
-      <div class="form-group">
-        <input type="text" class="form-input custom-opt-input" id="opt_0" placeholder="Вариант 1 (напр.: Муж 👨)" value="Муж 👨">
-      </div>
-      <div class="form-group">
-        <input type="text" class="form-input custom-opt-input" id="opt_1" placeholder="Вариант 2 (напр.: Жена 👩)" value="Жена 👩">
-      </div>
-      <div class="form-group">
-        <input type="text" class="form-input custom-opt-input" id="opt_2" placeholder="Вариант 3 (напр.: Вместе ❤️)" value="Вместе ❤️">
-      </div>
-      <div class="form-group">
-        <input type="text" class="form-input custom-opt-input" id="opt_3" placeholder="Вариант 4 (напр.: Завтра 😴)" value="Завтра 😴">
-      </div>
-      <div class="form-group">
-        <input type="text" class="form-input custom-opt-input" id="opt_4" placeholder="Вариант 5 (необязательно)" value="">
-      </div>
-      <div class="form-group">
-        <input type="text" class="form-input custom-opt-input" id="opt_5" placeholder="Вариант 6 (необязательно)" value="">
-      </div>
-
+      <div class="form-group"><input type="text" class="form-input" id="wheel_opt_0" placeholder="Вариант 1"></div>
+      <div class="form-group"><input type="text" class="form-input" id="wheel_opt_1" placeholder="Вариант 2"></div>
+      <div class="form-group"><input type="text" class="form-input" id="wheel_opt_2" placeholder="Вариант 3 (необязательно)"></div>
+      <div class="form-group"><input type="text" class="form-input" id="wheel_opt_3" placeholder="Вариант 4 (необязательно)"></div>
+      <div class="form-group"><input type="text" class="form-input" id="wheel_opt_4" placeholder="Вариант 5 (необязательно)"></div>
+      <div class="form-group"><input type="text" class="form-input" id="wheel_opt_5" placeholder="Вариант 6 (необязательно)"></div>
       <div class="form-actions">
-        <button class="btn-secondary" onclick="closeCustomDisputeModal()">Отмена</button>
-        <button class="btn-primary-action" onclick="saveCustomDispute()">Сохранить и крутить!</button>
+        <button class="btn-secondary" onclick="closeEditWheelModal()">Отмена</button>
+        <button class="btn-primary-action" onclick="saveWheelConfig()">Сохранить варианты</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно деталей комнаты Домика -->
+  <div class="modal-overlay" id="roomDetailsModal" onclick="if(event.target===this) closeRoomDetailsModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span id="roomModalIcon" style="font-size:22px;">🛋️</span>
+          <h3 id="roomModalTitle">Комната</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeRoomDetailsModal()">✕</button>
+      </div>
+      <p id="roomModalDesc" style="font-size:12px; color:#A0A5B5; margin-bottom:14px; line-height:1.4;"></p>
+      <div style="font-size:11px; font-weight:800; color:#E0E5F5; text-transform:uppercase; margin-bottom:8px;">Установленная мебель и декор:</div>
+      <div id="roomModalItemsList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:14px;"></div>
+      <div class="form-actions">
+        <button class="btn-primary-action" style="width:100%;" onclick="closeRoomDetailsModal(); setHouseMode('shop');">
+          🛋️ Перейти в Лавку уюта
+        </button>
       </div>
     </div>
   </div>
@@ -1787,7 +2085,7 @@
     <!-- Рендерится через JS -->
   </main>
 
-  <!-- Парящее стеклянное нижнее меню Liquid Glass -->
+  <!-- Парящее стеклянное нижнее меню Liquid Glass (5 вкладок v1.2.0) -->
   <nav id="bottomNav">
     <button class="nav-btn active" onclick="setTab('home')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1804,33 +2102,29 @@
       </svg>
       <span>Покупки</span>
     </button>
-    <button class="nav-btn" onclick="setTab('games')">
+    <button class="nav-btn" onclick="setTab('together')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="4"/>
-        <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/>
-        <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/>
-        <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
-        <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/>
-        <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/>
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
-      <span>Игры</span>
+      <span>Вместе</span>
     </button>
-    <button class="nav-btn" onclick="setTab('dinner')">
+    <button class="nav-btn" onclick="setTab('house')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 18h18"/>
-        <path d="M4.5 18a7.5 7.5 0 0 1 15 0"/>
-        <circle cx="12" cy="7.5" r="1.5"/>
-        <path d="M19 4l.6 1.4L21 6l-1.4.6L19 8l-.6-1.4L17 6l1.4-.6L19 4z" fill="currentColor" stroke="none"/>
+        <path d="M12 2L2 9.5V20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9.5L12 2z"/>
+        <path d="M9 22V12h6v10"/>
+        <path d="M19 6l1-1.5L21 6l-1 1.5z" fill="currentColor"/>
       </svg>
-      <span>Ужин</span>
+      <span>Домик</span>
     </button>
-    <button class="nav-btn" onclick="setTab('passport')">
+    <button class="nav-btn" onclick="setTab('notes')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3.5" y="3" width="17" height="18" rx="3"/>
-        <path d="M8 8h8M8 12h5M8 16h6"/>
-        <circle cx="16" cy="12" r="1.2" fill="currentColor"/>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <path d="M14 2v6h6"/>
+        <path d="M16 13H8"/>
+        <path d="M16 17H8"/>
+        <path d="M10 9H8"/>
       </svg>
-      <span>Паспорт</span>
+      <span>Заметки</span>
     </button>
   </nav>
 
@@ -1970,15 +2264,62 @@
     ];
 
     let passportSearchQuery = '';
+    let selectedNotesCategory = 'all';
 
-    let passportItems = [
-      { id: 'pass_1', category: 'intercom', icon: '🔢', label: 'Домофон подъезда', value: '# 4829', note: 'Калитка во двор: 1234#' },
-      { id: 'pass_2', category: 'wifi', icon: '📶', label: 'Wi-Fi для гостей', value: 'CozyHome2026!', note: 'Сеть: Home_5G' },
-      { id: 'pass_3', category: 'filter', icon: '🚰', label: 'Сменные фильтры воды', value: 'Аквафор К5 / К2 / КО-50', note: 'Замена в декабре' },
-      { id: 'pass_4', category: 'paint', icon: '🎨', label: 'Цвет краски стен', value: 'Dulux 30YY 68/024', note: 'Гостиная и прихожая' },
-      { id: 'pass_5', category: 'meter', icon: '⚡', label: 'Лицевой счет электроэнергии', value: 'Л/С 8372-1094-22', note: 'Подавать до 25 числа' },
-      { id: 'pass_6', category: 'master', icon: '🔧', label: 'Сантехник (УК Дом)', value: '+7 (999) 555-32-10', note: 'Михаил Иванович, 9:00-18:00' }
+    let notesCategories = [
+      { id: 'meds', name: 'Домашняя аптечка', icon: '💊' },
+      { id: 'home', name: 'Полезное / Дом', icon: '🏡' },
+      { id: 'dates', name: 'Счётчик дат & События', icon: '📅' },
+      { id: 'masters', name: 'Контакты мастеров', icon: '🔧' }
     ];
+
+    let notesItems = [
+      { id: 'n_1', categoryId: 'meds', label: 'Нурофен / Ибупрофен 400', value: 'Шкафчик в ванной, верхняя полка', note: 'Срок годности: до 08.2027. Принимать после еды', type: 'text' },
+      { id: 'n_2', categoryId: 'meds', label: 'Аптечка: ревизия сроков лекарств', value: 'Проверить и обновить аптечку', note: 'Выбросить просроченные капли и антигистаминные', type: 'date_reminder', reminderDate: '2026-11-01', reminderNoticeDays: 7 },
+      { id: 'n_3', categoryId: 'home', label: 'Wi-Fi для гостей', value: 'CozyHome2026!', note: 'Сеть: Home_5G (роутер в коридоре)', type: 'text' },
+      { id: 'n_4', categoryId: 'home', label: 'Код домофона подъезда', value: '# 4829', note: 'Калитка во двор: 1234#', type: 'text' },
+      { id: 'n_5', categoryId: 'home', label: 'Сменные фильтры воды', value: 'Аквафор К5 / К2 / КО-50', note: 'Замена каждые 6 мес', type: 'date_reminder', reminderDate: '2026-12-15', reminderNoticeDays: 7 },
+      { id: 'n_6', categoryId: 'dates', label: 'Годовщина нашего знакомства ❤️', value: 'Забронировать любимый ресторан!', note: 'Подарок + букет пионовидных роз', type: 'date_reminder', reminderDate: '2026-11-20', reminderNoticeDays: 7 },
+      { id: 'n_7', categoryId: 'dates', label: 'День рождения мамы 🎂', value: 'Позвонить с утра и заказать цветы', note: 'Юбилей!', type: 'date_reminder', reminderDate: '2026-11-08', reminderNoticeDays: 3 },
+      { id: 'n_8', categoryId: 'masters', label: 'Сантехник (УК Дом)', value: '+7 (999) 555-32-10', note: 'Михаил Иванович, 9:00-18:00', type: 'text' }
+    ];
+
+    let wishlistItems = [
+      { id: 'wish_1', title: 'Уютный кашемировый плед 🧶', price: 4500, url: 'Бежевый цвет, 200x220', createdBy: 'wife', bookedBy: null, isPurchased: false },
+      { id: 'wish_2', title: 'Беспроводные наушники Sony 🎧', price: 18900, url: 'С активным шумоподавлением', createdBy: 'husband', bookedBy: null, isPurchased: false },
+      { id: 'wish_3', title: 'Набор свечей Diptyque 🕯️', price: 7200, url: 'С ароматом инжира и хвои', createdBy: 'wife', bookedBy: 'husband', isPurchased: true }
+    ];
+    let selectedWishlistFilter = 'all';
+
+    let moneyGoals = [
+      { id: 'goal_1', title: 'Поездка на море в Сочи 🏖️', targetAmount: 120000, currentAmount: 48500, icon: '🌊', completed: false },
+      { id: 'goal_2', title: 'Робот-пылесос с влажной уборкой 🤖', targetAmount: 42000, currentAmount: 42000, icon: '🧹', completed: true }
+    ];
+    let currentContributingGoalId = null;
+
+    let houseState = {
+      sparks: 240,
+      tier: 2,
+      installedFurniture: ['plaid'],
+      dayNight: 'day',
+      weeklyPurchases: 1,
+      corgiMood: 'sleeping'
+    };
+    let houseTierNames = {
+      1: 'Уютная студия с камином',
+      2: 'Мансарда с балкончиком',
+      3: 'Загородная вилла с оранжереей'
+    };
+    let selectedHouseMode = 'overview';
+    let selectedRoomDetails = null;
+
+    let wheelQuestion = 'Кто сегодня моет посуду? 🍽️';
+    let wheelOptions = ['Муж 👱🏼‍♂️', 'Любимая 👩🏻', 'Вместе под музыку 🎵', 'Посудомойка 🫧'];
+    let isSpinningWheel = false;
+    let wheelResult = null;
+    let currentWheelRotation = 0;
+
+    let togetherSubTab = 'dinner';
 
     function showToast(text) {
       const box = document.getElementById('toastBox');
@@ -2005,8 +2346,10 @@
     function setTab(tab) {
       currentTab = tab;
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      const idx = { home: 0, shopping: 1, games: 2, dinner: 3, passport: 4 }[tab];
-      document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
+      const idx = { home: 0, shopping: 1, together: 2, house: 3, notes: 4 }[tab];
+      if (idx !== undefined) {
+        document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
+      }
       render();
     }
 
@@ -2294,8 +2637,13 @@
           senderMood: myMood,
           avatarType: avatarType,
           items: items,
-          gamePresets: gamePresets,
-          passportItems: passportItems,
+          notesCategories: notesCategories,
+          notesItems: notesItems,
+          wishlistItems: wishlistItems,
+          moneyGoals: moneyGoals,
+          houseState: houseState,
+          wheelQuestion: wheelQuestion,
+          wheelOptions: wheelOptions,
           dinnerPoll: dinnerPoll,
           dinnerRecipes: dinnerRecipes
         });
@@ -2312,8 +2660,13 @@
           items = data.items;
           updateNativeWidget();
         }
-        if (data.gamePresets) Object.assign(gamePresets, data.gamePresets);
-        if (data.passportItems) passportItems = data.passportItems;
+        if (data.notesCategories) notesCategories = data.notesCategories;
+        if (data.notesItems) notesItems = data.notesItems;
+        if (data.wishlistItems) wishlistItems = data.wishlistItems;
+        if (data.moneyGoals) moneyGoals = data.moneyGoals;
+        if (data.houseState) houseState = data.houseState;
+        if (data.wheelQuestion) wheelQuestion = data.wheelQuestion;
+        if (data.wheelOptions) wheelOptions = data.wheelOptions;
         if (data.dinnerPoll) dinnerPoll = data.dinnerPoll;
         if (data.dinnerRecipes) dinnerRecipes = data.dinnerRecipes;
         saveLocalState();
@@ -2337,16 +2690,36 @@
         triggerHeadsUp(data.icon || '🚨', data.sender || 'Партнер', data.text, data.title);
         if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 250]);
         showToast('⚡ Срочный пуш: ' + (data.icon || '🚨') + ' ' + data.text);
-      } else if (type === 'GAMES_UPDATE') {
-        if (data.presets) gamePresets = data.presets;
+      } else if (type === 'NOTES_UPDATE') {
+        if (data.items) notesItems = data.items;
         saveLocalState();
         render();
-        showToast('🎲 Добавлен новый спор для двоих!');
-      } else if (type === 'PASSPORT_UPDATE') {
-        if (data.items) passportItems = data.items;
+        showToast('📝 Заметки обновлены партнером!');
+      } else if (type === 'NOTES_CATEGORIES_UPDATE') {
+        if (data.categories) notesCategories = data.categories;
         saveLocalState();
         render();
-        showToast('📋 Паспорт дома обновлен партнером!');
+      } else if (type === 'WISHLIST_UPDATE') {
+        if (data.items) wishlistItems = data.items;
+        saveLocalState();
+        render();
+        showToast('🎁 Вишлист обновлен!');
+      } else if (type === 'MONEY_GOALS_UPDATE') {
+        if (data.goals) moneyGoals = data.goals;
+        saveLocalState();
+        render();
+        showToast('🎯 Копилка пополнена партнером!');
+      } else if (type === 'HOUSE_UPDATE') {
+        if (data.houseState) houseState = data.houseState;
+        saveLocalState();
+        render();
+        showToast('🏡 Домик обустроен партнером!');
+      } else if (type === 'WHEEL_UPDATE') {
+        if (data.question) wheelQuestion = data.question;
+        if (data.options) wheelOptions = data.options;
+        saveLocalState();
+        render();
+        showToast('🎡 Вопрос для колеса обновлен!');
       } else if (type === 'DINNER_POLL_UPDATE') {
         if (data.poll) dinnerPoll = data.poll;
         saveLocalState();
@@ -2371,8 +2744,13 @@
           partnerMood,
           avatarType,
           items,
-          gamePresets,
-          passportItems,
+          notesCategories,
+          notesItems,
+          wishlistItems,
+          moneyGoals,
+          houseState,
+          wheelQuestion,
+          wheelOptions,
           dinnerPoll,
           dinnerRecipes,
           lastSaved: Date.now()
@@ -2390,8 +2768,13 @@
           if (state.partnerMood) partnerMood = state.partnerMood;
           if (state.avatarType) avatarType = state.avatarType;
           if (state.items) items = state.items;
-          if (state.gamePresets) Object.assign(gamePresets, state.gamePresets);
-          if (state.passportItems) passportItems = state.passportItems;
+          if (state.notesCategories) notesCategories = state.notesCategories;
+          if (state.notesItems) notesItems = state.notesItems;
+          if (state.wishlistItems) wishlistItems = state.wishlistItems;
+          if (state.moneyGoals) moneyGoals = state.moneyGoals;
+          if (state.houseState) houseState = state.houseState;
+          if (state.wheelQuestion) wheelQuestion = state.wheelQuestion;
+          if (state.wheelOptions) wheelOptions = state.wheelOptions;
           if (state.dinnerPoll) dinnerPoll = state.dinnerPoll;
           if (state.dinnerRecipes) dinnerRecipes = state.dinnerRecipes;
           avatarType = { husband: 'pixar', wife: 'pixar' };
@@ -2407,15 +2790,6 @@
     }
 
 
-
-    let gameRandomizerMode = 'dice'; // 'dice' | 'wheel'
-    let selectedGamePresetKey = 'dishes';
-    let isRollingDice = false;
-    let isSpinningWheel = false;
-    let diceResult = null;
-    let wheelResult = null;
-    let currentWheelRotation = 0;
-    let currentDiceTransform = '';
 
     let dinnerPoll = {
       title: 'Что приготовим сегодня на ужин? 🍲',
@@ -2447,188 +2821,6 @@
         ingredients: ['Рис Арборио', 'Шампиньоны', 'Сыр Пармезан', 'Лук шалот', 'Белое сухое']
       }
     ];
-
-    const gamePresets = {
-      dishes: {
-        title: 'Кто моет посуду? 🍽️',
-        options: ['Муж 👨', 'Жена 👩', 'Вместе ❤️', 'Завтра 😴', 'Посудомойка 🧼', 'Кто проиграет 🎲']
-      },
-      breakfast: {
-        title: 'Кто готовит завтрак? 🍳',
-        options: ['Муж 👨', 'Жена 👩', 'Вместе 🥞', 'Кофе в постель ☕', 'Доставка 🥐', 'Сюрприз ✨']
-      },
-      evening: {
-        title: 'Чем займемся вечером? 🍿',
-        options: ['Кино 🎬', 'Прогулка 🌙', 'Настолка 🎲', 'Сериал 🛋️', 'Пицца 🍕', 'Чай и болтать ☕']
-      },
-      coffee: {
-        title: 'Кто заваривает кофе? ☕',
-        options: ['Муж 👨', 'Жена 👩', 'Оба в пижамах 🧦', 'Сегодня чай 🍵', 'Доставка 🛵', 'Камень-ножницы ✌️']
-      }
-    };
-
-    function setGameMode(mode) {
-      gameRandomizerMode = mode;
-      diceResult = null;
-      wheelResult = null;
-      render();
-    }
-
-    function selectGamePreset(key) {
-      selectedGamePresetKey = key;
-      diceResult = null;
-      wheelResult = null;
-      render();
-    }
-
-    let currentEditingDisputeKey = null;
-
-    function openCustomDisputeModal(keyToEdit = null) {
-      currentEditingDisputeKey = keyToEdit;
-      const modal = document.getElementById('addCustomDisputeModal');
-      const titleInput = document.getElementById('customDisputeTitle');
-      
-      if (keyToEdit && gamePresets[keyToEdit]) {
-        const p = gamePresets[keyToEdit];
-        titleInput.value = p.title;
-        for (let i = 0; i < 6; i++) {
-          const optEl = document.getElementById('opt_' + i);
-          if (optEl) optEl.value = p.options[i] || '';
-        }
-      } else {
-        titleInput.value = '';
-        const defaults = ['Муж 👨', 'Жена 👩', 'Вместе ❤️', 'Завтра 😴', '', ''];
-        for (let i = 0; i < 6; i++) {
-          const optEl = document.getElementById('opt_' + i);
-          if (optEl) optEl.value = defaults[i];
-        }
-      }
-      modal.style.display = 'flex';
-    }
-
-    function closeCustomDisputeModal() {
-      const modal = document.getElementById('addCustomDisputeModal');
-      modal.style.display = 'none';
-      currentEditingDisputeKey = null;
-    }
-
-    function saveCustomDispute() {
-      const titleInput = document.getElementById('customDisputeTitle');
-      const title = titleInput ? titleInput.value.trim() : '';
-      if (!title) {
-        showToast('Введите тему спора или вопрос!');
-        return;
-      }
-
-      const collected = [];
-      for (let i = 0; i < 6; i++) {
-        const el = document.getElementById('opt_' + i);
-        if (el && el.value.trim()) {
-          collected.push(el.value.trim());
-        }
-      }
-
-      if (collected.length < 2) {
-        showToast('Укажите минимум 2 варианта ответа!');
-        return;
-      }
-
-      const key = currentEditingDisputeKey || ('custom_' + Date.now());
-      gamePresets[key] = {
-        title: title,
-        options: collected,
-        isCustom: true
-      };
-
-      selectedGamePresetKey = key;
-      closeCustomDisputeModal();
-      broadcastSync('GAMES_UPDATE', { presets: gamePresets });
-      render();
-      showToast('🎉 Вопрос «' + title + '» сохранён!');
-    }
-
-    function deleteCustomDispute(key) {
-      if (!gamePresets[key]) return;
-      delete gamePresets[key];
-      if (selectedGamePresetKey === key) {
-        selectedGamePresetKey = 'dishes';
-      }
-      broadcastSync('GAMES_UPDATE', { presets: gamePresets });
-      render();
-      showToast('🗑️ Спор удалён');
-    }
-
-    function rollDice() {
-      if (isRollingDice) return;
-      isRollingDice = true;
-      diceResult = null;
-      render();
-
-      const options = gamePresets[selectedGamePresetKey].options;
-      const mappedOptions = [];
-      for (let i = 0; i < 6; i++) {
-        mappedOptions.push(options[i % options.length]);
-      }
-
-      const winningIndex = Math.floor(Math.random() * 6);
-      const rotations = [
-        { x: 0, y: 0 },       // Front (face 1)
-        { x: 0, y: -90 },     // Right (face 2)
-        { x: 0, y: -180 },    // Back (face 3)
-        { x: 0, y: 90 },      // Left (face 4)
-        { x: -90, y: 0 },     // Top (face 5)
-        { x: 90, y: 0 }       // Bottom (face 6)
-      ];
-
-      const rot = rotations[winningIndex];
-      const spinCount = 3 + Math.floor(Math.random() * 2);
-      const targetX = rot.x + (spinCount * 360);
-      const targetY = rot.y + (spinCount * 360);
-
-      currentDiceTransform = `rotateX(${targetX}deg) rotateY(${targetY}deg)`;
-      setTimeout(() => {
-        const cube = document.getElementById('diceCubeElement');
-        if (cube) {
-          cube.style.transform = currentDiceTransform;
-        }
-      }, 50);
-
-      setTimeout(() => {
-        isRollingDice = false;
-        diceResult = mappedOptions[winningIndex];
-        render();
-        showToast('🎲 Кубик решил: ' + diceResult + '!');
-      }, 1250);
-    }
-
-    function spinWheel() {
-      if (isSpinningWheel) return;
-      isSpinningWheel = true;
-      wheelResult = null;
-      render();
-
-      const options = gamePresets[selectedGamePresetKey].options;
-      const N = options.length;
-      const winningIndex = Math.floor(Math.random() * N);
-      const sectorAngle = 360 / N;
-      const sectorCenter = (winningIndex * sectorAngle) + (sectorAngle / 2);
-      const spinDegrees = (5 + Math.floor(Math.random() * 3)) * 360;
-      currentWheelRotation += spinDegrees + (360 - (currentWheelRotation % 360)) + (360 - sectorCenter);
-
-      setTimeout(() => {
-        const disc = document.getElementById('wheelDiscElement');
-        if (disc) {
-          disc.style.transform = `rotate(${currentWheelRotation}deg)`;
-        }
-      }, 50);
-
-      setTimeout(() => {
-        isSpinningWheel = false;
-        wheelResult = options[winningIndex];
-        render();
-        showToast('🎡 Колесо выбрало: ' + wheelResult + '!');
-      }, 3550);
-    }
 
     function getWheelSvg(options) {
       const colors = ['#FF5E62', '#00F2FE', '#9B51E0', '#F59E0B', '#22C55E', '#EC4899', '#3B82F6', '#10B981'];
@@ -2810,128 +3002,572 @@
       showToast(`Скопировано [${label}]: ${text}`);
     }
 
-    function handlePassportSearch(q) {
-      passportSearchQuery = q;
-      renderPassportList();
-    }
-
-    function openAddPassportModal() {
-      document.getElementById('addPassportModal').style.display = 'flex';
-      document.getElementById('newPassLabel').value = '';
-      document.getElementById('newPassValue').value = '';
-      document.getElementById('newPassNote').value = '';
-    }
-
-    function closeAddPassportModal() {
-      document.getElementById('addPassportModal').style.display = 'none';
-    }
-
-    function saveNewPassportItem() {
-      const cat = document.getElementById('newPassCategory').value;
-      const label = document.getElementById('newPassLabel').value.trim();
-      const val = document.getElementById('newPassValue').value.trim();
-      const note = document.getElementById('newPassNote').value.trim();
-
-      if (!label || !val) {
-        showToast('Заполните название и значение!');
-        return;
+    // ==================== СЧЁТЧИК ДАТ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
+    function getDaysRemaining(dateStr) {
+      if (!dateStr) return null;
+      try {
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return null;
+        const target = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diffMs = target.getTime() - today.getTime();
+        return Math.round(diffMs / (1000 * 60 * 60 * 24));
+      } catch (e) {
+        return null;
       }
-
-      const icons = {
-        intercom: '🔢',
-        wifi: '📶',
-        filter: '🚰',
-        meter: '⚡',
-        paint: '🎨',
-        master: '🔧',
-        custom: '📋'
-      };
-
-      passportItems.unshift({
-        id: 'pass_' + Date.now(),
-        category: cat,
-        icon: icons[cat] || '📋',
-        label: label,
-        value: val,
-        note: note || undefined
-      });
-
-      closeAddPassportModal();
-      broadcastSync('PASSPORT_UPDATE', { items: passportItems });
-      render();
-      showToast(`Запись «${label}» успешно добавлена в паспорт дома!`);
     }
 
-    let currentEditingPassportId = null;
+    function formatCountdownBadge(dateStr, noticeDays = 7) {
+      const days = getDaysRemaining(dateStr);
+      if (days === null) return '';
+      if (days === 0) {
+        return `<span class="countdown-badge countdown-today">🎉 Сегодня!</span>`;
+      }
+      if (days === 1) {
+        return `<span class="countdown-badge countdown-urgent">⚠️ Завтра!</span>`;
+      }
+      if (days > 1 && days <= noticeDays) {
+        return `<span class="countdown-badge countdown-urgent">⏱️ Осталось ${days} дн.</span>`;
+      }
+      if (days > noticeDays) {
+        return `<span class="countdown-badge countdown-soon">📅 Через ${days} дн.</span>`;
+      }
+      return `<span class="countdown-badge countdown-past">Прошло ${Math.abs(days)} дн. назад</span>`;
+    }
 
-    function openEditPassportModal(id) {
-      const item = passportItems.find(p => p.id === id);
-      if (!item) return;
-      currentEditingPassportId = id;
-      const modal = document.getElementById('editPassportModal');
-      if (!modal) return;
-      document.getElementById('editPassCategory').value = item.category || 'custom';
-      document.getElementById('editPassLabel').value = item.label || '';
-      document.getElementById('editPassValue').value = item.value || '';
-      document.getElementById('editPassNote').value = item.note || '';
+    // ==================== ЗАМЕТКИ И ГРУППЫ ====================
+    let currentEditingNoteId = null;
+
+    function handleNotesSearch(q) {
+      notesSearchQuery = q;
+      renderNotesList();
+    }
+
+    function selectNotesCategory(catId) {
+      selectedNotesCategory = catId;
+      render();
+    }
+
+    function openAddCategoryModal() {
+      const modal = document.getElementById('addCategoryModal');
+      document.getElementById('newCategoryName').value = '';
+      document.getElementById('newCategoryIcon').value = '📁';
       modal.style.display = 'flex';
     }
 
-    function closeEditPassportModal() {
-      const modal = document.getElementById('editPassportModal');
-      if (modal) modal.style.display = 'none';
-      currentEditingPassportId = null;
+    function closeAddCategoryModal() {
+      document.getElementById('addCategoryModal').style.display = 'none';
     }
 
-    function saveEditedPassportItem() {
-      if (!currentEditingPassportId) return;
-      const cat = document.getElementById('editPassCategory').value;
-      const label = document.getElementById('editPassLabel').value.trim();
-      const val = document.getElementById('editPassValue').value.trim();
-      const note = document.getElementById('editPassNote').value.trim();
+    function saveNewCategory() {
+      const name = document.getElementById('newCategoryName').value.trim();
+      const icon = document.getElementById('newCategoryIcon').value.trim() || '📁';
+      if (!name) {
+        showToast('Введите название группы!');
+        return;
+      }
+      const newCat = {
+        id: 'cat_' + Date.now(),
+        name: name,
+        icon: icon
+      };
+      notesCategories.push(newCat);
+      selectedNotesCategory = newCat.id;
+      closeAddCategoryModal();
+      saveLocalState();
+      broadcastSync('NOTES_CATEGORIES_UPDATE', { categories: notesCategories });
+      render();
+      showToast('Группа «' + name + '» создана!');
+    }
+
+    function setNoteTypeInput(type) {
+      document.getElementById('newNoteType').value = type;
+      document.getElementById('btnNoteTypeText')?.classList.toggle('active', type === 'text');
+      document.getElementById('btnNoteTypeDate')?.classList.toggle('active', type === 'date_reminder');
+      const dateBlock = document.getElementById('newNoteDateBlock');
+      if (dateBlock) dateBlock.style.display = type === 'date_reminder' ? 'block' : 'none';
+    }
+
+    function setEditNoteTypeInput(type) {
+      document.getElementById('editNoteType').value = type;
+      document.getElementById('btnEditNoteTypeText')?.classList.toggle('active', type === 'text');
+      document.getElementById('btnEditNoteTypeDate')?.classList.toggle('active', type === 'date_reminder');
+      const dateBlock = document.getElementById('editNoteDateBlock');
+      if (dateBlock) dateBlock.style.display = type === 'date_reminder' ? 'block' : 'none';
+    }
+
+    function openAddNoteModal() {
+      const modal = document.getElementById('addNoteModal');
+      const sel = document.getElementById('newNoteCategorySelect');
+      sel.innerHTML = notesCategories.map(c => `
+        <option value="${c.id}" ${selectedNotesCategory === c.id ? 'selected' : ''}>${c.icon} ${c.name}</option>
+      `).join('');
+      document.getElementById('newNoteLabel').value = '';
+      document.getElementById('newNoteValue').value = '';
+      document.getElementById('newNoteNote').value = '';
+      document.getElementById('newNoteDate').value = '';
+      setNoteTypeInput('text');
+      modal.style.display = 'flex';
+    }
+
+    function closeAddNoteModal() {
+      document.getElementById('addNoteModal').style.display = 'none';
+    }
+
+    function saveNewNote() {
+      const catId = document.getElementById('newNoteCategorySelect').value;
+      const label = document.getElementById('newNoteLabel').value.trim();
+      const val = document.getElementById('newNoteValue').value.trim();
+      const note = document.getElementById('newNoteNote').value.trim();
+      const type = document.getElementById('newNoteType').value;
+      const dateVal = document.getElementById('newNoteDate').value;
+      const noticeDays = parseInt(document.getElementById('newNoteNoticeDays').value, 10) || 7;
 
       if (!label || !val) {
         showToast('Заполните название и значение!');
         return;
       }
 
-      const icons = {
-        intercom: '🔢',
-        wifi: '📶',
-        filter: '🚰',
-        meter: '⚡',
-        paint: '🎨',
-        master: '🔧',
-        custom: '📋'
+      const item = {
+        id: 'n_' + Date.now(),
+        categoryId: catId,
+        label: label,
+        value: val,
+        note: note || undefined,
+        type: type,
+        reminderDate: type === 'date_reminder' ? dateVal : undefined,
+        reminderNoticeDays: type === 'date_reminder' ? noticeDays : undefined
       };
 
-      const idx = passportItems.findIndex(p => p.id === currentEditingPassportId);
+      notesItems.unshift(item);
+      closeAddNoteModal();
+      saveLocalState();
+      broadcastSync('NOTES_UPDATE', { items: notesItems });
+      render();
+      showToast(`Запись «${label}» сохранена!`);
+    }
+
+    function openEditNoteModal(id) {
+      const item = notesItems.find(n => n.id === id);
+      if (!item) return;
+      currentEditingNoteId = id;
+      const modal = document.getElementById('editNoteModal');
+      const sel = document.getElementById('editNoteCategorySelect');
+      sel.innerHTML = notesCategories.map(c => `
+        <option value="${c.id}" ${item.categoryId === c.id ? 'selected' : ''}>${c.icon} ${c.name}</option>
+      `).join('');
+      document.getElementById('editNoteLabel').value = item.label || '';
+      document.getElementById('editNoteValue').value = item.value || '';
+      document.getElementById('editNoteNote').value = item.note || '';
+      document.getElementById('editNoteDate').value = item.reminderDate || '';
+      document.getElementById('editNoteNoticeDays').value = (item.reminderNoticeDays !== undefined ? item.reminderNoticeDays : 7).toString();
+      setEditNoteTypeInput(item.type || 'text');
+      modal.style.display = 'flex';
+    }
+
+    function closeEditNoteModal() {
+      document.getElementById('editNoteModal').style.display = 'none';
+      currentEditingNoteId = null;
+    }
+
+    function saveEditedNoteItem() {
+      if (!currentEditingNoteId) return;
+      const catId = document.getElementById('editNoteCategorySelect').value;
+      const label = document.getElementById('editNoteLabel').value.trim();
+      const val = document.getElementById('editNoteValue').value.trim();
+      const note = document.getElementById('editNoteNote').value.trim();
+      const type = document.getElementById('editNoteType').value;
+      const dateVal = document.getElementById('editNoteDate').value;
+      const noticeDays = parseInt(document.getElementById('editNoteNoticeDays').value, 10) || 7;
+
+      if (!label || !val) {
+        showToast('Заполните название и значение!');
+        return;
+      }
+
+      const idx = notesItems.findIndex(n => n.id === currentEditingNoteId);
       if (idx !== -1) {
-        passportItems[idx] = {
-          ...passportItems[idx],
-          category: cat,
-          icon: icons[cat] || '📋',
+        notesItems[idx] = {
+          ...notesItems[idx],
+          categoryId: catId,
           label: label,
           value: val,
           note: note || undefined,
+          type: type,
+          reminderDate: type === 'date_reminder' ? dateVal : undefined,
+          reminderNoticeDays: type === 'date_reminder' ? noticeDays : undefined,
           updatedAt: Date.now()
         };
-        closeEditPassportModal();
-        broadcastSync('PASSPORT_UPDATE', { items: passportItems });
+        closeEditNoteModal();
+        saveLocalState();
+        broadcastSync('NOTES_UPDATE', { items: notesItems });
         render();
         showToast(`Запись «${label}» обновлена!`);
       }
     }
 
-    function deletePassportItem() {
-      if (!currentEditingPassportId) return;
-      const item = passportItems.find(p => p.id === currentEditingPassportId);
+    function deleteNoteItem() {
+      if (!currentEditingNoteId) return;
+      const item = notesItems.find(n => n.id === currentEditingNoteId);
       const label = item ? item.label : '';
-      passportItems = passportItems.filter(p => p.id !== currentEditingPassportId);
-      closeEditPassportModal();
-      broadcastSync('PASSPORT_UPDATE', { items: passportItems });
+      notesItems = notesItems.filter(n => n.id !== currentEditingNoteId);
+      closeEditNoteModal();
+      saveLocalState();
+      broadcastSync('NOTES_UPDATE', { items: notesItems });
       render();
-      showToast(`Запись «${label}» удалена из паспорта дома`);
+      showToast(`Запись «${label}» удалена`);
+    }
+
+    // ==================== ВИШЛИСТ (С РЕЖИМОМ СЮРПРИЗА) ====================
+    function openAddWishlistModal() {
+      document.getElementById('addWishlistModal').style.display = 'flex';
+      document.getElementById('wishTitleInput').value = '';
+      document.getElementById('wishPriceInput').value = '';
+      document.getElementById('wishUrlInput').value = '';
+    }
+
+    function closeAddWishlistModal() {
+      document.getElementById('addWishlistModal').style.display = 'none';
+    }
+
+    function saveNewWish() {
+      const title = document.getElementById('wishTitleInput').value.trim();
+      const price = parseInt(document.getElementById('wishPriceInput').value, 10) || undefined;
+      const url = document.getElementById('wishUrlInput').value.trim() || undefined;
+
+      if (!title) {
+        showToast('Введите название желания!');
+        return;
+      }
+
+      wishlistItems.unshift({
+        id: 'wish_' + Date.now(),
+        title: title,
+        price: price,
+        url: url,
+        createdBy: currentRole,
+        bookedBy: null,
+        isPurchased: false
+      });
+
+      closeAddWishlistModal();
+      saveLocalState();
+      broadcastSync('WISHLIST_UPDATE', { items: wishlistItems });
+      render();
+      showToast('Желание «' + title + '» добавлено в вишлист ✨');
+    }
+
+    function toggleSecretBookWish(wishId) {
+      const wish = wishlistItems.find(w => w.id === wishId);
+      if (!wish) return;
+
+      if (wish.bookedBy === currentRole) {
+        wish.bookedBy = null;
+        wish.isPurchased = false;
+        showToast('Бронь сюрприза отменена');
+      } else {
+        wish.bookedBy = currentRole;
+        wish.isPurchased = true;
+        showToast('🎁 Забронировано втайне! Партнёр не увидит эту бронь 🤫');
+      }
+
+      saveLocalState();
+      broadcastSync('WISHLIST_UPDATE', { items: wishlistItems });
+      render();
+    }
+
+    function deleteWish(wishId) {
+      wishlistItems = wishlistItems.filter(w => w.id !== wishId);
+      saveLocalState();
+      broadcastSync('WISHLIST_UPDATE', { items: wishlistItems });
+      render();
+      showToast('Желание удалено');
+    }
+
+    // ==================== КОПИЛКА НА МЕЧТУ ====================
+    function openAddGoalModal() {
+      document.getElementById('addGoalModal').style.display = 'flex';
+      document.getElementById('goalTitleInput').value = '';
+      document.getElementById('goalTargetInput').value = '';
+    }
+
+    function closeAddGoalModal() {
+      document.getElementById('addGoalModal').style.display = 'none';
+    }
+
+    function saveNewGoal() {
+      const title = document.getElementById('goalTitleInput').value.trim();
+      const target = parseInt(document.getElementById('goalTargetInput').value, 10) || 0;
+      const icon = document.getElementById('goalIconInput').value || '🏖️';
+
+      if (!title || target <= 0) {
+        showToast('Укажите название и корректную сумму цели!');
+        return;
+      }
+
+      moneyGoals.push({
+        id: 'goal_' + Date.now(),
+        title: title,
+        targetAmount: target,
+        currentAmount: 0,
+        icon: icon,
+        completed: false
+      });
+
+      closeAddGoalModal();
+      saveLocalState();
+      broadcastSync('MONEY_GOALS_UPDATE', { goals: moneyGoals });
+      render();
+      showToast('Общая цель «' + title + '» создана! 🎯');
+    }
+
+    function openContributeGoalModal(goalId) {
+      currentContributingGoalId = goalId;
+      const g = moneyGoals.find(x => x.id === goalId);
+      if (g) {
+        document.getElementById('contributeGoalModalTitle').innerText = 'Пополнить: ' + g.title;
+      }
+      document.getElementById('customContributionAmount').value = '';
+      document.getElementById('contributeGoalModal').style.display = 'flex';
+    }
+
+    function closeContributeGoalModal() {
+      document.getElementById('contributeGoalModal').style.display = 'none';
+      currentContributingGoalId = null;
+    }
+
+    function submitGoalContribution(amountArg) {
+      if (!currentContributingGoalId) return;
+      const g = moneyGoals.find(x => x.id === currentContributingGoalId);
+      if (!g) return;
+
+      const amt = amountArg || parseInt(document.getElementById('customContributionAmount').value, 10) || 0;
+      if (amt <= 0) {
+        showToast('Введите сумму взноса больше нуля!');
+        return;
+      }
+
+      g.currentAmount = (g.currentAmount || 0) + amt;
+      if (g.currentAmount >= g.targetAmount) {
+        g.completed = true;
+        showToast('🎉 УРА! Мечта «' + g.title + '» накоплена на 100%! 🥂');
+      } else {
+        showToast('Внесено +' + amt.toLocaleString('ru-RU') + ' ₽ в копилку!');
+      }
+
+      closeContributeGoalModal();
+      saveLocalState();
+      broadcastSync('MONEY_GOALS_UPDATE', { goals: moneyGoals });
+      render();
+    }
+
+    // ==================== ИЗОМЕТРИЧЕСКИЙ ДОМИК И КОРЖИК ====================
+    function setHouseMode(mode) {
+      selectedHouseMode = mode;
+      render();
+    }
+
+    function toggleDayNight() {
+      houseState.dayNight = houseState.dayNight === 'day' ? 'night' : 'day';
+      saveLocalState();
+      broadcastSync('HOUSE_UPDATE', { houseState });
+      render();
+      showToast(houseState.dayNight === 'night' ? '🌙 Зажгли уютные вечерние огни!' : '☀️ Наступило тёплое утро!');
+    }
+
+    function petCorgi() {
+      if (window.AndroidBridge && window.AndroidBridge.vibrate) {
+        window.AndroidBridge.vibrate(60);
+      } else if (navigator.vibrate) {
+        navigator.vibrate([40, 60, 40]);
+      }
+      houseState.corgiMood = 'happy';
+      showToast('Коржик прижал ушки, виляет хвостиком и шлёт любовь! 🥰🐾');
+
+      const frame = document.querySelector('.house-frame');
+      if (frame) {
+        for (let i = 0; i < 5; i++) {
+          const heart = document.createElement('div');
+          heart.className = 'pet-heart-particle';
+          heart.innerText = ['❤️', '💖', '✨', '🐾', '🥰'][i % 5];
+          heart.style.left = (54 + (Math.random() * 12 - 6)) + '%';
+          heart.style.top = (70 + (Math.random() * 10 - 5)) + '%';
+          heart.style.animationDelay = (i * 0.15) + 's';
+          frame.appendChild(heart);
+          setTimeout(() => heart.remove(), 1400);
+        }
+      }
+    }
+
+    const houseFurnitureCatalog = [
+      { id: 'plaid', name: 'Вязаный тёплый плед', room: 'Гостиная на диване', price: 60, icon: '🛋️' },
+      { id: 'garland', name: 'Гирлянда тёплых огоньков', room: 'Мансарда на окнах', price: 80, icon: '✨' },
+      { id: 'lavender', name: 'Лаванда в горшочке', room: 'Сад и терраса', price: 50, icon: '🪴' },
+      { id: 'coffee', name: 'Кофемашина для двоих', room: 'Кухня на стойке', price: 90, icon: '☕' },
+      { id: 'candle', name: 'Ароматическая свеча', room: 'Журнальный столик', price: 40, icon: '🕯️' },
+      { id: 'bowl', name: 'Мисочка Коржика', room: 'У камина в гостиной', price: 45, icon: '🥣' }
+    ];
+
+    function buyFurniture(itemId, price) {
+      if (!houseState.installedFurniture) houseState.installedFurniture = [];
+      if (houseState.installedFurniture.includes(itemId)) {
+        showToast('Этот предмет уже обустроен в доме!');
+        return;
+      }
+      if (houseState.weeklyPurchases >= 2) {
+        showToast('Лимит недели исчерпан (2/2). Сброс в воскресенье!');
+        return;
+      }
+      if (houseState.sparks < price) {
+        showToast('Недостаточно искорок! Выполняйте совместные действия ✨');
+        return;
+      }
+
+      houseState.sparks -= price;
+      houseState.installedFurniture.push(itemId);
+      houseState.weeklyPurchases = (houseState.weeklyPurchases || 0) + 1;
+
+      saveLocalState();
+      broadcastSync('HOUSE_UPDATE', { houseState });
+      render();
+      showToast('Предмет куплен и появился в комнате! 🏡');
+    }
+
+    function upgradeHouseTier() {
+      if (houseState.tier >= 3) {
+        showToast('Ваш дом уже достиг наивысшего уровня (Вилла)! 🌟');
+        return;
+      }
+      const nextCost = houseState.tier === 1 ? 150 : 300;
+      if (houseState.sparks < nextCost) {
+        showToast('Для расширения нужно ' + nextCost + ' ✨ искорок!');
+        return;
+      }
+      houseState.sparks -= nextCost;
+      houseState.tier += 1;
+      saveLocalState();
+      broadcastSync('HOUSE_UPDATE', { houseState });
+      render();
+      showToast('🎉 Ура! Дом расширен до уровня «' + houseTierNames[houseState.tier] + '»!');
+    }
+
+    const roomDetailsDb = {
+      livingRoom: {
+        title: 'Гостиная с дровяным очагом',
+        icon: '🛋️',
+        desc: 'Сердце дома: потрескивающий огонь, мягкий диван и коврик, на котором любит дремать Коржик.'
+      },
+      bedroom: {
+        title: 'Уютная спальня-мансарда',
+        icon: '🛏️',
+        desc: 'Верхний этаж под покатой крышей с тёплыми гирляндами и видом на звёзды.'
+      },
+      kitchen: {
+        title: 'Кухня для совместной готовки',
+        icon: '🍳',
+        desc: 'Место для неспешных завтраков, аромата свежего кофе и семейных ужинов.'
+      },
+      garden: {
+        title: 'Садик с патио и лавандой',
+        icon: '🌿',
+        desc: 'Зелёный уголок для прогулок на свежем воздухе и чаепития.'
+      }
+    };
+
+    function showRoomDetails(roomId) {
+      const r = roomDetailsDb[roomId];
+      if (!r) return;
+      document.getElementById('roomModalTitle').innerText = r.title;
+      document.getElementById('roomModalIcon').innerText = r.icon;
+      document.getElementById('roomModalDesc').innerText = r.desc;
+
+      const installed = houseFurnitureCatalog.filter(it => (houseState.installedFurniture || []).includes(it.id));
+      const listEl = document.getElementById('roomModalItemsList');
+      if (installed.length === 0) {
+        listEl.innerHTML = '<div style="font-size:11.5px; color:#A0A5B5;">В этой комнате пока нет мебели из Лавки уюта.</div>';
+      } else {
+        listEl.innerHTML = installed.map(it => `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:12px; font-size:12px;">
+            <span>${it.icon} ${it.name}</span>
+            <span style="color:#4ADE80; font-size:11px; font-weight:700;">В комнате ✓</span>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('roomDetailsModal').style.display = 'flex';
+    }
+
+    function closeRoomDetailsModal() {
+      document.getElementById('roomDetailsModal').style.display = 'none';
+    }
+
+    // ==================== КОЛЕСО ФОРТУНЫ ====================
+    function openEditWheelModal() {
+      document.getElementById('wheelQuestionInput').value = wheelQuestion;
+      for (let i = 0; i < 6; i++) {
+        const el = document.getElementById('wheel_opt_' + i);
+        if (el) el.value = wheelOptions[i] || '';
+      }
+      document.getElementById('editWheelModal').style.display = 'flex';
+    }
+
+    function closeEditWheelModal() {
+      document.getElementById('editWheelModal').style.display = 'none';
+    }
+
+    function saveWheelConfig() {
+      const q = document.getElementById('wheelQuestionInput').value.trim();
+      if (!q) {
+        showToast('Введите вопрос спора!');
+        return;
+      }
+      const opts = [];
+      for (let i = 0; i < 6; i++) {
+        const val = document.getElementById('wheel_opt_' + i)?.value.trim();
+        if (val) opts.push(val);
+      }
+      if (opts.length < 2) {
+        showToast('Укажите минимум 2 варианта ответа!');
+        return;
+      }
+
+      wheelQuestion = q;
+      wheelOptions = opts;
+      wheelResult = null;
+      closeEditWheelModal();
+      saveLocalState();
+      broadcastSync('WHEEL_UPDATE', { question: wheelQuestion, options: wheelOptions });
+      render();
+      showToast('Колесо фортуны обновлено! 🎡');
+    }
+
+    function spinWheel() {
+      if (isSpinningWheel) return;
+      isSpinningWheel = true;
+      wheelResult = null;
+      render();
+
+      const N = wheelOptions.length;
+      const winningIndex = Math.floor(Math.random() * N);
+      const sectorAngle = 360 / N;
+      const sectorCenter = (winningIndex * sectorAngle) + (sectorAngle / 2);
+      const spinDegrees = (5 + Math.floor(Math.random() * 3)) * 360;
+      currentWheelRotation += spinDegrees + (360 - (currentWheelRotation % 360)) + (360 - sectorCenter);
+
+      setTimeout(() => {
+        const disc = document.getElementById('wheelDiscElement');
+        if (disc) {
+          disc.style.transform = `rotate(${currentWheelRotation}deg)`;
+        }
+      }, 50);
+
+      setTimeout(() => {
+        isSpinningWheel = false;
+        wheelResult = wheelOptions[winningIndex];
+        render();
+        showToast('🎡 Колесо выбрало: ' + wheelResult + '!');
+      }, 3550);
     }
 
     // ==================== ДЛЯ УЖИНА (ГОЛОСОВАНИЕ И РЕЦЕПТЫ) ====================
@@ -2981,6 +3617,12 @@
       broadcastSync('DINNER_POLL_UPDATE', { poll: dinnerPoll });
       render();
       showToast('🎉 Опрос запущен! Партнер видит новые варианты ужина.');
+    }
+
+    function voteDinnerByIndex(idx) {
+      if (dinnerPoll && dinnerPoll.options && dinnerPoll.options[idx]) {
+        voteDinner(dinnerPoll.options[idx]);
+      }
     }
 
     function voteDinner(option) {
@@ -3233,42 +3875,96 @@
       `;
     }
 
-    function renderPassportList() {
-      const container = document.getElementById('passportListContainer');
+    function copyNoteItemById(id) {
+      const item = notesItems.find(n => n.id === id);
+      if (item) {
+        copyToClipboard(item.value, item.label);
+      }
+    }
+
+    function renderNotesList() {
+      const container = document.getElementById('notesListContainer');
       if (!container) return;
 
-      const q = passportSearchQuery.trim().toLowerCase();
-      const filtered = passportItems.filter(p => {
+      const q = (notesSearchQuery || '').trim().toLowerCase();
+      const filtered = notesItems.filter(n => {
+        if (selectedNotesCategory !== 'all' && n.categoryId !== selectedNotesCategory) {
+          return false;
+        }
         if (!q) return true;
-        return p.label.toLowerCase().includes(q) ||
-               p.value.toLowerCase().includes(q) ||
-               (p.note && p.note.toLowerCase().includes(q)) ||
-               p.category.toLowerCase().includes(q);
+        const cat = notesCategories.find(c => c.id === n.categoryId);
+        const catName = cat ? cat.name.toLowerCase() : '';
+        return (n.label && n.label.toLowerCase().includes(q)) ||
+               (n.value && n.value.toLowerCase().includes(q)) ||
+               (n.note && n.note.toLowerCase().includes(q)) ||
+               catName.includes(q);
       });
 
       if (filtered.length === 0) {
         container.innerHTML = `
           <div style="text-align:center; padding:32px 16px; color:#8E93A3;">
             <div style="font-size:32px; margin-bottom:8px;">🔍</div>
-            <div style="font-size:14px; font-weight:700; color:#fff; margin-bottom:4px;">Ничего не найдено</div>
-            <div style="font-size:12px;">Попробуйте изменить поисковый запрос</div>
+            <div style="font-size:14px; font-weight:700; color:#fff; margin-bottom:4px;">В этой группе пока нет записей</div>
+            <div style="font-size:12px;">Нажмите «＋ Заметка», чтобы добавить код, аптечку или напоминание с датой</div>
           </div>
         `;
         return;
       }
 
       container.innerHTML = `
-        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px;">
-          ${filtered.map(item => `
-            <div class="glass-card" style="padding:14px; margin:0; position:relative; cursor:pointer;" onclick="copyToClipboard('${item.value}', '${item.label}')">
-              <button style="position:absolute; top:8px; right:8px; background:rgba(255,255,255,0.08); border:none; border-radius:8px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; color:#A0A5B5; font-size:12px; cursor:pointer;" onclick="event.stopPropagation(); openEditPassportModal('${item.id}')" title="Редактировать">✏️</button>
-              <div style="font-size:22px; margin-bottom:4px;">${item.icon}</div>
-              <div style="font-size:10.5px; color:#8E93A3; font-weight:700;">${item.label}</div>
-              <div style="font-size:13.5px; font-weight:800; color:#fff; word-break:break-all; margin:2px 0;">${item.value}</div>
-              <div style="font-size:10px; color:#00F2FE;">Тапни скопировать</div>
-              ${item.note ? `<div style="font-size:9.5px; color:#A0A5B5; margin-top:4px;">${item.note}</div>` : ''}
-            </div>
-          `).join('')}
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          ${filtered.map(item => {
+            const cat = notesCategories.find(c => c.id === item.categoryId) || { icon: '📝', name: 'Заметка' };
+            const isReminder = item.type === 'date_reminder';
+            const countdownHtml = isReminder ? formatCountdownBadge(item.reminderDate, item.reminderNoticeDays) : '';
+            return `
+              <div class="glass-card" style="padding:14px; margin:0; position:relative;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; padding-right:32px;">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span style="font-size:16px;">${cat.icon}</span>
+                    <span style="font-size:11px; font-weight:800; color:#A0A5B5; text-transform:uppercase;">${cat.name}</span>
+                  </div>
+                  ${countdownHtml}
+                </div>
+
+                <!-- Кнопка редактирования -->
+                <button style="position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.08); border:none; border-radius:8px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#A0A5B5; font-size:12px; cursor:pointer;" onclick="openEditNoteModal('${item.id}')" title="Редактировать">
+                  ✏️
+                </button>
+
+                <div style="font-size:14px; font-weight:800; color:#FFFFFF; margin-bottom:4px;">
+                  ${item.label}
+                </div>
+
+                <!-- Значение для 1-тап копирования -->
+                <div style="
+                  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14);
+                  border-radius:12px; padding:10px 12px; margin:8px 0; display:flex; align-items:center; justify-content:space-between;
+                  cursor:pointer; transition:all 0.2s;
+                " onclick="copyNoteItemById('${item.id}')"">
+                  <span style="font-size:13.5px; font-weight:800; color:#00F2FE; word-break:break-all;">
+                    ${item.value}
+                  </span>
+                  <span style="font-size:11px; font-weight:700; color:#A0A5B5; background:rgba(255,255,255,0.08); padding:3px 7px; border-radius:6px; white-space:nowrap; margin-left:8px;">
+                    📋 1 тап
+                  </span>
+                </div>
+
+                ${item.note ? `
+                  <div style="font-size:11.5px; color:#A0A5B5; line-height:1.4;">
+                    ${item.note}
+                  </div>
+                ` : ''}
+
+                ${isReminder && item.reminderDate ? `
+                  <div style="font-size:10.5px; color:#8E93A3; margin-top:6px; display:flex; align-items:center; gap:6px;">
+                    <span>📅 Дата: ${item.reminderDate}</span>
+                    <span>• Напомнить за ${item.reminderNoticeDays || 7} дн.</span>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
         </div>
       `;
     }
@@ -3304,15 +4000,13 @@
               <span class="card-badge">Синхронно</span>
             </div>
 
-
-
             <div class="avatar-preview-row">
               <div class="avatar-box" style="--mood-glow: ${myMood.color};" onclick="triggerAvatarTap(this)">
                 ${getSvg(myMood, currentRole, avatarType[currentRole])}
               </div>
               <div class="avatar-meta">
                 <h4>${myMood.title}</h4>
-                <p>Партнер видит этот аватар на своем смартфоне и виджете</p>
+                <p>Партнер видит этот аватар на своем смартфоне и виджете One UI</p>
               </div>
             </div>
 
@@ -3366,9 +4060,11 @@
               </div>
             </div>
           </div>
-
-          <!-- Кнопка «Я зашел в магазин» -->
-          <button class="store-btn" onclick="sendStoreArrivalNotification()">
+        `;
+      } else if (currentTab === 'shopping') {
+        container.innerHTML = `
+          <!-- Кнопка «Я зашёл в супермаркет!» перенесена сюда на самый верх списка покупок -->
+          <button class="store-btn" onclick="sendStoreArrivalNotification()" style="margin-bottom:14px;">
             <div style="display:flex; align-items:center; gap:12px;">
               <span style="font-size:24px;">🛒</span>
               <div style="text-align:left;">
@@ -3378,9 +4074,7 @@
             </div>
             <span>➔</span>
           </button>
-        `;
-      } else if (currentTab === 'shopping') {
-        container.innerHTML = `
+
           <div class="card-head" style="margin-bottom:12px;">
             <div>
               <h3>Список покупок 🛒</h3>
@@ -3439,237 +4133,311 @@
             </div>
           </div>
         `;
-      } else if (currentTab === 'dinner') {
-        const partnerRole = currentRole === 'husband' ? 'wife' : 'husband';
-        const partnerName = currentRole === 'husband' ? 'Любимая' : 'Муж';
-
+      } else if (currentTab === 'together') {
         const myVote = (dinnerPoll && dinnerPoll.votes) ? dinnerPoll.votes[currentRole] : null;
         const partnerVote = (dinnerPoll && dinnerPoll.votes) ? dinnerPoll.votes[partnerRole] : null;
         const hasConsensus = myVote && partnerVote && myVote === partnerVote;
         const isConflict = myVote && partnerVote && myVote !== partnerVote;
 
         container.innerHTML = `
-          <!-- БЛОК 1: ИНТЕРАКТИВНОЕ ГОЛОСОВАНИЕ НА УЖИН ДЛЯ ДВОИХ -->
-          <div class="card-head" style="margin-bottom:10px;">
-            <div>
-              <h3>Опрос на ужин 🍲</h3>
-              <p style="font-size:11px; color:#8E93A3;">Жена предлагает — муж голосует (и наоборот!)</p>
-            </div>
-            <button style="background:linear-gradient(135deg, #00F2FE, #4FACFE); border:none; border-radius:12px; padding:6px 12px; color:#0B0E17; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openDinnerPollModal()">
-              ＋ Новый опрос
+          <!-- Переключатель подразделов «Вместе» -->
+          <div style="display:flex; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:3px; gap:4px; margin-bottom:14px;">
+            <button class="together-tab-btn ${togetherSubTab === 'dinner' ? 'active' : ''}" onclick="togetherSubTab='dinner'; render();">
+              <span>🍲</span> Ужин
+            </button>
+            <button class="together-tab-btn ${togetherSubTab === 'wishlist' ? 'active' : ''}" onclick="togetherSubTab='wishlist'; render();">
+              <span>🎁</span> Вишлист
+            </button>
+            <button class="together-tab-btn ${togetherSubTab === 'goals' ? 'active' : ''}" onclick="togetherSubTab='goals'; render();">
+              <span>🎯</span> Копилка
+            </button>
+            <button class="together-tab-btn ${togetherSubTab === 'wheel' ? 'active' : ''}" onclick="togetherSubTab='wheel'; render();">
+              <span>🎡</span> Колесо
             </button>
           </div>
 
-          <div class="glass-card" style="padding:16px; margin-bottom:16px; border:1px solid rgba(0, 242, 254, 0.25);">
-            <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-              <span>🍲</span>
-              <span>${dinnerPoll.title || 'Что приготовим сегодня на ужин?'}</span>
+          ${togetherSubTab === 'dinner' ? `
+            <!-- ПОДРАЗДЕЛ: УЖИН & РЕЦЕПТЫ -->
+            <div class="card-head" style="margin-bottom:10px;">
+              <div>
+                <h3>Опрос на ужин 🍲</h3>
+                <p style="font-size:11px; color:#8E93A3;">Жена предлагает — муж голосует (и наоборот!)</p>
+              </div>
+              <button style="background:linear-gradient(135deg, #00F2FE, #4FACFE); border:none; border-radius:12px; padding:6px 12px; color:#0B0E17; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openDinnerPollModal()">
+                ＋ Новый опрос
+              </button>
             </div>
 
-            <!-- Варианты блюд для голосования -->
-            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
-              ${(dinnerPoll.options || []).map((opt) => {
-                const isSelectedByMe = myVote === opt;
-                const isSelectedByPartner = partnerVote === opt;
-                return `
-                  <div style="
-                    display:flex; align-items:center; justify-content:space-between;
-                    background:${isSelectedByMe ? 'rgba(0, 242, 254, 0.15)' : 'rgba(255, 255, 255, 0.04)'};
-                    border:1px solid ${isSelectedByMe ? '#00F2FE' : isSelectedByPartner ? '#FF5E62' : 'rgba(255, 255, 255, 0.1)'};
-                    border-radius:14px; padding:10px 14px; cursor:pointer; transition:all 0.2s ease;
-                  " onclick="voteDinner('${opt.replace(/'/g, "\'")}')">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                      <div style="
-                        width:20px; height:20px; border-radius:50%;
-                        border:2px solid ${isSelectedByMe ? '#00F2FE' : 'rgba(255, 255, 255, 0.3)'};
-                        background:${isSelectedByMe ? '#00F2FE' : 'transparent'};
-                        display:flex; align-items:center; justify-content:center; font-size:10px; color:#0B0E17; font-weight:900;
-                      ">
-                        ${isSelectedByMe ? '✓' : ''}
+            <div class="glass-card" style="padding:16px; margin-bottom:16px; border:1px solid rgba(0, 242, 254, 0.25);">
+              <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                <span>🍲</span>
+                <span>${dinnerPoll.title || 'Что приготовим сегодня на ужин?'}</span>
+              </div>
+
+              <!-- Варианты блюд для голосования -->
+              <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+                ${(dinnerPoll.options || []).map((opt, idx) => {
+                  const isSelectedByMe = myVote === opt;
+                  const isSelectedByPartner = partnerVote === opt;
+                  return `
+                    <div style="
+                      display:flex; align-items:center; justify-content:space-between;
+                      background:${isSelectedByMe ? 'rgba(0, 242, 254, 0.15)' : 'rgba(255, 255, 255, 0.04)'};
+                      border:1px solid ${isSelectedByMe ? '#00F2FE' : isSelectedByPartner ? '#FF5E62' : 'rgba(255, 255, 255, 0.1)'};
+                      border-radius:14px; padding:10px 14px; cursor:pointer; transition:all 0.2s ease;
+                    " onclick="voteDinnerByIndex(${idx})"">
+                      <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="
+                          width:20px; height:20px; border-radius:50%;
+                          border:2px solid ${isSelectedByMe ? '#00F2FE' : 'rgba(255, 255, 255, 0.3)'};
+                          background:${isSelectedByMe ? '#00F2FE' : 'transparent'};
+                          display:flex; align-items:center; justify-content:center; font-size:10px; color:#0B0E17; font-weight:900;
+                        ">
+                          ${isSelectedByMe ? '✓' : ''}
+                        </div>
+                        <span style="font-size:13.5px; font-weight:700; color:${isSelectedByMe ? '#00F2FE' : '#FFFFFF'};">
+                          ${opt}
+                        </span>
                       </div>
-                      <span style="font-size:13.5px; font-weight:700; color:${isSelectedByMe ? '#00F2FE' : '#FFFFFF'};">
-                        ${opt}
+
+                      <div style="display:flex; gap:6px; align-items:center;">
+                        ${isSelectedByMe ? `
+                          <span style="font-size:10px; font-weight:800; background:rgba(0, 242, 254, 0.25); color:#00F2FE; padding:3px 7px; border-radius:8px;">
+                            Ты ${currentRole === 'husband' ? '👱🏼‍♂️' : '👩🏻'}
+                          </span>
+                        ` : ''}
+                        ${isSelectedByPartner ? `
+                          <span style="font-size:10px; font-weight:800; background:rgba(255, 94, 98, 0.25); color:#FF5E62; padding:3px 7px; border-radius:8px;">
+                            ${partnerName} ${partnerRole === 'husband' ? '👱🏼‍♂️' : '👩🏻'}
+                          </span>
+                        ` : ''}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+
+              <!-- Итог голосования / Статус консенсуса -->
+              ${hasConsensus ? `
+                <div style="background:rgba(34, 197, 94, 0.15); border:1px solid #22C55E; border-radius:14px; padding:12px; text-align:center; margin-bottom:6px;">
+                  <div style="font-size:13.5px; font-weight:800; color:#4ADE80; margin-bottom:6px;">
+                    🎉 Ура! Вы оба выбрали: «${myVote}» 🥂
+                  </div>
+                  <button class="btn-primary-action" style="width:100%; font-size:12px; padding:8px 12px; background:linear-gradient(135deg, #22C55E, #16A34A);" onclick="addPollWinnerToShopping(myVote)"">
+                    🛒 Закинуть продукты для этого блюда в покупки
+                  </button>
+                </div>
+              ` : isConflict ? `
+                <div style="background:rgba(245, 158, 11, 0.12); border:1px solid #F59E0B; border-radius:14px; padding:12px; text-align:center; margin-bottom:6px;">
+                  <div style="font-size:12px; color:#FCD34D; font-weight:700; margin-bottom:6px;">
+                    Мнения разделились: ты за «${myVote}», а ${partnerName} за «${partnerVote}»
+                  </div>
+                  <button class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:#F59E0B; color:#FCD34D;" onclick="togetherSubTab='wheel'; render();">
+                    🎡 Решить колесом фортуны!
+                  </button>
+                </div>
+              ` : `
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#8E93A3; padding:2px 4px;">
+                  <span>${myVote ? 'Твой выбор: ' + myVote : 'Выбери вариант выше 👆'}</span>
+                  <span>${partnerVote ? partnerName + ': ' + partnerVote : partnerName + ' ещё думает... ⏳'}</span>
+                </div>
+              `}
+            </div>
+
+            <!-- РЕЦЕПТЫ -->
+            <div class="card-head" style="margin-bottom:10px; margin-top:20px;">
+              <div>
+                <h3>Любимые рецепты 🍝</h3>
+                <p style="font-size:11px; color:#8E93A3;">Добавляй, редактируй и закупай в 1 клик</p>
+              </div>
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:12px; padding:6px 12px; color:#FFFFFF; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openRecipeModal()">
+                ＋ Рецепт
+              </button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              ${dinnerRecipes.map(r => `
+                <div class="glass-card" style="padding:14px; margin:0; position:relative;">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                    <div style="font-size:14px; font-weight:800; color:#FFFFFF; padding-right:32px;">
+                      ${r.title}
+                    </div>
+                    <span style="font-size:10.5px; color:#A0A5B5; background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:8px; white-space:nowrap;">
+                      ⏱ ${r.time}
+                    </span>
+                  </div>
+
+                  <button style="position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#A0A5B5; font-size:12px; cursor:pointer;" onclick="openRecipeModal('${r.id}')" title="Изменить рецепт">
+                    ✏️
+                  </button>
+
+                  <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:10px; line-height:1.4;">
+                    ${r.ingredients && r.ingredients.length > 0 ? r.ingredients.join(', ') : 'Ингредиенты не указаны'}
+                  </div>
+
+                  <button style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:12px; padding:8px; color:#FFFFFF; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="addRecipeToShopping('${r.id}')">
+                    <span>🛒</span> Закинуть всё в список покупок
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          ` : togetherSubTab === 'wishlist' ? `
+            <!-- ПОДРАЗДЕЛ: ВИШЛИСТ С РЕЖИМОМ СЮРПРИЗА -->
+            <div class="card-head" style="margin-bottom:10px;">
+              <div>
+                <h3>Вишлист подарков 🎁</h3>
+                <p style="font-size:11px; color:#8E93A3;">Режим сюрприза: бронь партнёра видна только покупателю!</p>
+              </div>
+              <button style="background:linear-gradient(135deg, #FF5E62, #FF8E53); border:none; border-radius:12px; padding:6px 12px; color:#FFFFFF; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openAddWishlistModal()">
+                ＋ Загадать
+              </button>
+            </div>
+
+            <!-- Фильтр желаний -->
+            <div style="display:flex; gap:6px; margin-bottom:12px;">
+              <button class="preset-chip ${selectedWishlistFilter === 'all' ? 'active' : ''}" style="padding:6px 12px; font-size:11px;" onclick="selectedWishlistFilter='all'; render();">Все желания</button>
+              <button class="preset-chip ${selectedWishlistFilter === 'mine' ? 'active' : ''}" style="padding:6px 12px; font-size:11px;" onclick="selectedWishlistFilter='mine'; render();">Мои (${currentRole === 'husband' ? 'Муж' : 'Любимая'})</button>
+              <button class="preset-chip ${selectedWishlistFilter === 'partner' ? 'active' : ''}" style="padding:6px 12px; font-size:11px;" onclick="selectedWishlistFilter='partner'; render();">Для ${partnerName}</button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              ${wishlistItems.filter(w => {
+                if (selectedWishlistFilter === 'mine') return w.createdBy === currentRole;
+                if (selectedWishlistFilter === 'partner') return w.createdBy !== currentRole;
+                return true;
+              }).map(w => {
+                const isMine = w.createdBy === currentRole;
+                const isBookedByMe = w.bookedBy === currentRole;
+                return `
+                  <div class="wish-card ${isBookedByMe ? 'booked-by-me' : ''}">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                      <div style="padding-right:24px;">
+                        <div style="font-size:14px; font-weight:800; color:#FFFFFF; margin-bottom:2px;">
+                          ${w.title}
+                        </div>
+                        ${w.price ? `<span style="font-size:13px; font-weight:800; color:#F59E0B;">${w.price.toLocaleString('ru-RU')} ₽</span>` : ''}
+                      </div>
+
+                      <span style="font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px; ${isMine ? 'background:rgba(0,242,254,0.15); color:#00F2FE;' : 'background:rgba(255,94,98,0.15); color:#FF5E62;'}">
+                        ${isMine ? 'Моё желание ✨' : partnerName + ' 🎁'}
                       </span>
                     </div>
 
-                    <!-- Бейджи голосов участников -->
-                    <div style="display:flex; gap:6px; align-items:center;">
-                      ${isSelectedByMe ? `
-                        <span style="font-size:10px; font-weight:800; background:rgba(0, 242, 254, 0.25); color:#00F2FE; padding:3px 7px; border-radius:8px;">
-                          Ты ${currentRole === 'husband' ? '👱🏼‍♂️' : '👩🏻'}
-                        </span>
-                      ` : ''}
-                      ${isSelectedByPartner ? `
-                        <span style="font-size:10px; font-weight:800; background:rgba(255, 94, 98, 0.25); color:#FF5E62; padding:3px 7px; border-radius:8px;">
-                          ${partnerName} ${partnerRole === 'husband' ? '👱🏼‍♂️' : '👩🏻'}
-                        </span>
+                    ${w.url ? `
+                      <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:10px; line-height:1.4;">
+                        ${w.url}
+                      </div>
+                    ` : ''}
+
+                    <!-- Кнопки управления и режим сюрприза -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); pt-2; margin-top:8px; padding-top:8px;">
+                      ${!isMine ? `
+                        <!-- Для желаний партнера: могу тайно забронировать покупку -->
+                        <button class="btn-primary-action" style="font-size:11px; padding:6px 12px; ${isBookedByMe ? 'background:linear-gradient(135deg, #22C55E, #16A34A);' : ''}" onclick="toggleSecretBookWish('${w.id}')">
+                          ${isBookedByMe ? '✓ Забронировано тобой втайне! 🤫' : '🎁 Забронировать (сюрприз)'}
+                        </button>
+                      ` : `
+                        <!-- Для своего желания: статус сюрприза скрыт! -->
+                        <span style="font-size:11px; color:#8E93A3;">Ждёт исполнения ✨</span>
+                      `}
+
+                      ${isMine ? `
+                        <button style="background:transparent; border:none; color:#F87171; font-size:11.5px; cursor:pointer;" onclick="deleteWish('${w.id}')">
+                          🗑️
+                        </button>
                       ` : ''}
                     </div>
                   </div>
                 `;
               }).join('')}
             </div>
-
-            <!-- Итог голосования / Статус консенсуса -->
-            ${hasConsensus ? `
-              <div style="background:rgba(34, 197, 94, 0.15); border:1px solid #22C55E; border-radius:14px; padding:12px; text-align:center; margin-bottom:6px;">
-                <div style="font-size:13.5px; font-weight:800; color:#4ADE80; margin-bottom:6px;">
-                  🎉 Ура! Вы оба выбрали: «${myVote}» 🥂
-                </div>
-                <button class="btn-primary-action" style="width:100%; font-size:12px; padding:8px 12px; background:linear-gradient(135deg, #22C55E, #16A34A);" onclick="addPollWinnerToShopping('${myVote.replace(/'/g, "\'")}')">
-                  🛒 Закинуть продукты для этого блюда в покупки
-                </button>
+          ` : togetherSubTab === 'goals' ? `
+            <!-- ПОДРАЗДЕЛ: КОПИЛКА НА МЕЧТУ -->
+            <div class="card-head" style="margin-bottom:10px;">
+              <div>
+                <h3>Копилка на мечту 🎯</h3>
+                <p style="font-size:11px; color:#8E93A3;">Накопления на совместные большие цели</p>
               </div>
-            ` : isConflict ? `
-              <div style="background:rgba(245, 158, 11, 0.12); border:1px solid #F59E0B; border-radius:14px; padding:12px; text-align:center; margin-bottom:6px;">
-                <div style="font-size:12px; color:#FCD34D; font-weight:700; margin-bottom:6px;">
-                  Мнения разделились: ты за «${myVote}», а ${partnerName} за «${partnerVote}»
-                </div>
-                <button class="btn-secondary" style="font-size:11.5px; padding:6px 14px; border-color:#F59E0B; color:#FCD34D;" onclick="setTab('games')">
-                  🎲 Решить кубиком судьбы
-                </button>
-              </div>
-            ` : `
-              <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#8E93A3; padding:2px 4px;">
-                <span>${myVote ? 'Твой выбор: ' + myVote : 'Выбери вариант выше 👆'}</span>
-                <span>${partnerVote ? partnerName + ': ' + partnerVote : partnerName + ' ещё думает... ⏳'}</span>
-              </div>
-            `}
-          </div>
-
-          <!-- БЛОК 2: РЕЦЕПТЫ ДЛЯ ДВОИХ (С РЕДАКТИРОВАНИЕМ И ДОБАВЛЕНИЕМ В ПОКУПКИ) -->
-          <div class="card-head" style="margin-bottom:10px; margin-top:20px;">
-            <div>
-              <h3>Любимые рецепты 🍝</h3>
-              <p style="font-size:11px; color:#8E93A3;">Добавляй, редактируй и закупай в 1 клик</p>
+              <button style="background:linear-gradient(135deg, #22C55E, #16A34A); border:none; border-radius:12px; padding:6px 12px; color:#FFFFFF; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openAddGoalModal()">
+                ＋ Новая мечта
+              </button>
             </div>
-            <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:12px; padding:6px 12px; color:#FFFFFF; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openRecipeModal()">
-              ＋ Рецепт
-            </button>
-          </div>
 
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            ${dinnerRecipes.map(r => `
-              <div class="glass-card" style="padding:14px; margin:0; position:relative;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
-                  <div style="font-size:14px; font-weight:800; color:#FFFFFF; padding-right:32px;">
-                    ${r.title}
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              ${moneyGoals.map(g => {
+                const pct = Math.min(100, Math.round((g.currentAmount / g.targetAmount) * 100));
+                return `
+                  <div class="goal-card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:24px;">${g.icon}</span>
+                        <div>
+                          <div style="font-size:14px; font-weight:800; color:#FFFFFF;">${g.title}</div>
+                          <div style="font-size:11px; color:#A0A5B5;">Цель: ${g.targetAmount.toLocaleString('ru-RU')} ₽</div>
+                        </div>
+                      </div>
+                      <span style="font-size:12px; font-weight:800; color:${pct >= 100 ? '#4ADE80' : '#FF8E53'};">
+                        ${pct}%
+                      </span>
+                    </div>
+
+                    <!-- Прогресс бар -->
+                    <div class="goal-progress-bar-bg">
+                      <div class="goal-progress-bar-fill" style="width:${pct}%;"></div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:#D1D5E0; margin-bottom:10px;">
+                      <span>Накоплено: <strong>${g.currentAmount.toLocaleString('ru-RU')} ₽</strong></span>
+                      <span>Осталось: <strong>${Math.max(0, g.targetAmount - g.currentAmount).toLocaleString('ru-RU')} ₽</strong></span>
+                    </div>
+
+                    ${pct >= 100 ? `
+                      <div style="background:rgba(34,197,94,0.18); border:1px solid #22C55E; border-radius:12px; padding:8px; text-align:center; font-size:12px; font-weight:800; color:#4ADE80;">
+                        🎉 Мечта накоплена на 100%! Пора осуществлять! 🥂
+                      </div>
+                    ` : `
+                      <button class="btn-primary-action" style="width:100%; font-size:12px; padding:8px;" onclick="openContributeGoalModal('${g.id}')">
+                        🪙 Пополнить копилку
+                      </button>
+                    `}
                   </div>
-                  <span style="font-size:10.5px; color:#A0A5B5; background:rgba(255,255,255,0.06); padding:3px 8px; border-radius:8px; white-space:nowrap;">
-                    ⏱ ${r.time}
+                `;
+              }).join('')}
+            </div>
+          ` : `
+            <!-- ПОДРАЗДЕЛ: КОЛЕСО ФОРТУНЫ -->
+            <div class="card-head" style="margin-bottom:10px;">
+              <div>
+                <h3>Колесо Фортуны 🎡</h3>
+                <p style="font-size:11px; color:#8E93A3;">Решайте любые бытовые споры легко и справедливо</p>
+              </div>
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:12px; padding:6px 12px; color:#FFFFFF; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openEditWheelModal()">
+                ✏️ Свой спор
+              </button>
+            </div>
+
+            <div class="glass-card" style="padding:18px; text-align:center;">
+              <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-bottom:4px;">
+                ${wheelQuestion}
+              </div>
+              <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:12px;">
+                Крутите колесо фортуны с физикой вращения
+              </div>
+
+              <!-- Варианты в виде чипов -->
+              <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin-bottom:14px;">
+                ${wheelOptions.map(opt => `
+                  <span style="font-size:11px; font-weight:600; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:4px 9px; color:#E0E5F5;">
+                    ${opt}
                   </span>
-                </div>
-
-                <!-- Кнопка редактирования -->
-                <button style="position:absolute; top:12px; right:12px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:#A0A5B5; font-size:12px; cursor:pointer;" onclick="openRecipeModal('${r.id}')" title="Изменить рецепт">
-                  ✏️
-                </button>
-
-                <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:10px; line-height:1.4;">
-                  ${r.ingredients && r.ingredients.length > 0 ? r.ingredients.join(', ') : 'Ингредиенты не указаны'}
-                </div>
-
-                <button style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:12px; padding:8px; color:#FFFFFF; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;" onclick="addRecipeToShopping('${r.id}')">
-                  <span>🛒</span> Закинуть всё в список покупок
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      } else if (currentTab === 'games') {
-        const currentPreset = gamePresets[selectedGamePresetKey];
-        const options = currentPreset.options;
-        const mappedOptions = [];
-        for (let i = 0; i < 6; i++) {
-          mappedOptions.push(options[i % options.length]);
-        }
-
-        container.innerHTML = `
-          <div class="card-head" style="margin-bottom:12px;">
-            <div>
-              <h3>Супер-Рандомайзер 🎲</h3>
-              <p style="font-size:11px; color:#8E93A3;">Решайте любые бытовые споры легко и с юмором</p>
-            </div>
-            <button style="background:linear-gradient(135deg, #00F2FE, #4FACFE); border:none; border-radius:12px; padding:6px 12px; color:#0B0E17; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openCustomDisputeModal()">
-              ＋ Свой вопрос
-            </button>
-          </div>
-
-          <!-- Выбор темы спора (чипы) -->
-          <div class="preset-chips-row">
-            ${Object.keys(gamePresets).map(k => `
-              <div class="preset-chip ${selectedGamePresetKey === k ? 'active' : ''}" onclick="selectGamePreset('${k}')">
-                ${gamePresets[k].title}
-              </div>
-            `).join('')}
-            <div class="preset-chip" style="background:rgba(0,242,254,0.12); border:1px dashed #00F2FE; color:#00F2FE; font-weight:800;" onclick="openCustomDisputeModal()">
-              ＋ Свой спор
-            </div>
-          </div>
-
-          <!-- Карточка рандомайзера -->
-          <div class="glass-card" style="padding:20px; text-align:center;">
-            <!-- Переключатель: Кубик / Колесо -->
-            <div class="game-mode-toggle">
-              <button class="game-mode-btn ${gameRandomizerMode === 'dice' ? 'active' : ''}" onclick="setGameMode('dice')">
-                <span style="font-size:16px;">🎲</span> 3D Кубик Судьбы
-              </button>
-              <button class="game-mode-btn ${gameRandomizerMode === 'wheel' ? 'active' : ''}" onclick="setGameMode('wheel')">
-                <span style="font-size:16px;">🎡</span> Колесо Фортуны
-              </button>
-            </div>
-
-            <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-bottom:4px;">
-              ${currentPreset.title}
-            </div>
-            <div style="font-size:11.5px; color:#A0A5B5; margin-bottom:8px;">
-              ${gameRandomizerMode === 'dice' ? 'Бросьте 3D кубик, чтобы случай решил исход' : 'Крутите колесо фортуны со случайной физикой'}
-            </div>
-
-            <!-- Если это пользовательский спор - даем изменить или удалить -->
-            ${currentPreset.isCustom ? `
-              <div style="display:flex; justify-content:center; gap:8px; margin-bottom:12px;">
-                <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); border-radius:10px; color:#fff; font-size:11px; font-weight:700; padding:5px 12px; cursor:pointer;" onclick="openCustomDisputeModal('${selectedGamePresetKey}')">
-                  ✏️ Изменить вопрос
-                </button>
-                <button style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); border-radius:10px; color:#F87171; font-size:11px; font-weight:700; padding:5px 12px; cursor:pointer;" onclick="deleteCustomDispute('${selectedGamePresetKey}')">
-                  🗑️ Удалить
-                </button>
-              </div>
-            ` : ''}
-
-            <!-- Варианты в виде аккуратных чипов -->
-            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:6px; margin:4px 0 16px;">
-              ${options.map(opt => `
-                <span style="font-size:11px; font-weight:600; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:4px 9px; color:#E0E5F5;">
-                  ${opt}
-                </span>
-              `).join('')}
-            </div>
-
-            ${gameRandomizerMode === 'dice' ? `
-              <!-- 3D Сцена Кубика -->
-              <div class="dice-scene">
-                <div class="dice-cube" id="diceCubeElement" style="${currentDiceTransform ? 'transform: ' + currentDiceTransform + ';' : ''} ${isRollingDice ? 'transition: transform 1.2s cubic-bezier(0.15, 0.9, 0.25, 1);' : 'transition: none;'}">
-                  <div class="dice-face dice-face-1">${mappedOptions[0]}</div>
-                  <div class="dice-face dice-face-2">${mappedOptions[1]}</div>
-                  <div class="dice-face dice-face-3">${mappedOptions[2]}</div>
-                  <div class="dice-face dice-face-4">${mappedOptions[3]}</div>
-                  <div class="dice-face dice-face-5">${mappedOptions[4]}</div>
-                  <div class="dice-face dice-face-6">${mappedOptions[5]}</div>
-                </div>
+                `).join('')}
               </div>
 
-              <button class="game-action-btn" onclick="rollDice()" ${isRollingDice ? 'disabled style="opacity:0.6;"' : ''}>
-                <span style="font-size:18px;">🎲</span>
-                <span>${isRollingDice ? 'Кубик крутится в воздухе...' : 'Бросить кубик судьбы!'}</span>
-              </button>
-            ` : `
               <!-- Колесо Фортуны -->
               <div class="wheel-wrapper">
                 <div class="wheel-arrow"></div>
                 <div class="wheel-disc-box" id="wheelDiscElement" style="${currentWheelRotation ? 'transform: rotate(' + currentWheelRotation + 'deg);' : ''} ${isSpinningWheel ? 'transition: transform 3.5s cubic-bezier(0.12, 0.8, 0.2, 1);' : 'transition: none;'}">
-                  ${getWheelSvg(options)}
+                  ${getWheelSvg(wheelOptions)}
                 </div>
                 <div class="wheel-center-hub">🎯</div>
               </div>
@@ -3678,49 +4446,292 @@
                 <span style="font-size:18px;">🎡</span>
                 <span>${isSpinningWheel ? 'Колесо вращается...' : 'Крутить колесо выбора!'}</span>
               </button>
-            `}
 
-            <!-- Результат выпадения -->
-            ${(diceResult || wheelResult) ? `
-              <div class="game-winner-banner">
-                <div style="font-size:11px; font-weight:800; color:#4ADE80; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">
-                  Победитель раунда:
+              ${wheelResult ? `
+                <div class="game-winner-banner">
+                  <div style="font-size:11px; font-weight:800; color:#4ADE80; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">
+                    Победитель раунда:
+                  </div>
+                  <div style="font-size:20px; font-weight:900; color:#FFFFFF; margin-bottom:4px;">
+                    🎉 ${wheelResult}
+                  </div>
+                  <div style="font-size:11.5px; color:#A0A5B5;">
+                    Спор официально решён! Без обид ❤️
+                  </div>
                 </div>
-                <div style="font-size:20px; font-weight:900; color:#FFFFFF; margin-bottom:4px;">
-                  🎉 ${diceResult || wheelResult}
-                </div>
-                <div style="font-size:11.5px; color:#A0A5B5;">
-                  Спор официально решён! Без обид ❤️
-                </div>
-              </div>
-            ` : ''}
-          </div>
-        `;
-      } else if (currentTab === 'passport') {
-        container.innerHTML = `
-          <div class="card-head" style="margin-bottom:10px;">
-            <div>
-              <h3>Паспорт дома 📋</h3>
-              <p style="font-size:11px; color:#8E93A3;">1 тап копирует код или пароль</p>
+              ` : ''}
             </div>
-            <button style="background:linear-gradient(135deg, #00F2FE, #4FACFE); border:none; border-radius:12px; padding:6px 12px; color:#0B0E17; font-size:11.5px; font-weight:800; cursor:pointer;" onclick="openAddPassportModal()">
-              ＋ Добавить
+          `}
+        `;
+      } else if (currentTab === 'house') {
+        const installed = houseState.installedFurniture || [];
+
+        container.innerHTML = `
+          <!-- ХЕДЕР ДОМИКА: ИСКОРКИ, УРОВЕНЬ, ДЕНЬ/НОЧЬ -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:rgba(255,255,255,0.05); padding:10px 14px; border-radius:18px; border:1px solid rgba(255,255,255,0.12);">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:16px;">✨</span>
+              <span style="font-size:13px; font-weight:800; color:#F59E0B;">${houseState.sparks || 240}</span>
+              <span style="font-size:11px; color:#A0A5B5;">искорок</span>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:10px; font-weight:800; background:rgba(34,197,94,0.2); color:#4ADE80; padding:3px 8px; border-radius:8px;">
+                Lv. ${houseState.tier || 2}
+              </span>
+              <button onclick="toggleDayNight()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:4px 9px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">
+                ${houseState.dayNight === 'night' ? '🌙 Вечер' : '☀️ День'}
+              </button>
+            </div>
+          </div>
+
+          <!-- Переключатель видов внутри Домика -->
+          <div style="display:flex; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:3px; gap:4px; margin-bottom:12px;">
+            <button class="together-tab-btn ${selectedHouseMode === 'overview' ? 'active' : ''}" onclick="setHouseMode('overview')">
+              <span>🏠</span> Наш дом
+            </button>
+            <button class="together-tab-btn ${selectedHouseMode === 'shop' ? 'active' : ''}" onclick="setHouseMode('shop')">
+              <span>🛋️</span> Лавка уюта
+            </button>
+            <button class="together-tab-btn ${selectedHouseMode === 'upgrade' ? 'active' : ''}" onclick="setHouseMode('upgrade')">
+              <span>🏗️</span> Расширение
             </button>
           </div>
 
-          <!-- Поиск по паспорту дома -->
-          <div class="search-box">
-            <span class="search-icon-pos">🔍</span>
-            <input type="text" class="search-input" id="passportSearchInput" value="${passportSearchQuery}" placeholder="Поиск (код, фильтр, wi-fi, краска...)" oninput="handlePassportSearch(this.value)">
+          ${selectedHouseMode === 'overview' ? `
+            <!-- РЕЖИМ 1: ИЗОМЕТРИЧЕСКИЙ ДОМИК С ЖИВЫМИ СЛОЯМИ МЕБЕЛИ И КОРЖИКОМ -->
+            <div class="house-frame">
+              <img src="assets/diorama.jpg" alt="Домик мечты" class="house-diorama-img" onerror="this.onerror=null; this.src='icon.png';">
+              <div class="night-overlay ${houseState.dayNight === 'night' ? 'active' : ''}"></div>
+
+              <!-- ВИЗУАЛЬНЫЙ СЛОЙ МЕБЕЛИ 1: Плед на диване -->
+              ${installed.includes('plaid') ? `
+                <div class="item-appear" style="position:absolute; bottom:35%; left:44%; transform:translateX(-50%); pointer-events:none; z-index:10;">
+                  <div style="padding:3px 7px; border-radius:8px; background:linear-gradient(135deg, rgba(244,63,94,0.95), rgba(245,158,11,0.95)); color:#fff; font-size:9.5px; font-weight:800; border:1px solid #fff; box-shadow:0 4px 12px rgba(0,0,0,0.5);">
+                    🛋️ Плед
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- ВИЗУАЛЬНЫЙ СЛОЙ МЕБЕЛИ 2: Гирлянда на мансарде -->
+              ${installed.includes('garland') ? `
+                <div class="item-appear garland-glow" style="position:absolute; top:22%; right:18%; pointer-events:none; z-index:10;">
+                  <div style="padding:2px 7px; border-radius:12px; background:rgba(245,158,11,0.95); color:#0B0E17; font-size:9px; font-weight:900; border:1px solid #FDE68A;">
+                    ✨ Огоньки
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- ВИЗУАЛЬНЫЙ СЛОЙ МЕБЕЛИ 3: Лаванда в садике -->
+              ${installed.includes('lavender') ? `
+                <div class="item-appear" style="position:absolute; bottom:8%; right:25%; pointer-events:none; z-index:10;">
+                  <div style="padding:2px 6px; border-radius:8px; background:rgba(147,51,234,0.9); color:#fff; font-size:9px; font-weight:800; border:1px solid #D8B4FE;">
+                    🪴 Лаванда
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- ВИЗУАЛЬНЫЙ СЛОЙ МЕБЕЛИ 4: Кофемашина на кухне -->
+              ${installed.includes('coffee') ? `
+                <div class="item-appear" style="position:absolute; bottom:46%; left:16%; pointer-events:none; z-index:10;">
+                  <div style="padding:2px 6px; border-radius:6px; background:rgba(30,30,40,0.9); color:#FCD34D; font-size:9px; font-weight:800; border:1px solid rgba(253,211,77,0.4);">
+                    ☕ Кофе
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- ВИЗУАЛЬНЫЙ СЛОЙ 5: Свеча -->
+              ${installed.includes('candle') ? `
+                <div class="item-appear" style="position:absolute; bottom:32%; left:34%; pointer-events:none; z-index:10;">
+                  <div style="padding:2px 5px; border-radius:6px; background:rgba(245,158,11,0.9); color:#fff; font-size:9px; font-weight:800;">
+                    🕯️ Свеча
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- ВИЗУАЛЬНЫЙ СЛОЙ 6: Мисочка Коржика -->
+              ${installed.includes('bowl') ? `
+                <div class="item-appear" style="position:absolute; bottom:25%; left:64%; pointer-events:none; z-index:10;">
+                  <div style="padding:2px 6px; border-radius:6px; background:rgba(16,185,129,0.9); color:#fff; font-size:9px; font-weight:800;">
+                    🥣 Корм
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- КОРЖИК (ЖИВОЙ ПИТОМЕЦ В ДОМЕ) -->
+              <div style="position:absolute; bottom:28%; left:56%; pointer-events:none; z-index:15;">
+                <div style="padding:2px 7px; border-radius:12px; background:rgba(0,0,0,0.75); border:1.5px solid #F59E0B; color:#FCD34D; font-size:10px; font-weight:800; display:flex; align-items:center; gap:3px;">
+                  <span>🐶</span> Коржик
+                </div>
+              </div>
+
+              <!-- Интерактивные хотспоты комнат -->
+              <button class="hotspot-btn" style="bottom:38%; left:52%; background:#F59E0B; color:#0B0E17;" onclick="showRoomDetails('livingRoom')" title="Гостиная">🛋️</button>
+              <button class="hotspot-btn" style="top:28%; right:28%; background:#EC4899; color:#fff;" onclick="showRoomDetails('bedroom')" title="Мансарда">🛏️</button>
+              <button class="hotspot-btn" style="bottom:44%; left:22%; background:#F97316; color:#fff;" onclick="showRoomDetails('kitchen')" title="Кухня">🍳</button>
+              <button class="hotspot-btn" style="bottom:10%; right:30%; background:#10B981; color:#fff;" onclick="showRoomDetails('garden')" title="Сад">🌿</button>
+
+              <!-- Нижняя панель внутри диорамы -->
+              <div style="position:absolute; bottom:8px; left:8px; right:8px; background:rgba(11,14,23,0.85); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:16px;">🐾</span>
+                  <span style="font-size:11px; color:#FCD34D; font-weight:700;">
+                    ${houseState.corgiMood === 'happy' ? 'Коржик виляет хвостиком 🥰' : 'Коржик сладко спит у камина 💤'}
+                  </span>
+                </div>
+                <button onclick="petCorgi()" style="background:rgba(245,158,11,0.25); border:1px solid #F59E0B; color:#FCD34D; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:10px; cursor:pointer;">
+                  ❤️ Почесать пузико
+                </button>
+              </div>
+            </div>
+
+            <!-- Недельный лимит мебели -->
+            <div class="glass-card" style="padding:12px; margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="font-size:12px; font-weight:800; color:#fff;">
+                  Мебель этой недели: <span style="color:#F59E0B;">${houseState.weeklyPurchases || 0} / 2</span>
+                </div>
+                <div style="font-size:10px; color:#8E93A3; margin-top:2px;">
+                  Лимит бережёт баланс. Сброс каждое воскресенье!
+                </div>
+              </div>
+              <button class="btn-primary-action" style="font-size:11px; padding:6px 12px;" onclick="setHouseMode('shop')">
+                + Лавка уюта
+              </button>
+            </div>
+          ` : selectedHouseMode === 'shop' ? `
+            <!-- РЕЖИМ 2: ЛАВКА УЮТА (КАТАЛОГ МЕБЕЛИ) -->
+            <div class="card-head" style="margin-bottom:10px;">
+              <div>
+                <h3>Лавка уюта 🛋️</h3>
+                <p style="font-size:11px; color:#8E93A3;">Купленный предмет сразу отображается в комнате!</p>
+              </div>
+              <span style="font-size:12px; font-weight:800; color:#F59E0B;">
+                ✨ ${houseState.sparks || 240}
+              </span>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              ${houseFurnitureCatalog.map(item => {
+                const isInstalled = (houseState.installedFurniture || []).includes(item.id);
+                return `
+                  <div class="glass-card" style="padding:12px; margin:0; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; font-size:20px;">
+                        ${item.icon}
+                      </div>
+                      <div>
+                        <div style="font-size:13px; font-weight:800; color:#fff;">${item.name}</div>
+                        <div style="font-size:10.5px; color:#8E93A3;">${item.room}</div>
+                        <div style="font-size:11px; font-weight:800; color:#F59E0B; margin-top:2px;">${item.price} ✨</div>
+                      </div>
+                    </div>
+
+                    ${isInstalled ? `
+                      <span style="font-size:11px; font-weight:800; color:#4ADE80; background:rgba(34,197,94,0.15); padding:5px 10px; border-radius:10px;">
+                        В доме ✓
+                      </span>
+                    ` : `
+                      <button class="btn-primary-action" style="font-size:11px; padding:6px 12px;" onclick="buyFurniture('${item.id}', ${item.price})">
+                        Купить
+                      </button>
+                    `}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          ` : `
+            <!-- РЕЖИМ 3: РАСШИРЕНИЕ ДОМА (УРОВНИ) -->
+            <div class="card-head" style="margin-bottom:10px;">
+              <div>
+                <h3>Расширение дома 🏗️</h3>
+                <p style="font-size:11px; color:#8E93A3;">С ростом уровня открываются новые комнаты и виды</p>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div class="glass-card" style="padding:14px; margin:0; border-color:${houseState.tier >= 1 ? '#22C55E' : 'rgba(255,255,255,0.12)'};">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <div style="font-size:13.5px; font-weight:800; color:#fff;">Lv. 1: Уютная студия с камином</div>
+                    <div style="font-size:11px; color:#8E93A3;">Базовая планировка: камин, диван и коврик для Коржика</div>
+                  </div>
+                  <span style="font-size:11px; font-weight:800; color:#4ADE80;">Построено ✓</span>
+                </div>
+              </div>
+
+              <div class="glass-card" style="padding:14px; margin:0; border-color:${houseState.tier >= 2 ? '#22C55E' : 'rgba(255,255,255,0.12)'};">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <div style="font-size:13.5px; font-weight:800; color:#fff;">Lv. 2: Мансарда с балкончиком</div>
+                    <div style="font-size:11px; color:#8E93A3;">Спальня под покатой крышей, окна в сад и огоньки</div>
+                  </div>
+                  <span style="font-size:11px; font-weight:800; color:#4ADE80;">Открыто ✓</span>
+                </div>
+              </div>
+
+              <div class="glass-card" style="padding:14px; margin:0; border-color:${houseState.tier >= 3 ? '#22C55E' : 'rgba(255,255,255,0.12)'};">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <div style="font-size:13.5px; font-weight:800; color:#fff;">Lv. 3: Загородная вилла с оранжереей</div>
+                    <div style="font-size:11px; color:#8E93A3;">Терраса, сад с цветами, лаванда и веранда для чая</div>
+                  </div>
+                  ${houseState.tier >= 3 ? `
+                    <span style="font-size:11px; font-weight:800; color:#4ADE80;">Открыто ✓</span>
+                  ` : `
+                    <button class="btn-primary-action" style="font-size:11px; padding:6px 12px;" onclick="upgradeHouseTier()">
+                      300 ✨ Открыть
+                    </button>
+                  `}
+                </div>
+              </div>
+            </div>
+          `}
+        `;
+      } else if (currentTab === 'notes') {
+        container.innerHTML = `
+          <div class="card-head" style="margin-bottom:10px;">
+            <div>
+              <h3>Заметки дома 📝</h3>
+              <p style="font-size:11px; color:#8E93A3;">Аптечка, пароли, даты и быстрое копирование в 1 тап</p>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); border-radius:12px; padding:6px 10px; color:#FFFFFF; font-size:11px; font-weight:800; cursor:pointer;" onclick="openAddCategoryModal()">
+                ＋ Папка
+              </button>
+              <button style="background:linear-gradient(135deg, #00F2FE, #4FACFE); border:none; border-radius:12px; padding:6px 12px; color:#0B0E17; font-size:11px; font-weight:800; cursor:pointer;" onclick="openAddNoteModal()">
+                ＋ Заметка
+              </button>
+            </div>
           </div>
 
-          <!-- Контейнер карточек паспорта -->
-          <div id="passportListContainer"></div>
+          <!-- Поиск по заметкам -->
+          <div class="search-box">
+            <span class="search-icon-pos">🔍</span>
+            <input type="text" class="search-input" id="notesSearchInput" value="${notesSearchQuery}" placeholder="Поиск (лекарство, wi-fi, код, дата...)" oninput="handleNotesSearch(this.value)">
+          </div>
+
+          <!-- Горизонтальные чипы категорий / папок -->
+          <div class="preset-chips-row">
+            <div class="preset-chip ${selectedNotesCategory === 'all' ? 'active' : ''}" onclick="selectNotesCategory('all')">
+              Все заметки
+            </div>
+            ${notesCategories.map(cat => `
+              <div class="preset-chip ${selectedNotesCategory === cat.id ? 'active' : ''}" onclick="selectNotesCategory('${cat.id}')">
+                ${cat.icon} ${cat.name}
+              </div>
+            `).join('')}
+            <div class="preset-chip" style="background:rgba(0,242,254,0.12); border:1px dashed #00F2FE; color:#00F2FE; font-weight:800;" onclick="openAddCategoryModal()">
+              ＋ Новая группа
+            </div>
+          </div>
+
+          <!-- Контейнер карточек заметок -->
+          <div id="notesListContainer"></div>
         `;
-        renderPassportList();
+        renderNotesList();
       }
     }
-
     loadLocalState();
 
     // Считываем актуальные данные партнера, сохраненные нативным виджетом Android
