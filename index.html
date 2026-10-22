@@ -1155,6 +1155,347 @@
       font-size: 24px;
       z-index: 60;
     }
+    /* DIORAMA STAGE & ISOMETRIC 2.5D HOUSE (v1.2.2) */
+    .diorama-stage {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 1.5px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.65), 0 0 35px rgba(255,142,83,0.12);
+      background: radial-gradient(circle at 50% 40%, #1E2640 0%, #0F1322 85%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.8s ease;
+    }
+    .diorama-stage.night {
+      background: radial-gradient(circle at 50% 40%, #121829 0%, #060911 90%);
+    }
+    .night-stars {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+      background-image: 
+        radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 120px 80px, #ffdfa9, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 240px 40px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 320px 100px, #ffd1f8, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 70px 160px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 280px 180px, #ffdfa9, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 320px 220px;
+    }
+    .diorama-stage.night .night-stars {
+      opacity: 0.85;
+    }
+
+    .house-isometric {
+      position: relative;
+      width: 330px;
+      height: 340px;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .room-box {
+      position: absolute;
+      border-radius: 18px;
+      backdrop-filter: blur(8px);
+      transition: all 0.4s ease;
+      cursor: pointer;
+    }
+    .ground-room {
+      bottom: 25px;
+      left: 25px;
+      width: 280px;
+      height: 165px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.25);
+      transform: rotateX(15deg) rotateY(-5deg);
+    }
+    .ground-room::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(0deg, rgba(230,180,140,0.18) 0%, transparent 100%);
+      border-radius: 0 0 16px 16px;
+    }
+    .ground-room-wall {
+      position: absolute;
+      top: 10px;
+      left: 14px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+    }
+    .attic-room {
+      top: 25px;
+      left: 50px;
+      width: 230px;
+      height: 135px;
+      background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1.5px solid rgba(255,255,255,0.16);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+      clip-path: polygon(50% 0%, 100% 30%, 100% 100%, 0% 100%, 0% 30%);
+      opacity: 0;
+      transform: translateY(-20px) scale(0.9);
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .tier-2 .attic-room, .tier-3 .attic-room {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .patio-zone {
+      bottom: 12px;
+      left: 5px;
+      width: 320px;
+      height: 60px;
+      background: linear-gradient(90deg, rgba(16,185,129,0.15) 0%, rgba(139,92,246,0.12) 100%);
+      border: 1px dashed rgba(52,211,153,0.4);
+      border-radius: 20px;
+      opacity: 0;
+      transform: scale(0.95);
+      pointer-events: none;
+      transition: all 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 16px;
+      cursor: pointer;
+    }
+    .tier-3 .patio-zone {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    /* Furniture Layer Elements */
+    .furniture-item {
+      position: absolute;
+      opacity: 0;
+      transform: scale(0.4) translateY(15px);
+      transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    .furniture-item.installed {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .furniture-item:hover {
+      filter: brightness(1.2);
+    }
+    .item-fireplace {
+      bottom: 20px;
+      left: 18px;
+      width: 48px;
+      height: 52px;
+      background: linear-gradient(135deg, #4A3B32, #2B1E1A);
+      border-radius: 8px 8px 4px 4px;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 6px;
+      z-index: 5;
+    }
+    .fire-glow {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #FFA500 0%, #FF4500 70%, transparent 100%);
+      animation: flicker 1.8s infinite alternate ease-in-out;
+      box-shadow: 0 0 18px #FF6B00, 0 0 30px rgba(255,100,0,0.4);
+    }
+    @keyframes flicker {
+      0% { transform: scale(0.85); opacity: 0.8; }
+      100% { transform: scale(1.15); opacity: 1; }
+    }
+    .item-sofa {
+      bottom: 26px;
+      left: 78px;
+      width: 82px;
+      height: 44px;
+      background: linear-gradient(135deg, #3A4766, #242D42);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      z-index: 6;
+    }
+    .plaid-decor {
+      position: absolute;
+      top: 4px;
+      right: 8px;
+      font-size: 15px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .item-sofa.has-plaid .plaid-decor {
+      opacity: 1;
+    }
+    .item-rug {
+      bottom: 12px;
+      left: 140px;
+      width: 74px;
+      height: 38px;
+      background: radial-gradient(ellipse at center, rgba(255,200,150,0.25) 0%, rgba(255,140,80,0.12) 70%, transparent 100%);
+      border: 1.5px dashed rgba(255,180,120,0.4);
+      border-radius: 50%;
+      transform: rotateX(45deg);
+      z-index: 4;
+    }
+    .item-lamp {
+      bottom: 45px;
+      left: 165px;
+      width: 24px;
+      height: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 7;
+    }
+    .lamp-shade {
+      width: 22px;
+      height: 16px;
+      background: #FFE8A3;
+      border-radius: 6px 6px 2px 2px;
+      box-shadow: 0 0 14px rgba(255,232,163,0.6);
+      transition: all 0.3s;
+    }
+    .diorama-stage.night .lamp-shade {
+      box-shadow: 0 0 25px #FFD54F, 0 0 50px rgba(255,213,79,0.5);
+    }
+    .lamp-pole {
+      width: 3px;
+      height: 44px;
+      background: rgba(255,255,255,0.4);
+    }
+    .item-kitchen {
+      bottom: 30px;
+      right: 18px;
+      width: 58px;
+      height: 55px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 5;
+    }
+    .item-corgi-spot {
+      bottom: 14px;
+      left: 100px;
+      width: 52px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .item-corgi-spot:active {
+      transform: scale(1.2);
+    }
+    .corgi-avatar-svg {
+      width: 42px;
+      height: 42px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+      animation: gentle-breathe 2.8s infinite ease-in-out;
+      font-size: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @keyframes gentle-breathe {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-2px) scale(1.03); }
+    }
+    .item-bed {
+      top: 55px;
+      left: 75px;
+      width: 76px;
+      height: 52px;
+      background: linear-gradient(135deg, #7C3AED, #4C1D95);
+      border: 1.5px solid rgba(255,255,255,0.22);
+      border-radius: 10px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      z-index: 6;
+    }
+    .item-garland {
+      top: 36px;
+      left: 80px;
+      right: 80px;
+      height: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 11px;
+      opacity: 0;
+      transition: opacity 0.4s;
+      z-index: 8;
+    }
+    .item-garland.installed {
+      opacity: 1;
+    }
+    .garland-bulb {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #FBBF24;
+      box-shadow: 0 0 8px #FBBF24;
+      animation: twinkle 1.5s infinite alternate;
+    }
+    .garland-bulb:nth-child(2) { background: #EC4899; box-shadow: 0 0 8px #EC4899; animation-delay: 0.3s; }
+    .garland-bulb:nth-child(3) { background: #38BDF8; box-shadow: 0 0 8px #38BDF8; animation-delay: 0.6s; }
+    .garland-bulb:nth-child(4) { background: #A7F3D0; box-shadow: 0 0 8px #A7F3D0; animation-delay: 0.9s; }
+    @keyframes twinkle {
+      0% { opacity: 0.4; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); }
+    }
+    .patio-item {
+      font-size: 20px;
+      transition: transform 0.2s;
+    }
+    .patio-item:hover {
+      transform: scale(1.15);
+    }
+    .heart-float {
+      position: absolute;
+      font-size: 18px;
+      pointer-events: none;
+      animation: float-up 1.2s forwards ease-out;
+      z-index: 99;
+    }
+    @keyframes float-up {
+      0% { opacity: 1; transform: translateY(0) scale(0.7); }
+      100% { opacity: 0; transform: translateY(-40px) scale(1.3); }
+    }
+
     .house-frame {
       position: relative;
       width: 100%;
@@ -2354,7 +2695,7 @@
     let currentContributingGoalId = null;
 
     let houseState = {
-      sparks: 0,
+      sparks: 5000,
       tier: 1,
       installedFurniture: [],
       dayNight: 'day',
@@ -2836,17 +3177,11 @@
           avatarType = { husband: 'pixar', wife: 'pixar' };
         }
 
-        // Принудительный сброс прогресса домика по запросу пользователя для версии 1.2.1
-        if (localStorage.getItem('cozy_house_reset_v121') !== 'true') {
-          houseState = {
-            sparks: 0,
-            tier: 1,
-            installedFurniture: [],
-            dayNight: 'day',
-            weeklyPurchases: 0,
-            corgiMood: 'sleeping'
-          };
-          localStorage.setItem('cozy_house_reset_v121', 'true');
+        // Начисление искорок и снятие лимитов для версии 1.2.2 (Тест динамического домика)
+        if (localStorage.getItem('cozy_house_v122_unlimited_sparks') !== 'true') {
+          houseState.sparks = Math.max(houseState.sparks || 0, 5000);
+          houseState.weeklyPurchases = 0;
+          localStorage.setItem('cozy_house_v122_unlimited_sparks', 'true');
           saveLocalState();
         }
       } catch (e) {}
@@ -3564,7 +3899,7 @@
       showToast(houseState.dayNight === 'night' ? '🌙 Зажгли уютные вечерние огни!' : '☀️ Наступило тёплое утро!');
     }
 
-    function petCorgi() {
+    function petCorgi(e) {
       if (window.AndroidBridge && window.AndroidBridge.vibrate) {
         window.AndroidBridge.vibrate(60);
       } else if (navigator.vibrate) {
@@ -3574,28 +3909,38 @@
       addSparks(2, 'Ласка для Коржика');
       showToast('Коржик прижал ушки, виляет хвостиком и шлёт любовь! 🥰🐾');
 
-      const frame = document.querySelector('.house-frame');
-      if (frame) {
+      const stage = document.getElementById('dioramaStage') || document.querySelector('.house-frame');
+      if (stage) {
         for (let i = 0; i < 5; i++) {
           const heart = document.createElement('div');
-          heart.className = 'pet-heart-particle';
+          heart.className = 'heart-float';
           heart.innerText = ['❤️', '💖', '✨', '🐾', '🥰'][i % 5];
-          heart.style.left = (54 + (Math.random() * 12 - 6)) + '%';
-          heart.style.top = (70 + (Math.random() * 10 - 5)) + '%';
-          heart.style.animationDelay = (i * 0.15) + 's';
-          frame.appendChild(heart);
-          setTimeout(() => heart.remove(), 1400);
+          const rect = stage.getBoundingClientRect();
+          const clientX = e && e.clientX ? e.clientX - rect.left : 160;
+          const clientY = e && e.clientY ? e.clientY - rect.top : 260;
+          heart.style.left = (clientX + (Math.random() * 30 - 15)) + 'px';
+          heart.style.top = (clientY + (Math.random() * 20 - 10)) + 'px';
+          heart.style.animationDelay = (i * 0.12) + 's';
+          stage.appendChild(heart);
+          setTimeout(() => heart.remove(), 1300);
         }
       }
     }
 
     const houseFurnitureCatalog = [
-      { id: 'plaid', name: 'Вязаный тёплый плед', room: 'Гостиная на диване', price: 60, icon: '🛋️' },
-      { id: 'garland', name: 'Гирлянда тёплых огоньков', room: 'Мансарда на окнах', price: 80, icon: '✨' },
-      { id: 'lavender', name: 'Лаванда в горшочке', room: 'Сад и терраса', price: 50, icon: '🪴' },
-      { id: 'coffee', name: 'Кофемашина для двоих', room: 'Кухня на стойке', price: 90, icon: '☕' },
-      { id: 'candle', name: 'Ароматическая свеча', room: 'Журнальный столик', price: 40, icon: '🕯️' },
-      { id: 'bowl', name: 'Мисочка Коржика', room: 'У камина в гостиной', price: 45, icon: '🥣' }
+      { id: 'fireplace', name: 'Дровяной камин', room: 'Гостиная (левая стена)', price: 70, icon: '🔥', tier: 1 },
+      { id: 'sofa', name: 'Мягкий диван для двоих', room: 'Гостиная (центр)', price: 90, icon: '🛋️', tier: 1 },
+      { id: 'plaid', name: 'Вязаный тёплый плед', room: 'Гостиная (на диване)', price: 40, icon: '🧶', tier: 1 },
+      { id: 'rug', name: 'Уютный пушистый коврик', room: 'Гостиная (у камина)', price: 50, icon: '🟤', tier: 1 },
+      { id: 'lamp', name: 'Тёплый вечерний торшер', room: 'Гостиная (в углу)', price: 55, icon: '💡', tier: 1 },
+      { id: 'coffee', name: 'Кофемашина для двоих', room: 'Кухня (на стойке)', price: 65, icon: '☕', tier: 1 },
+      { id: 'candle', name: 'Ароматическая свеча', room: 'Журнальный столик', price: 35, icon: '🕯️', tier: 1 },
+      { id: 'bowl', name: 'Мисочка Коржика', room: 'Гостиная у камина', price: 30, icon: '🥣', tier: 1 },
+      { id: 'bed', name: 'Большая кровать под крышей', room: 'Мансарда (Lv. 2)', price: 110, icon: '🛏️', tier: 2 },
+      { id: 'garland', name: 'Гирлянда тёплых огоньков', room: 'Мансарда (Lv. 2)', price: 75, icon: '✨', tier: 2 },
+      { id: 'lavender', name: 'Лаванда в горшочках', room: 'Сад и терраса (Lv. 3)', price: 80, icon: '🪴', tier: 3 },
+      { id: 'garden_tea', name: 'Плетёный чайный столик', room: 'Сад и терраса (Lv. 3)', price: 95, icon: '🪑', tier: 3 },
+      { id: 'garden_light', name: 'Садовый фонарик', room: 'Сад и терраса (Lv. 3)', price: 45, icon: '🏮', tier: 3 }
     ];
 
     function buyFurniture(itemId, price) {
@@ -3604,12 +3949,20 @@
         showToast('Этот предмет уже обустроен в доме!');
         return;
       }
-      if (houseState.weeklyPurchases >= 2) {
-        showToast('Лимит недели исчерпан (2/2). Сброс в воскресенье!');
+
+      const item = houseFurnitureCatalog.find(x => x.id === itemId);
+      if (item && item.tier && (houseState.tier || 1) < item.tier) {
+        showToast('Этот предмет доступен на Уровне ' + item.tier + ' дома! Сначала расширьте дом.');
         return;
       }
+
+      if (itemId === 'plaid' && !houseState.installedFurniture.includes('sofa')) {
+        showToast('Сначала обустройте диван, чтобы постелить на него плед!');
+        return;
+      }
+
       if (houseState.sparks < price) {
-        showToast('Недостаточно искорок! Выполняйте совместные действия ✨');
+        showToast('Недостаточно искорок! Нажмите «+1 000 ✨» вверху для пополнения.');
         return;
       }
 
@@ -3620,7 +3973,7 @@
       saveLocalState();
       broadcastSync('HOUSE_UPDATE', { houseState });
       render();
-      showToast('Предмет куплен и появился в комнате! 🏡');
+      showToast('«' + (item ? item.name : 'Предмет') + '» куплен и появился в комнате! 🏡✨');
     }
 
     function upgradeHouseTier() {
@@ -4657,19 +5010,23 @@
         `;
       } else if (currentTab === 'house') {
         const installed = houseState.installedFurniture || [];
+        const currentTier = houseState.tier || 1;
 
         container.innerHTML = `
           <!-- ХЕДЕР ДОМИКА: ИСКОРКИ, УРОВЕНЬ, ДЕНЬ/НОЧЬ -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:rgba(255,255,255,0.05); padding:10px 14px; border-radius:18px; border:1px solid rgba(255,255,255,0.12);">
             <div style="display:flex; align-items:center; gap:6px;">
               <span style="font-size:16px;">✨</span>
-              <span style="font-size:13px; font-weight:800; color:#F59E0B;">${houseState.sparks ?? 0}</span>
+              <span style="font-size:14px; font-weight:800; color:#F59E0B;">${houseState.sparks ?? 0}</span>
               <span style="font-size:11px; color:#A0A5B5;">искорок</span>
+              <button onclick="addSparks(1000, 'Бонус к тесту'); render();" style="background:rgba(245,158,11,0.2); border:1px solid #F59E0B; border-radius:8px; padding:2px 7px; color:#FCD34D; font-size:10px; font-weight:800; cursor:pointer; margin-left:4px;" title="Добавить 1 000 искорок для теста">
+                +1 000 ✨
+              </button>
             </div>
 
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:10px; font-weight:800; background:rgba(34,197,94,0.2); color:#4ADE80; padding:3px 8px; border-radius:8px;">
-                Lv. ${houseState.tier || 1}
+                Lv. ${currentTier} (${houseTierNames[currentTier] || 'Студия'})
               </span>
               <button onclick="toggleDayNight()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); border-radius:10px; padding:4px 9px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">
                 ${houseState.dayNight === 'night' ? '🌙 Вечер' : '☀️ День'}
@@ -4683,108 +5040,124 @@
               <span>🏠</span> Наш дом
             </button>
             <button class="together-tab-btn ${selectedHouseMode === 'shop' ? 'active' : ''}" onclick="setHouseMode('shop')">
-              <span>🛋️</span> Лавка уюта
+              <span>🛋️</span> Лавка уюта (${installed.length}/${houseFurnitureCatalog.length})
             </button>
             <button class="together-tab-btn ${selectedHouseMode === 'upgrade' ? 'active' : ''}" onclick="setHouseMode('upgrade')">
-              <span>🏗️</span> Расширение
+              <span>🏗️</span> Расширение (Lv. ${currentTier})
             </button>
           </div>
 
           ${selectedHouseMode === 'overview' ? `
-            <!-- РЕЖИМ 1: ИЗОМЕТРИЧЕСКИЙ ДОМИК С ЖИВЫМИ СЛОЯМИ МЕБЕЛИ И КОРЖИКОМ -->
-            <div class="house-frame">
-              <img src="assets/diorama.jpg" alt="Домик мечты" class="house-diorama-img" onerror="this.onerror=null; this.src='icon.png';">
-              <div class="night-overlay ${houseState.dayNight === 'night' ? 'active' : ''}"></div>
+            <!-- РЕЖИМ 1: ДИНАМИЧЕСКИЙ 2.5D ИЗОМЕТРИЧЕСКИЙ ДОМИК -->
+            <div class="diorama-stage ${houseState.dayNight === 'night' ? 'night' : ''}" id="dioramaStage">
+              <div class="night-stars"></div>
 
-              <!-- ВИЗУАЛЬНЫЙ СЛОЙ МЕБЕЛИ 1: Плед на диване -->
-              ${installed.includes('plaid') ? `
-                <div class="item-appear" style="position:absolute; bottom:35%; left:44%; transform:translateX(-50%); pointer-events:none; z-index:10;">
-                  <div style="padding:3px 7px; border-radius:8px; background:linear-gradient(135deg, rgba(244,63,94,0.95), rgba(245,158,11,0.95)); color:#fff; font-size:9.5px; font-weight:800; border:1px solid #fff; box-shadow:0 4px 12px rgba(0,0,0,0.5);">
-                    🛋️ Плед
+              <div class="house-isometric tier-${currentTier}" id="houseIsometric">
+                
+                <!-- ATTIC / 2nd FLOOR (Level 2+) -->
+                <div class="room-box attic-room" id="atticRoom" onclick="showRoomDetails('bedroom')" title="Мансарда (нажмите для деталей)">
+                  <div style="position:absolute; top:36px; left:16px; font-size:9.5px; font-weight:800; color:rgba(255,255,255,0.4); text-transform:uppercase;">
+                    Спальня под крышей 🛏️
+                  </div>
+                  
+                  <!-- Garland lights on attic beam -->
+                  <div class="item-garland ${installed.includes('garland') ? 'installed' : ''}" id="itemGarland">
+                    <div class="garland-bulb"></div>
+                    <div class="garland-bulb"></div>
+                    <div class="garland-bulb"></div>
+                    <div class="garland-bulb"></div>
+                    <div class="garland-bulb"></div>
+                  </div>
+
+                  <!-- Bed -->
+                  <div class="furniture-item item-bed ${installed.includes('bed') ? 'installed' : ''}" id="itemBed" title="Кровать с мягким пледом">
+                    🛏️
                   </div>
                 </div>
-              ` : ''}
 
-              <!-- ВИЗУАЛЬНЫЙ СЛОЙ МЕБЕЛИ 2: Гирлянда на мансарде -->
-              ${installed.includes('garland') ? `
-                <div class="item-appear garland-glow" style="position:absolute; top:22%; right:18%; pointer-events:none; z-index:10;">
-                  <div style="padding:2px 7px; border-radius:12px; background:rgba(245,158,11,0.95); color:#0B0E17; font-size:9px; font-weight:900; border:1px solid #FDE68A;">
-                    ✨ Огоньки
+                <!-- GROUND FLOOR (Level 1+) -->
+                <div class="room-box ground-room" onclick="showRoomDetails('livingRoom')" title="Гостиная (нажмите для деталей)">
+                  <div class="ground-room-wall">Гостиная с камином</div>
+
+                  <!-- 1. Fireplace -->
+                  <div class="furniture-item item-fireplace ${installed.includes('fireplace') ? 'installed' : ''}" id="itemFireplace" title="Дровяной камин">
+                    <div class="fire-glow"></div>
+                    <div style="font-size:14px; margin-top:4px;">🪵</div>
                   </div>
-                </div>
-              ` : ''}
 
-              <!-- ВИЗУАЛЬНЫЙ СЛОЙ МЕБЕЛИ 3: Лаванда в садике -->
-              ${installed.includes('lavender') ? `
-                <div class="item-appear" style="position:absolute; bottom:8%; right:25%; pointer-events:none; z-index:10;">
-                  <div style="padding:2px 6px; border-radius:8px; background:rgba(147,51,234,0.9); color:#fff; font-size:9px; font-weight:800; border:1px solid #D8B4FE;">
-                    🪴 Лаванда
+                  <!-- 2. Sofa -->
+                  <div class="furniture-item item-sofa ${installed.includes('sofa') ? 'installed' : ''} ${installed.includes('plaid') ? 'has-plaid' : ''}" id="itemSofa" title="Диван для двоих">
+                    🛋️
+                    <span class="plaid-decor" id="plaidDecor">🧶</span>
                   </div>
-                </div>
-              ` : ''}
 
-              <!-- ВИЗУАЛЬНЫЙ СЛОЙ МЕБЕЛИ 4: Кофемашина на кухне -->
-              ${installed.includes('coffee') ? `
-                <div class="item-appear" style="position:absolute; bottom:46%; left:16%; pointer-events:none; z-index:10;">
-                  <div style="padding:2px 6px; border-radius:6px; background:rgba(30,30,40,0.9); color:#FCD34D; font-size:9px; font-weight:800; border:1px solid rgba(253,211,77,0.4);">
-                    ☕ Кофе
+                  <!-- 3. Soft Rug -->
+                  <div class="furniture-item item-rug ${installed.includes('rug') ? 'installed' : ''}" id="itemRug" title="Коврик"></div>
+
+                  <!-- 4. Living Corgi Pet on rug -->
+                  <div class="furniture-item item-corgi-spot installed" id="corgiSpot" onclick="event.stopPropagation(); petCorgi(event)" title="Погладить Коржика!">
+                    <div class="corgi-avatar-svg" id="corgiSvg">
+                      🐶
+                    </div>
                   </div>
-                </div>
-              ` : ''}
 
-              <!-- ВИЗУАЛЬНЫЙ СЛОЙ 5: Свеча -->
-              ${installed.includes('candle') ? `
-                <div class="item-appear" style="position:absolute; bottom:32%; left:34%; pointer-events:none; z-index:10;">
-                  <div style="padding:2px 5px; border-radius:6px; background:rgba(245,158,11,0.9); color:#fff; font-size:9px; font-weight:800;">
-                    🕯️ Свеча
+                  <!-- 5. Floor Lamp -->
+                  <div class="furniture-item item-lamp ${installed.includes('lamp') ? 'installed' : ''}" id="itemLamp" title="Тёплый торшер">
+                    <div class="lamp-shade"></div>
+                    <div class="lamp-pole"></div>
                   </div>
-                </div>
-              ` : ''}
 
-              <!-- ВИЗУАЛЬНЫЙ СЛОЙ 6: Мисочка Коржика -->
-              ${installed.includes('bowl') ? `
-                <div class="item-appear" style="position:absolute; bottom:25%; left:64%; pointer-events:none; z-index:10;">
-                  <div style="padding:2px 6px; border-radius:6px; background:rgba(16,185,129,0.9); color:#fff; font-size:9px; font-weight:800;">
-                    🥣 Корм
+                  <!-- 6. Kitchenette Coffee Corner -->
+                  <div class="furniture-item item-kitchen ${installed.includes('coffee') ? 'installed' : ''}" id="itemKitchen" title="Кофемашина" onclick="event.stopPropagation(); showRoomDetails('kitchen')">
+                    ☕
                   </div>
-                </div>
-              ` : ''}
 
-              <!-- КОРЖИК (ЖИВОЙ ПИТОМЕЦ В ДОМЕ) -->
-              <div style="position:absolute; bottom:28%; left:56%; pointer-events:none; z-index:15;">
-                <div style="padding:2px 7px; border-radius:12px; background:rgba(0,0,0,0.75); border:1.5px solid #F59E0B; color:#FCD34D; font-size:10px; font-weight:800; display:flex; align-items:center; gap:3px;">
-                  <span>🐶</span> Коржик
+                  <!-- 7. Candle -->
+                  ${installed.includes('candle') ? `
+                    <div class="furniture-item item-appear installed" style="bottom:36px; left:135px; font-size:18px; z-index:12;" title="Ароматическая свеча">
+                      🕯️
+                    </div>
+                  ` : ''}
+
+                  <!-- 8. Bowl -->
+                  ${installed.includes('bowl') ? `
+                    <div class="furniture-item item-appear installed" style="bottom:18px; left:68px; font-size:16px; z-index:12;" title="Мисочка Коржика">
+                      🥣
+                    </div>
+                  ` : ''}
                 </div>
+
+                <!-- PATIO / GARDEN (Level 3) -->
+                <div class="patio-zone" id="patioZone" onclick="showRoomDetails('garden')" title="Сад и терраса (нажмите для деталей)">
+                  <span class="patio-item furniture-item ${installed.includes('lavender') ? 'installed' : ''}" id="itemGardenFlowers">🪴 Лаванда</span>
+                  <span class="patio-item furniture-item ${installed.includes('garden_tea') ? 'installed' : ''}" id="itemGardenTea">🪑 Чайный столик</span>
+                  <span class="patio-item furniture-item ${installed.includes('garden_light') ? 'installed' : ''}" id="itemGardenLight">🏮 Фонарик</span>
+                </div>
+
               </div>
 
-              <!-- Интерактивные хотспоты комнат -->
-              <button class="hotspot-btn" style="bottom:38%; left:52%; background:#F59E0B; color:#0B0E17;" onclick="showRoomDetails('livingRoom')" title="Гостиная">🛋️</button>
-              <button class="hotspot-btn" style="top:28%; right:28%; background:#EC4899; color:#fff;" onclick="showRoomDetails('bedroom')" title="Мансарда">🛏️</button>
-              <button class="hotspot-btn" style="bottom:44%; left:22%; background:#F97316; color:#fff;" onclick="showRoomDetails('kitchen')" title="Кухня">🍳</button>
-              <button class="hotspot-btn" style="bottom:10%; right:30%; background:#10B981; color:#fff;" onclick="showRoomDetails('garden')" title="Сад">🌿</button>
-
               <!-- Нижняя панель внутри диорамы -->
-              <div style="position:absolute; bottom:8px; left:8px; right:8px; background:rgba(11,14,23,0.85); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+              <div style="position:absolute; bottom:8px; left:8px; right:8px; background:rgba(11,14,23,0.85); backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.12); border-radius:16px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; z-index:25;">
                 <div style="display:flex; align-items:center; gap:6px;">
                   <span style="font-size:16px;">🐾</span>
                   <span style="font-size:11px; color:#FCD34D; font-weight:700;">
-                    ${houseState.corgiMood === 'happy' ? 'Коржик виляет хвостиком 🥰' : 'Коржик сладко спит у камина 💤'}
+                    ${houseState.corgiMood === 'happy' ? 'Коржик виляет хвостиком 🥰' : 'Коржик сладко спит на коврике 💤'}
                   </span>
                 </div>
-                <button onclick="petCorgi()" style="background:rgba(245,158,11,0.25); border:1px solid #F59E0B; color:#FCD34D; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:10px; cursor:pointer;">
+                <button onclick="petCorgi(event)" style="background:rgba(245,158,11,0.25); border:1px solid #F59E0B; color:#FCD34D; font-size:10.5px; font-weight:800; padding:4px 10px; border-radius:10px; cursor:pointer;">
                   ❤️ Почесать пузико
                 </button>
               </div>
             </div>
 
-            <!-- Недельный лимит мебели -->
+            <!-- Подсказка обустройства -->
             <div class="glass-card" style="padding:12px; margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
               <div>
                 <div style="font-size:12px; font-weight:800; color:#fff;">
-                  Мебель этой недели: <span style="color:#F59E0B;">${houseState.weeklyPurchases || 0} / 2</span>
+                  Обустроено предметов: <span style="color:#F59E0B;">${installed.length} из ${houseFurnitureCatalog.length}</span>
                 </div>
-                <div style="font-size:10px; color:#8E93A3; margin-top:2px;">
-                  Лимит бережёт баланс. Сброс каждое воскресенье!
+                <div style="font-size:10px; color:#4ADE80; margin-top:2px;">
+                  ✨ Безлимитное обустройство включено (лимиты сняты)!
                 </div>
               </div>
               <button class="btn-primary-action" style="font-size:11px; padding:6px 12px;" onclick="setHouseMode('shop')">
@@ -4802,38 +5175,49 @@
             <div class="card-head" style="margin-bottom:10px;">
               <div>
                 <h3>Лавка уюта 🛋️</h3>
-                <p style="font-size:11px; color:#8E93A3;">Купленный предмет сразу отображается в комнате!</p>
+                <p style="font-size:11px; color:#8E93A3;">Купленный предмет сразу физически появляется в комнате!</p>
               </div>
-              <span style="font-size:12px; font-weight:800; color:#F59E0B;">
-                ✨ ${houseState.sparks ?? 0}
-              </span>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:12px; font-weight:800; color:#F59E0B;">
+                  ✨ ${houseState.sparks ?? 0}
+                </span>
+                <button onclick="addSparks(1000, 'Бонус к тесту'); render();" style="background:rgba(245,158,11,0.2); border:1px solid #F59E0B; border-radius:8px; padding:2px 6px; color:#FCD34D; font-size:10px; font-weight:800; cursor:pointer;" title="Добавить 1 000 искорок для теста">
+                  +1 000 ✨
+                </button>
+              </div>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:8px;">
               ${houseFurnitureCatalog.map(item => {
                 const isInstalled = (houseState.installedFurniture || []).includes(item.id);
+                const isLocked = item.tier && (houseState.tier || 1) < item.tier;
                 return `
-                  <div class="glass-card" style="padding:12px; margin:0; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                  <div class="glass-card" style="padding:12px; margin:0; display:flex; justify-content:space-between; align-items:center; gap:12px; ${isLocked ? 'opacity:0.6;' : ''}">
                     <div style="display:flex; align-items:center; gap:10px;">
                       <div style="width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center; font-size:20px;">
                         ${item.icon}
                       </div>
                       <div>
-                        <div style="font-size:13px; font-weight:800; color:#fff;">${item.name}</div>
-                        <div style="font-size:10.5px; color:#8E93A3;">${item.room}</div>
-                        <div style="font-size:11px; font-weight:800; color:#F59E0B; margin-top:2px;">${item.price} ✨</div>
+                        <div style="font-size:13px; font-weight:800; color:#FFFFFF;">${item.name}</div>
+                        <div style="font-size:10.5px; color:#A0A5B5;">${item.room}</div>
                       </div>
                     </div>
 
-                    ${isInstalled ? `
-                      <span style="font-size:11px; font-weight:800; color:#4ADE80; background:rgba(34,197,94,0.15); padding:5px 10px; border-radius:10px;">
-                        В доме ✓
-                      </span>
-                    ` : `
-                      <button class="btn-primary-action" style="font-size:11px; padding:6px 12px;" onclick="buyFurniture('${item.id}', ${item.price})">
-                        Купить
-                      </button>
-                    `}
+                    <div>
+                      ${isInstalled ? `
+                        <span style="font-size:11px; font-weight:800; color:#4ADE80; background:rgba(34,197,94,0.15); padding:4px 8px; border-radius:8px;">
+                          В комнате ✓
+                        </span>
+                      ` : isLocked ? `
+                        <span style="font-size:10px; font-weight:700; color:#F87171; background:rgba(239,68,68,0.15); padding:4px 8px; border-radius:8px;">
+                          Нужен Lv. ${item.tier} 🔒
+                        </span>
+                      ` : `
+                        <button class="btn-primary-action" style="font-size:11px; padding:6px 12px;" onclick="buyFurniture('${item.id}', ${item.price})">
+                          ${item.price} ✨ Купить
+                        </button>
+                      `}
+                    </div>
                   </div>
                 `;
               }).join('')}
@@ -4843,7 +5227,7 @@
             <div class="card-head" style="margin-bottom:10px;">
               <div>
                 <h3>Расширение дома 🏗️</h3>
-                <p style="font-size:11px; color:#8E93A3;">С ростом уровня открываются новые комнаты и виды</p>
+                <p style="font-size:11px; color:#8E93A3;">Добавляйте новые комнаты и этажи за искорки</p>
               </div>
             </div>
 
